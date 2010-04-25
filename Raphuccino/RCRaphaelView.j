@@ -1,9 +1,10 @@
 @import <AppKit/CPView.j>
+@import "RCCircle.j"
 
 @implementation RCRaphaelView : CPView
 {
     id delegate @accessors;   
-    JSObject _paper; 
+    JSObject _paper @accessors(property=paper, readonly);
 }
 
 - (id)initWithFrame:(CGRect)aFrame
@@ -12,17 +13,16 @@
         var bounds = [self bounds];
 
         _paper = Raphael(_DOMElement, bounds.width, bounds.height);
-        
-        var circle = _paper.circle(50, 40, 10);
-        // Sets the fill attribute of the circle to red (#f00)
-        circle.attr("fill", "#f00");
-
-        // Sets the stroke attribute of the circle to white
-        circle.attr("stroke", "#fff");
         //[self setMainFrameURL:document.location.href.substring(0, document.location.href.lastIndexOf('/')) + @"/Frameworks/CPVideoKit/" + [_player iFrameFileName]];
     }
 
     return self;
 }
+
+- (RCCircle)circleAtPoint:(CPPoint)aPoint radius:(int)aRadius
+{
+    return [RCCircle circleWithRaphaelView:self atPoint:aPoint radius:aRadius];
+}
+
 
 @end

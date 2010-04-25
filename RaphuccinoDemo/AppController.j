@@ -13,6 +13,7 @@
 @implementation AppController : CPObject
 {
     @outlet CPWindow    theWindow; //this "outlet" is connected automatically by the Cib
+    @outlet RCRaphaelView raphaelView;
 }
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
@@ -25,6 +26,7 @@
     // This is called when the cib is done loading.
     // You can implement this method on any object instantiated from a Cib.
     // It's a useful hook for setting up current UI values, and other things. 
+    var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(50, 50) radius:40];
 }
 
 @end
