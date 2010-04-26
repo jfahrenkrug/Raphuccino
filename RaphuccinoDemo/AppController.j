@@ -29,6 +29,8 @@
     var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(50, 50) radius:40];
     
     var rect = [RCRect rectWithRaphaelView:raphaelView rect:CPMakeRect(60, 60, 20, 40)];
+    
+    var ellipse = [RCEllipse ellipseWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) xRadius:60 yRadius:30];
 }
 
 @end

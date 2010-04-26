@@ -7,10 +7,13 @@
 
 - (id)initWithRaphaelView:(RCRaphaelView)aRaphaelView atPoint:(CPPoint)aPoint radius:(int)aRadius
 {
-    if (self = [super initWithRaphaelView:aRaphaelView atPoint:aPoint]) 
+    if (aPoint === nil)
+        [CPException raise:CPInvalidArgumentException reason:"Point can't be nil."];
+    
+    if (self = [super initWithRaphaelView:aRaphaelView rect:CPMakeRect(aPoint.x, aPoint.y, 0, 0)]) 
     {
        _radius = aRadius;
-       _raphaelObject = [_raphaelView paper].circle(_point.x, _point.y, _radius);
+       _raphaelObject = [_raphaelView paper].circle(aPoint.x, aPoint.y, _radius);
               
        // Sets the fill attribute of the circle to red (#f00)
        //_raphaelObject.attr("fill", "#f00");
