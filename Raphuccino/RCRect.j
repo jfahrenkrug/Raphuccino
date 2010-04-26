@@ -20,11 +20,7 @@
        _cornerRadius = aRadius;
        _raphaelObject = [_raphaelView paper].rect(_rect.origin.x, _rect.origin.y, _rect.size.width, _rect.size.height, _cornerRadius);
 
-       // Sets the fill attribute of the circle to red (#f00)
-       //_raphaelObject.attr("fill", "#f00");
-
-       // Sets the stroke attribute of the circle to white
-       //_raphaelObject.attr("stroke", "#fff");
+       [self registerEvents];
     }
     
     return self;

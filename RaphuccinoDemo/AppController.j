@@ -58,6 +58,7 @@
     //[rect rotateAroundPoint:CPMakePoint(60, 60) degrees:90];
     
     [image2 translateByX:150 y:140];
+    [image2 setDelegate:self];
     
     // scaling is either messed up in raphaeljs or I don't get it.
     [circle scaleByX:0.5 y:0.5 origin:CPMakePoint(70, 70)];
@@ -70,12 +71,72 @@
     //animate along path
     [rect setDelegate:self];
     [rect setAttr:{'fill': 'yellow'}]
-    [rect raphaelObject].click(function() {console.log('click'); [rect animateAlongPath:path toNewAttributes:{'fill': 'red'} duration:5000];}); 
+    [rect setOnAnimationFunction:function() {console.log('animating...')}];
+    [rect raphaelObject].click(function() {console.log('click'); [rect animateAlongPath:path duration:5000];}); 
+    
+    console.log([circle bounds]);
+    
+    [circle moveToFront];
+    
+    [rect insertBefore:ellipse];
+    [rect moveToFront];
+    [rect insertAfter:ellipse];
+    
+    console.log([path totalLength]);
+    console.log([path pointAtLength:30]);
+    console.log([path subpathSVGStringFrom:30 to:200]);
 }
 
+
+/* delegate methods */
 - (void)raphaelElementDidFinishAnimating:(RCElement)anElement
 {
     console.log("raphaelElementDidFinishAnimating: " + anElement);
+}
+
+- (void)raphaelElementWasClicked:(RCElement)anElement
+{
+    console.log("raphaelElementWasClicked: " + anElement);
+}
+
+- (void)raphaelElementWasDoubleClicked:(RCElement)anElement
+{
+    console.log("raphaelElementWasDoubleClicked: " + anElement);
+}
+
+- (void)raphaelElementMouseDown:(RCElement)anElement atPoint:(CPPoint)aPoint
+{
+    console.log("raphaelElementMouseDown: " + anElement + " atPoint:" + aPoint);
+}
+
+- (void)raphaelElementMouseUp:(RCElement)anElement atPoint:(CPPoint)aPoint
+{
+    console.log("raphaelElementMouseUp: " + anElement + " atPoint:" + aPoint);
+}
+
+- (void)raphaelElementMouseDidMove:(RCElement)anElement toPoint:(CPPoint)aPoint
+{
+    console.log("raphaelElementMouseDidMove: " + anElement + " toPoint:" + aPoint);
+}
+
+- (void)raphaelElementMouseOut:(RCElement)anElement
+{
+    console.log("raphaelElementMouseOut: " + anElement);
+}
+
+- (void)raphaelElementMouseOver:(RCElement)anElement
+{
+    console.log("raphaelElementMouseOver: " + anElement);
+}
+
+- (void)raphaelElementDidBeginHover:(RCElement)anElement
+{
+    console.log("raphaelElementDidBeginHover: " + anElement);
+}
+
+- (void)raphaelElementDidEndHover:(RCElement)anElement
+{
+    console.log("raphaelElementDidEndHover: " + anElement);
 }
 
 @end

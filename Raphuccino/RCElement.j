@@ -83,6 +83,69 @@ RCAnimationLinear       = nil;
     return self;
 }
 
+/*!
+    Sets up all the events to call delegate methods
+*/
+- (void)registerEvents
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.click(function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementWasClicked:)]) 
+        {
+            [_delegate raphaelElementWasClicked:self];
+        }
+    });
+    _raphaelObject.dblclick(function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementWasDoubleClicked:)]) 
+        {
+            [_delegate raphaelElementWasDoubleClicked:self];
+        }
+    });
+    _raphaelObject.mousedown(function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementMouseDown:atPoint:)]) 
+        {
+            [_delegate raphaelElementMouseDown:self atPoint:CPMakePoint(event.x, event.y)];
+        }
+    });
+    _raphaelObject.mousemove(function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementMouseDidMove:toPoint:)]) 
+        {
+            [_delegate raphaelElementMouseDidMove:self toPoint:CPMakePoint(event.x, event.y)];
+        }
+    });
+    _raphaelObject.mouseout(function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementMouseOut:)]) 
+        {
+            [_delegate raphaelElementMouseOut:self];
+        }
+    });
+    _raphaelObject.mouseover(function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementMouseOver:)]) 
+        {
+            [_delegate raphaelElementMouseOver:self];
+        }
+    });
+    _raphaelObject.mouseup(function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementMouseUp:atPoint:)]) 
+        {
+            [_delegate raphaelElementMouseUp:self atPoint:CPMakePoint(event.x, event.y)];
+        }
+    });
+    _raphaelObject.hover(function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementDidBeginHover:)]) 
+        {
+            [_delegate raphaelElementDidBeginHover:self];
+        }
+    }, function (event) {
+        if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementDidEndHover:)]) 
+        {
+            [_delegate raphaelElementDidEndHover:self];
+        }
+    });
+}
+
 
 /*!
     The DOM node of this Raphael object
@@ -346,6 +409,19 @@ RCAnimationLinear       = nil;
 */
 - (void)animateAlongPath:(id)aPathElementOrString duration:(int)milliseconds rotate:(BOOL)shouldRotate callbackFunction:(JSObject)aCallbackFunction
 {
+    [self animateAlongPath:aPathElementOrString duration:milliseconds rotate:shouldRotate reverse:NO callbackFunction:aCallbackFunction];
+}
+
+/*!
+    Animates the the element along a given SVG path. It only calls a delegate method if the given callback function is nil.
+    @param path can be a string, an instance of RCPath or a raphael JS path object
+    @param duration duration of the animation in milliseconds
+    @param rotate indicates whether the object should be rotated along the path
+    @param reverse go in the opposite direction
+    @param callbackFunction function to call when animation is finished
+*/
+- (void)animateAlongPath:(id)aPathElementOrString duration:(int)milliseconds rotate:(BOOL)shouldRotate reverse:(BOOL)shouldGoReverse callbackFunction:(JSObject)aCallbackFunction
+{
     if (!_raphaelObject)
         return;
         
@@ -370,11 +446,98 @@ RCAnimationLinear       = nil;
     catch(e) 
     {
     }
-    
-    console.log(aPathElementOrString);
         
-   _raphaelObject.animateAlong(aPathElementOrString, milliseconds, shouldRotate, aCallbackFunction);
+    if (shouldGoReverse)
+        _raphaelObject.animateAlongBack(aPathElementOrString, milliseconds, shouldRotate, aCallbackFunction);
+    else 
+        _raphaelObject.animateAlong(aPathElementOrString, milliseconds, shouldRotate, aCallbackFunction);
 }
+
+/*!
+    The function that gets called on every step of an animation
+    @return a JS function
+*/
+- (JSObject)onAnimationFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    return _raphaelObject.onAnimation;
+}
+
+/*!
+    Sets the function that should be called on every step of an animation
+    @param function a JS function
+*/
+- (void)setOnAnimationFunction:(JSObject)aFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    return _raphaelObject.onAnimation(aFunction);
+}
+
+/*!
+    The bounding box of the element
+    @return a CPRect that defines the bounding box
+*/
+- (CPRect)bounds
+{
+    if (!_raphaelObject)
+        return CPMakeRect(0, 0, 0, 0);
+     
+    var bb = _raphaelObject.getBBox()
+    console.log(bb);   
+    return CPMakeRect(bb.x, bb.y, bb.width, bb.height);
+}
+
+/*!
+    moves the element to the front (z axis)
+*/
+- (void)moveToFront
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.toFront();
+}
+
+/*!
+    moves the element to the back (z axis)
+*/
+- (void)moveToBack
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.toBack();
+}
+
+/*!
+    insert this element before the given one
+    @param element element which the current element should be inserted in front of
+*/
+- (void)insertBefore:(RCElement)anElement
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.insertBefore([anElement raphaelObject]);
+}
+
+/*!
+    insert this element after the given one
+    @param element element after which the current element should be inserted
+*/
+- (void)insertAfter:(RCElement)anElement
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.insertAfter([anElement raphaelObject]);
+}
+
+
 
 //TODO: implement animateWith
 

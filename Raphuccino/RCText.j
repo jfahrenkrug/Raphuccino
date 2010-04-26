@@ -19,11 +19,7 @@
        _text = someText;
        _raphaelObject = [_raphaelView paper].text(aPoint.x, aPoint.y, _text);
               
-       // Sets the fill attribute of the circle to red (#f00)
-       //_raphaelObject.attr("fill", "#f00");
-
-       // Sets the stroke attribute of the circle to white
-       //_raphaelObject.attr("stroke", "#fff");
+       [self registerEvents];
     }
     
     return self;

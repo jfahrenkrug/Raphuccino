@@ -15,11 +15,7 @@
        _radius = aRadius;
        _raphaelObject = [_raphaelView paper].circle(aPoint.x, aPoint.y, _radius);
               
-       // Sets the fill attribute of the circle to red (#f00)
-       //_raphaelObject.attr("fill", "#f00");
-
-       // Sets the stroke attribute of the circle to white
-       //_raphaelObject.attr("stroke", "#fff");
+       [self registerEvents];
     }
     
     return self;
