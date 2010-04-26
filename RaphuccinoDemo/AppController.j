@@ -38,6 +38,8 @@
     var image2 = [RCImage imageWithRaphaelView:raphaelView rect:CPMakeRect(20, 20, 32, 18) image:[[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] resourceURL] + "trololo.jpg"]];
     
     var text = [RCText textWithRaphaelView:raphaelView atPoint:CPMakePoint(80, 60) text:@"Raphaël\nis\nawesome!"];
+    
+    var path = [RCPath pathWithRaphaelView:raphaelView SVGString:@"M10 10L90 90"];
 }
 
 @end

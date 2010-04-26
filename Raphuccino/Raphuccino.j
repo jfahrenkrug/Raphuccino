@@ -5,3 +5,4 @@
 @import "RCEllipse.j"
 @import "RCImage.j"
 @import "RCText.j"
+@import "RCPath.j"
