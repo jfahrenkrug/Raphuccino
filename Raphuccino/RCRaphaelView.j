@@ -1,4 +1,4 @@
-@import <AppKit/CPView.j>
+@import <AppKit/CPWebView.j>
 @import "RCCircle.j"
 @import "RCRect.j"
 @import "RCEllipse.j"
@@ -7,24 +7,41 @@
 @import "RCPath.j"
 @import "RCSet.j"
 
-@implementation RCRaphaelView : CPView
+
+@implementation RCRaphaelView : CPWebView
 {
-    id delegate @accessors;   
+    id _delegate @accessors(property=delegate);   
     JSObject _paper @accessors(property=paper, readonly);
 }
 
 - (id)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame]) {
-        var bounds = [self bounds];
-
-        // fix in IE
-        //_paper = Raphael(_DOMElement, bounds.width, bounds.height);
-        _paper = Raphael(_DOMElement, '100%', '100%');
-        //[self setMainFrameURL:document.location.href.substring(0, document.location.href.lastIndexOf('/')) + @"/Frameworks/CPVideoKit/" + [_player iFrameFileName]];
+        [self setFrameLoadDelegate:self];
+        [self setMainFrameURL:document.location.href.substring(0, document.location.href.lastIndexOf('/')) + @"/Frameworks/Raphuccino/raphael-iframe.html"];
     }
 
     return self;
+}
+
+
+- (void)webView:(CPWebView)aWebView didFinishLoadForFrame:(id)aFrame {
+    var bounds = [self bounds];
+    var domWin = [self DOMWindow];
+
+    domWin.Raphael.setWindow(domWin);
+    
+    console.log(domWin.Raphael);
+
+    // fix in IE
+    _paper = domWin.Raphael(domWin.document.getElementById('RCRaphaelViewDiv'), '100%', '98%');
+    
+    console.log(_paper);
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(raphaelViewDidFinishLoading:)]) 
+    {
+        [_delegate raphaelViewDidFinishLoading:self];
+    }
 }
 
 
@@ -85,6 +102,23 @@
 - (RCSet)setWithItems:(CPArray)someItems
 {
     return [[RCSet alloc] initWithItems:someItems];
+}
+
+/* Overriding CPWebView's implementation */
+- (BOOL)_resizeWebFrame {
+    var width = [self bounds].size.width,
+        height = [self bounds].size.height;
+
+    _iframe.setAttribute("width", width);
+    _iframe.setAttribute("height", height);
+    
+    if (_paper)
+    {
+        //console.log('resize');
+        //_paper.setSize(width, height);
+    }
+
+    [_frameView setFrameSize:CGSizeMake(width, height)];
 }
 
 @end

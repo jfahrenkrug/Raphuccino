@@ -25,6 +25,12 @@
 
 - (void)awakeFromCib
 {
+    [raphaelView setDelegate:self];
+    console.log('cib');
+}
+
+- (void)raphaelViewDidFinishLoading:(RCRaphaelView)aRaphaelView
+{
     // This is called when the cib is done loading.
     // You can implement this method on any object instantiated from a Cib.
     // It's a useful hook for setting up current UI values, and other things. 
@@ -41,6 +47,7 @@
     
     var path = [RCPath pathWithRaphaelView:raphaelView SVGString:@"M10 10L90 90"];
     
+    
     var set = [RCSet setWithItems:[circle, rect, ellipse]];
     [set raphaelObject].attr("stroke", "#f00");
     [set removeItem:rect];
@@ -49,7 +56,27 @@
     [set raphaelObject].attr("stroke", "#00f");
     [set removeAllItems];
     [set addItem:circle];
-    [set raphaelObject].attr("stroke", "#000");
+    [set raphaelObject].attr("stroke", "#000");    
+    
+    [rect rotateAroundPoint:CPMakePoint(60,60) degrees:90];
+    
+    [image2 translateByX:150 y:140];
+    
+    // scaling is either messed up in raphaeljs or I don't get it.
+    [circle scaleByX:0.5 y:0.5 origin:CPMakePoint(70,70)];
+    
+    [circle setAttr:{fill: "green"}];
+    
+    [circle setDelegate:self];
+    
+    //[ellipse animateWithDuration:1000 toNewAttributes:{x: 200}];
+    
+    [circle raphaelObject].click(function() {[circle animateWithDuration:1000 toNewAttributes:{'fill': 'red', 'r': 80}];});
+}
+
+- (void)raphaelElementDidFinishAnimating:(RCElement)anElement
+{
+    console.log("raphaelElementDidFinishAnimating: " + anElement);
 }
 
 @end

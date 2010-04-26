@@ -100,9 +100,17 @@ function RCSetCheckValidItem(raphView, item)
 {
     if (!anItem || !_items || [_items count] < 1)
         return;
-    
+
     [_items removeObject:anItem];
-    [_raphaelObject.items removeObject:[anItem raphaelObject]];
+
+    for (var i = 0; i < _raphaelObject.items.length; i++)
+    { 
+        if (_raphaelObject.items[i] === [anItem raphaelObject])
+        {
+            _raphaelObject.items.splice(i,1); 
+            break;
+        }
+    }
 }
 
 - (void)removeAllItems
