@@ -27,6 +27,8 @@
     // You can implement this method on any object instantiated from a Cib.
     // It's a useful hook for setting up current UI values, and other things. 
     var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(50, 50) radius:40];
+    
+    var rect = [RCRect rectWithRaphaelView:raphaelView rect:CPMakeRect(60, 60, 20, 40)];
 }
 
 @end
