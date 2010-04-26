@@ -7,6 +7,8 @@
  */
 
 @import <Foundation/CPObject.j>
+@import <Foundation/CPBundle.j>
+@import <AppKit/CPImage.j>
 @import <Raphuccino/Raphuccino.j>
 
 
@@ -31,6 +33,9 @@
     var rect = [RCRect rectWithRaphaelView:raphaelView rect:CPMakeRect(60, 60, 20, 40)];
     
     var ellipse = [RCEllipse ellipseWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) xRadius:60 yRadius:30];
+    var image = [RCImage imageWithRaphaelView:raphaelView atPoint:CPMakePoint(200, 100) image:[[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] resourceURL] + "cappuccino-icon.png"]];
+    
+    var image2 = [RCImage imageWithRaphaelView:raphaelView rect:CPMakeRect(20, 20, 32, 18) image:[[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] resourceURL] + "trololo.jpg"]];
 }
 
 @end
