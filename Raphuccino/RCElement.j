@@ -42,4 +42,96 @@
 }
 
 
+/*!
+    The DOM node of this Raphael object
+    @return the DOM node
+*/
+- (JSObject)node
+{
+    if (!_raphaelObject)
+        return;
+    
+    return _raphaelObject.node;
+}
+
+/*!
+    Remove this element from the DOM. The Element can't be used anymore after this method call!
+*/
+- (void)remove
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.remove();
+}
+
+/*!
+    Makes this element invisible.
+*/
+- (void)hide
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.hide();
+}
+
+/*!
+    Makes this element visible.
+*/
+- (void)show
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.show();
+}
+
+/*!
+    Makes the element visible or invisible (calls show/hide).
+*/
+- (void)setVisible:(BOOL)visible
+{
+    if (visible)
+        [self show];
+    else
+        [self hide];
+}
+
+/*!
+    Rotates the element by the given degree from its center point, relative to the previous position.
+    @param degrees the relative degrees
+*/
+- (void)rotate:(int)degrees
+{
+    [self rotate:degrees absolute:NO];
+}
+
+/*!
+    Rotates the element by the given degree from its center point with an relative or absolute angle.
+    @param degrees the degrees
+    @param absolute relative or absolute angle?
+*/
+- (void)rotate:(int)degrees absolute:(BOOL)absolute
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.rotate(degrees, absolute);
+}
+
+/*!
+    Rotates the element by the given degree around the given point
+    @param point origin point of the rotation
+    @param degrees the degrees
+*/
+- (void)rotateAroundPoint:(CPPoint)aPoint degrees:(int)degrees
+{
+    if (!_raphaelObject)
+        return;
+    
+    _raphaelObject.rotate(degrees, aPoint.x, aPoint.y);
+}
+
+
 @end
