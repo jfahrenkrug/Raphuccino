@@ -9,6 +9,11 @@
     CPRect _rect @accessors(property=rect, readonly); 
 }
 
+- (id)init
+{
+    return [self initWithRaphaelView:nil rect:nil allowEmptyRaphaelView:YES];
+}
+
 - (id)initWithRaphaelView:(RCRaphaelView)aRaphaelView
 {
     return [self initWithRaphaelView:aRaphaelView rect:nil];
@@ -16,10 +21,15 @@
 
 - (id)initWithRaphaelView:(RCRaphaelView)aRaphaelView rect:(CPRect)aRect
 {
+    return [self initWithRaphaelView:aRaphaelView rect:aRect allowEmptyRaphaelView:NO];
+}
+
+- (id)initWithRaphaelView:(RCRaphaelView)aRaphaelView rect:(CPRect)aRect allowEmptyRaphaelView:(BOOL)allowEmpty
+{
     if ([self class] === [RCElement class])
         [CPException raise:CPInvalidArgumentException reason:"You can't directly instantiate RCElement, only subclasses thereof."];
     
-    if (aRaphaelView === nil || ![aRaphaelView isKindOfClass:[RCRaphaelView class]])
+    if (!allowEmpty && (aRaphaelView === nil || ![aRaphaelView isKindOfClass:[RCRaphaelView class]]))
         [CPException raise:CPInvalidArgumentException reason:"RaphaelView can't be nil and has to be an instance of RCRaphaelView."];
     
     if (self = [super init]) 

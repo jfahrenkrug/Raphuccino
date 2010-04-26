@@ -40,6 +40,16 @@
     var text = [RCText textWithRaphaelView:raphaelView atPoint:CPMakePoint(80, 60) text:@"Raphaël\nis\nawesome!"];
     
     var path = [RCPath pathWithRaphaelView:raphaelView SVGString:@"M10 10L90 90"];
+    
+    var set = [RCSet setWithItems:[circle, rect, ellipse]];
+    [set raphaelObject].attr("stroke", "#f00");
+    [set removeItem:rect];
+    [set raphaelObject].attr("stroke", "#0f0");
+    [set addItem:text];
+    [set raphaelObject].attr("stroke", "#00f");
+    [set removeAllItems];
+    [set addItem:circle];
+    [set raphaelObject].attr("stroke", "#000");
 }
 
 @end
