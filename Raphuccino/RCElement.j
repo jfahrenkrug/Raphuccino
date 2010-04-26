@@ -240,21 +240,45 @@ RCAnimationLinear       = nil;
     _raphaelObject.attr(someAttributes);
 }
 
+/*!
+    Animates the current values of the attributes to the given new values. It calls a delegate method when the animation is finished.
+    @param duration duration of the animation in milliseconds
+    @param newAttributes an associative js array of target attributes 
+*/
 - (void)animateWithDuration:(int)milliseconds toNewAttributes:(JSObject)newAttributes
 {
     [self animateWithDuration:milliseconds toNewAttributes:newAttributes animationCurve:RCAnimationLinear callbackFunction:nil];
 }
 
+/*!
+    Animates the current values of the attributes to the given new values. It does not call a delegate method but the given callback function.
+    @param duration duration of the animation in milliseconds
+    @param newAttributes an associative js array of target attributes 
+    @param callbackFunction function to call when animation is finished
+*/
 - (void)animateWithDuration:(int)milliseconds toNewAttributes:(JSObject)newAttributes callbackFunction:(JSObject)aCallbackFunction
 {
     [self animateWithDuration:milliseconds toNewAttributes:newAttributes animationCurve:RCAnimationLinear callbackFunction:aCallbackFunction];
 }
 
+/*!
+    Animates the current values of the attributes to the given new values. It calls a delegate method when the animation is finished.
+    @param duration duration of the animation in milliseconds
+    @param newAttributes an associative js array of target attributes 
+    @param animationCurve the timing curve of the animation (ease in, out etc)
+*/
 - (void)animateWithDuration:(int)milliseconds toNewAttributes:(JSObject)newAttributes animationCurve:(CPString)animationCurve
 {
     [self animateWithDuration:milliseconds toNewAttributes:newAttributes animationCurve:animationCurve callbackFunction:nil];
 }
 
+/*!
+    Animates the current values of the attributes to the given new values. It only calls a delegate method if the given callback function is nil.
+    @param duration duration of the animation in milliseconds
+    @param newAttributes an associative js array of target attributes 
+    @param animationCurve the timing curve of the animation (ease in, out etc)
+    @param callbackFunction function to call when animation is finished
+*/
 - (void)animateWithDuration:(int)milliseconds toNewAttributes:(JSObject)newAttributes animationCurve:(CPString)animationCurve callbackFunction:(JSObject)aCallbackFunction
 {
     if (!_raphaelObject)
@@ -280,6 +304,81 @@ RCAnimationLinear       = nil;
         _raphaelObject.animate(newAttributes, milliseconds, animationCurve, aCallbackFunction);
     }
 }
+
+/*!
+    Animates the the element along a given SVG path. It calls a delegate method when the animation is finished.
+    @param path can be a string, an instance of RCPath or a raphael JS path object
+    @param duration duration of the animation in milliseconds
+*/
+- (void)animateAlongPath:(id)aPathElementOrString duration:(int)milliseconds
+{
+    [self animateAlongPath:aPathElementOrString duration:milliseconds rotate:NO callbackFunction:nil];
+}
+
+/*!
+    Animates the the element along a given SVG path. It calls a delegate method when the animation is finished.
+    @param path can be a string, an instance of RCPath or a raphael JS path object
+    @param duration duration of the animation in milliseconds
+    @param rotate indicates whether the object should be rotated along the path
+*/
+- (void)animateAlongPath:(id)aPathElementOrString duration:(int)milliseconds rotate:(BOOL)shouldRotate
+{
+    [self animateAlongPath:aPathElementOrString duration:milliseconds rotate:shouldRotate callbackFunction:nil];
+}
+
+/*!
+    Animates the the element along a given SVG path. It only calls a delegate method if the given callback function is nil.
+    @param path can be a string, an instance of RCPath or a raphael JS path object
+    @param duration duration of the animation in milliseconds
+    @param callbackFunction function to call when animation is finished
+*/
+- (void)animateAlongPath:(id)aPathElementOrString duration:(int)milliseconds callbackFunction:(JSObject)aCallbackFunction
+{
+    [self animateAlongPath:aPathElementOrString duration:milliseconds rotate:NO callbackFunction:aCallbackFunction];
+}
+
+/*!
+    Animates the the element along a given SVG path. It only calls a delegate method if the given callback function is nil.
+    @param path can be a string, an instance of RCPath or a raphael JS path object
+    @param duration duration of the animation in milliseconds
+    @param rotate indicates whether the object should be rotated along the path
+    @param callbackFunction function to call when animation is finished
+*/
+- (void)animateAlongPath:(id)aPathElementOrString duration:(int)milliseconds rotate:(BOOL)shouldRotate callbackFunction:(JSObject)aCallbackFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    if (!aCallbackFunction)
+    {
+        aCallbackFunction = function() 
+        {
+            if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementDidFinishAnimating:)]) 
+            {
+                [_delegate raphaelElementDidFinishAnimating:self];
+            }
+        };
+    }
+    
+    try 
+    {
+        if ([aPathElementOrString isKindOfClass:[RCPath class]])
+        {
+            aPathElementOrString = [aPathElementOrString raphaelObject];
+        }
+    }
+    catch(e) 
+    {
+    }
+    
+    console.log(aPathElementOrString);
+        
+   _raphaelObject.animateAlong(aPathElementOrString, milliseconds, shouldRotate, aCallbackFunction);
+}
+
+//TODO: implement animateWith
+
+
 
 
 @end

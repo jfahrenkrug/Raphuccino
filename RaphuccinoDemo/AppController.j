@@ -26,17 +26,13 @@
 - (void)awakeFromCib
 {
     [raphaelView setDelegate:self];
-    console.log('cib');
 }
 
 - (void)raphaelViewDidFinishLoading:(RCRaphaelView)aRaphaelView
-{
-    // This is called when the cib is done loading.
-    // You can implement this method on any object instantiated from a Cib.
-    // It's a useful hook for setting up current UI values, and other things. 
+{ 
     var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(50, 50) radius:40];
     
-    var rect = [RCRect rectWithRaphaelView:raphaelView rect:CPMakeRect(60, 60, 20, 40)];
+    var rect = [RCRect rectWithRaphaelView:raphaelView rect:CPMakeRect(100, 100, 20, 40)];
     
     var ellipse = [RCEllipse ellipseWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) xRadius:60 yRadius:30];
     var image = [RCImage imageWithRaphaelView:raphaelView atPoint:CPMakePoint(200, 100) image:[[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] resourceURL] + "cappuccino-icon.png"]];
@@ -45,8 +41,9 @@
     
     var text = [RCText textWithRaphaelView:raphaelView atPoint:CPMakePoint(80, 60) text:@"Raphaël\nis\nawesome!"];
     
-    var path = [RCPath pathWithRaphaelView:raphaelView SVGString:@"M10 10L90 90"];
+    var path = [RCPath pathWithRaphaelView:raphaelView SVGString:@"M100,100c0,50 100-50 100,0c0,50 -100-50 -100,0z"];
     
+    console.log(typeof(@"test"));
     
     var set = [RCSet setWithItems:[circle, rect, ellipse]];
     [set raphaelObject].attr("stroke", "#f00");
@@ -58,20 +55,22 @@
     [set addItem:circle];
     [set raphaelObject].attr("stroke", "#000");    
     
-    [rect rotateAroundPoint:CPMakePoint(60,60) degrees:90];
+    //[rect rotateAroundPoint:CPMakePoint(60, 60) degrees:90];
     
     [image2 translateByX:150 y:140];
     
     // scaling is either messed up in raphaeljs or I don't get it.
-    [circle scaleByX:0.5 y:0.5 origin:CPMakePoint(70,70)];
+    [circle scaleByX:0.5 y:0.5 origin:CPMakePoint(70, 70)];
     
     [circle setAttr:{fill: "green"}];
     
-    [circle setDelegate:self];
-    
-    //[ellipse animateWithDuration:1000 toNewAttributes:{x: 200}];
-    
+    [circle setDelegate:self];    
     [circle raphaelObject].click(function() {[circle animateWithDuration:1000 toNewAttributes:{'fill': 'red', 'r': 80}];});
+    
+    //animate along path
+    [rect setDelegate:self];
+    [rect setAttr:{'fill': 'yellow'}]
+    [rect raphaelObject].click(function() {console.log('click'); [rect animateAlongPath:path toNewAttributes:{'fill': 'red'} duration:5000];}); 
 }
 
 - (void)raphaelElementDidFinishAnimating:(RCElement)anElement
