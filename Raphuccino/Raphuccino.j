@@ -4,3 +4,4 @@
 @import "RCRect.j"
 @import "RCEllipse.j"
 @import "RCImage.j"
+@import "RCText.j"
