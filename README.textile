@@ -1,0 +1,15 @@
+h1. Raphuccino: RaphaelJS meets Cappuccino
+
+Raphuccino is a Cappuccino Framework that provides an Objective-J API for the RaphaelJS JavaScript vector graphics library.
+
+Please take a look at "this video":http://www.springenwerk.com/2010/04/introducing-raphuccino.html.
+
+h2. Usage
+
+Copy the Raphuccino folder to your project's Frameworks folder and include @@import <Raphuccino/Raphuccino.j>@ in your class/controller/whatever.
+Then create your RCRaphaelView as you would create a normal CPView, or use Atlas and a custom view and set it's class to RCRaphaelView.
+
+The code is commented very well and the demo project and the RaphaelJS docs should cover the rest.
+
+Have fun!
+
