@@ -1,0 +1,56 @@
+/*
+ * Raphuccino
+ *
+ * Copyright (c) 2010 Johannes Fahrenkrug (http://springenwerk.com)
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ */
+
+var OS = require("os"),
+    ENV = require("system").env,
+    FILE = require("file"),
+    JAKE = require("jake"),
+    task = JAKE.task,
+    CLEAN = require("jake/clean").CLEAN,
+    FileList = JAKE.FileList,
+    framework = require("cappuccino/jake").framework,
+    browserEnvironment = require("objective-j/jake/environment").Browser,
+    configuration = ENV["CONFIG"] || ENV["CONFIGURATION"] || ENV["c"] || "Debug";
+
+framework ("Raphuccino", function(task)
+{   
+    var path = ENV["CAPP_BUILD"] || ENV["STEAM_BUILD"];
+    task.setBuildIntermediatesPath(FILE.join(path, "Raphuccino.build", configuration));
+    task.setBuildPath(FILE.join(path, configuration));
+
+    task.setProductName("Raphuccino");
+    task.setIdentifier("com.springenwerk.Raphuccino");
+    task.setVersion("0.1");
+    task.setAuthor("Johannes Fahrenkrug");
+    task.setSummary("A Cappuccino & Objective-J wrapper for the awesome RaphaelJS vector graphics library.");
+    task.setSources(new FileList("*.j"));
+    task.setResources(new FileList("Resources/**/*"));
+    //task.setEnvironments([browserEnvironment]);
+    //task.setFlattensSources(true);
+    task.setInfoPlistPath("Info.plist");
+
+    if (configuration === "Debug")
+        task.setCompilerFlags("-DDEBUG -g");
+    else
+        task.setCompilerFlags("-O");
+});
+
+task ("debug", function()
+{
+    ENV["CONFIGURATION"] = "Debug";
+    JAKE.subjake(["."], "build", ENV);
+});
+
+task ("release", function()
+{
+    ENV["CONFIGURATION"] = "Release";
+    JAKE.subjake(["."], "build", ENV);
+});
+
+task ("default", ["release"]);
+
+task ("build", ["Raphuccino"]);

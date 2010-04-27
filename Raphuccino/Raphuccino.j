@@ -5,7 +5,7 @@
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  */
 
-@import "raphael-min.js"
+@import "Resources/raphael-min.js"
 @import "RCRaphaelView.j"
 @import "RCCircle.j"
 @import "RCRect.j"

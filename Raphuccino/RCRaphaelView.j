@@ -32,7 +32,7 @@
 {
     if (self = [super initWithFrame:aFrame]) {
         [self setFrameLoadDelegate:self];
-        [self setMainFrameURL:document.location.href.substring(0, document.location.href.lastIndexOf('/')) + @"/Frameworks/Raphuccino/raphael-iframe.html"];
+        [self setMainFrameURL:document.location.href.substring(0, document.location.href.lastIndexOf('/')) + @"/Frameworks/Raphuccino/Resources/raphael-iframe.html"];
     }
 
     return self;
