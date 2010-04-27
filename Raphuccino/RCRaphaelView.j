@@ -1,3 +1,10 @@
+/*
+ * Raphuccino
+ *
+ * Copyright (c) 2010 Johannes Fahrenkrug (http://springenwerk.com)
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ */
+
 @import <AppKit/CPWebView.j>
 @import "RCCircle.j"
 @import "RCRect.j"
@@ -7,13 +14,20 @@
 @import "RCPath.j"
 @import "RCSet.j"
 
-
+/*! 
+    @class RCRaphaelView
+    @brief The Raphael view that displays elements on an SVG canvas. Uses an iframe.
+*/
 @implementation RCRaphaelView : CPWebView
 {
     id _delegate @accessors(property=delegate);   
     JSObject _paper @accessors(property=paper, readonly);
 }
 
+/*!
+    Designated initializer: Initializes the raphaelView with the given rect
+    @param aFrame the frame of the view
+*/
 - (id)initWithFrame:(CGRect)aFrame
 {
     if (self = [super initWithFrame:aFrame]) {
@@ -24,19 +38,17 @@
     return self;
 }
 
-
+/*!
+    Delegate method of the webView that gets called when it has finished loading so we can do the rest of the setup
+*/
 - (void)webView:(CPWebView)aWebView didFinishLoadForFrame:(id)aFrame {
     var bounds = [self bounds];
     var domWin = [self DOMWindow];
 
     domWin.Raphael.setWindow(domWin);
-    
-    console.log(domWin.Raphael);
 
-    // fix in IE
+    // fix in IE: 100% doesn't work in IE, will have to fix that
     _paper = domWin.Raphael(domWin.document.getElementById('RCRaphaelViewDiv'), '100%', '98%');
-    
-    console.log(_paper);
     
     if (_delegate && [_delegate respondsToSelector:@selector(raphaelViewDidFinishLoading:)]) 
     {

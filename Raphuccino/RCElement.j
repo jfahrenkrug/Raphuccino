@@ -1,3 +1,10 @@
+/*
+ * Raphuccino
+ *
+ * Copyright (c) 2010 Johannes Fahrenkrug (http://springenwerk.com)
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ */
+
 @import <Foundation/CPObject.j>
 @import "RCRaphaelView.j"
 
@@ -42,6 +49,10 @@ RCAnimationElastic      = @"elastic";
 */
 RCAnimationLinear       = nil;
 
+/*! 
+    @class RCElement
+    @brief The abstract base class for all the elements.
+*/
 @implementation RCElement : CPObject
 {  
     RCRaphaelView _raphaelView @accessors(property=raphaelView, readonly); 
@@ -51,21 +62,39 @@ RCAnimationLinear       = nil;
     id _delegate @accessors(property=delegate);
 }
 
+/*!
+    Initialize the element without a raphaelView (needed for RCSet)
+*/
 - (id)init
 {
     return [self initWithRaphaelView:nil rect:nil allowEmptyRaphaelView:YES];
 }
 
+/*!
+    Initialize the element with a raphaelView but without a size
+    @param raphaelView the raphaelView that should contain this element
+*/
 - (id)initWithRaphaelView:(RCRaphaelView)aRaphaelView
 {
     return [self initWithRaphaelView:aRaphaelView rect:nil];
 }
 
+/*!
+    Initialize the element with a raphaelView and a size
+    @param raphaelView the raphaelView that should contain this element
+    @param rect either a rect or a start point and the x and y radius of an ellipse
+*/
 - (id)initWithRaphaelView:(RCRaphaelView)aRaphaelView rect:(CPRect)aRect
 {
     return [self initWithRaphaelView:aRaphaelView rect:aRect allowEmptyRaphaelView:NO];
 }
 
+/*!
+    Designated initializer: Initialize the element with a raphaelView and a size
+    @param raphaelView the raphaelView that should contain this element
+    @param rect either a rect or a start point and the x and y radius of an ellipse
+    @param allowEmptyRaphaelView allow the raphaelView to be nil
+*/
 - (id)initWithRaphaelView:(RCRaphaelView)aRaphaelView rect:(CPRect)aRect allowEmptyRaphaelView:(BOOL)allowEmpty
 {
     if ([self class] === [RCElement class])
@@ -144,6 +173,103 @@ RCAnimationLinear       = nil;
             [_delegate raphaelElementDidEndHover:self];
         }
     });
+}
+
+/*!
+    Sets the functions that should be called on hover start and end events
+    @param startFunction JS function when mouse enters element
+    @param endFunction JS function when mouse leaves element
+*/
+- (void)setHoverStartFunction:(JSObject)startFunction endFunction:(JSObject)endFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.hover(startFunction, endFunction);
+}
+
+/*!
+    Sets the functions that should be called when the element is clicked
+    @param aFunction JS function
+*/
+- (void)setClickFunction:(JSObject)aFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.click(aFunction);
+}
+
+/*!
+    Sets the functions that should be called when the element is double clicked
+    @param aFunction JS function
+*/
+- (void)setDoubleClickFunction:(JSObject)aFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.dblclick(aFunction);
+}
+
+/*!
+    Sets the functions that should be called when the element receives the mouse down event
+    @param aFunction JS function
+*/
+- (void)setMouseDownFunction:(JSObject)aFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.mousedown(aFunction);
+}
+
+/*!
+    Sets the functions that should be called when the element receives the mouse up event
+    @param aFunction JS function
+*/
+- (void)setMouseUpFunction:(JSObject)aFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.mouseup(aFunction);
+}
+
+/*!
+    Sets the functions that should be called when the element receives the mouse move event
+    @param aFunction JS function
+*/
+- (void)setMouseMoveFunction:(JSObject)aFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.mousemove(aFunction);
+}
+
+/*!
+    Sets the functions that should be called when the element receives the mouse out event
+    @param aFunction JS function
+*/
+- (void)setMouseOutFunction:(JSObject)aFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.mouseout(aFunction);
+}
+
+/*!
+    Sets the functions that should be called when the element receives the mouse over event
+    @param aFunction JS function
+*/
+- (void)setMouseOverFunction:(JSObject)aFunction
+{
+    if (!_raphaelObject)
+        return;
+        
+    _raphaelObject.mouseover(aFunction);
 }
 
 

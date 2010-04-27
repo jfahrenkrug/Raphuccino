@@ -1,3 +1,10 @@
+/*
+ * Raphuccino
+ *
+ * Copyright (c) 2010 Johannes Fahrenkrug (http://springenwerk.com)
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ */
+
 @import <Foundation/CPArray.j>
 @import "RCElement.j"
 
@@ -16,16 +23,27 @@ function RCSetCheckValidItem(raphView, item)
     return YES;
 };
 
+/*! 
+    @class RCSet
+    @brief A set of elements, so you can manipulate multiple elements at once.
+*/
 @implementation RCSet : RCElement
 {  
    CPArray _items;
 }
 
+/*!
+    Initialize an empty new set
+*/
 - (id)init
 {
     return [self initWithItems:nil];
 }
 
+/*!
+    Designated initializer: Initialize a new set with the given items/elements
+    @param items CPArray of RCElement subclasses to add to the set
+*/
 - (id)initWithItems:(CPArray)someItems
 { 
     if (self = [super init]) 
@@ -36,11 +54,18 @@ function RCSetCheckValidItem(raphView, item)
     return self; 
 }
 
+/*!
+    @return the items in the set
+*/
 - (CPArray)items
 {
     return _items;
 }
 
+/*!
+    Sets the items in the set and checks if they all belong to the same raphaelView
+    @param items the new array of items this set should contain
+*/
 - (void)setItems:(CPArray)someItems
 {
     if (someItems === _items)
@@ -78,6 +103,10 @@ function RCSetCheckValidItem(raphView, item)
     }
 }
 
+/*!
+    Adds an item to the set
+    @param item the item to add
+*/
 - (void)addItem:(RCElement)anItem
 {
     if (!anItem)
@@ -96,6 +125,10 @@ function RCSetCheckValidItem(raphView, item)
     }
 }
 
+/*!
+    Removes an item from the set
+    @param item the item to remove
+*/
 - (void)removeItem:(RCElement)anItem
 {
     if (!anItem || !_items || [_items count] < 1)
@@ -113,6 +146,9 @@ function RCSetCheckValidItem(raphView, item)
     }
 }
 
+/*!
+    Removes all items from the set (but not from the view)
+*/
 - (void)removeAllItems
 {
     _items = nil;
@@ -120,6 +156,10 @@ function RCSetCheckValidItem(raphView, item)
         _raphaelObject.items = [];
 }
 
+/*!
+    Creates a new set with the given items/elements
+    @param items CPArray of RCElement subclasses to add to the set
+*/
 + (RCSet)setWithItems:(CPArray)someItems
 {
     return [[RCSet alloc] initWithItems:someItems];

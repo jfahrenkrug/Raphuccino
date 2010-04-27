@@ -3,7 +3,7 @@
  * RaphuccinoDemo
  *
  * Created by Johannes Fahrenkrug on April 24, 2010.
- * Copyright 2010, Your Company All rights reserved.
+ * Copyright 2010, Springenwerk All rights reserved.
  */
 
 @import <Foundation/CPObject.j>
@@ -16,6 +16,9 @@
 {
     @outlet CPWindow    theWindow; //this "outlet" is connected automatically by the Cib
     @outlet RCRaphaelView raphaelView;
+    
+    CPImage cappIcon;
+    CPImage trololoMan;
 }
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
@@ -30,61 +33,109 @@
 
 - (void)raphaelViewDidFinishLoading:(RCRaphaelView)aRaphaelView
 { 
-    var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(50, 50) radius:40];
+    cappIcon = [[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] resourceURL] + "cappuccino-icon.png"];
+    trololoMan = [[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] resourceURL] + "trololo.jpg"];
     
-    var rect = [RCRect rectWithRaphaelView:raphaelView rect:CPMakeRect(100, 100, 20, 40)];
+    return;
+}
+
+- (IBAction)demo1:(id)sender
+{
+    [raphaelView clear];
+    var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(250, 80) radius:80];
+    [circle setAttr:{'fill': 'green'}];
+    [circle animateWithDuration:2000 toNewAttributes:{'fill': 'red', 'cy': [raphaelView bounds].size.height - 20, 'r': 10} animationCurve:RCAnimationBounce];
+}
+
+- (IBAction)demo2:(id)sender
+{
+    [raphaelView clear];
+    var image = [RCImage imageWithRaphaelView:raphaelView atPoint:CPMakePoint(50, 50) image:cappIcon];
+    var startAngle = 5;
     
-    var ellipse = [RCEllipse ellipseWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) xRadius:60 yRadius:30];
-    var image = [RCImage imageWithRaphaelView:raphaelView atPoint:CPMakePoint(200, 100) image:[[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] resourceURL] + "cappuccino-icon.png"]];
+    [image setHoverStartFunction:function (event) {
+        [image scaleByX:1.2 y:1.2];
+    } endFunction:function (event) {
+        [image scaleByX:1.0 y:1.0];
+        [image animateWithDuration:1500 toNewAttributes:{'rotation': 0} animationCurve:RCAnimationEaseInOut];
+        startAngle = 5;
+    }];
     
-    var image2 = [RCImage imageWithRaphaelView:raphaelView rect:CPMakeRect(20, 20, 32, 18) image:[[CPImage alloc] initWithContentsOfFile:[[CPBundle mainBundle] resourceURL] + "trololo.jpg"]];
-    
-    var text = [RCText textWithRaphaelView:raphaelView atPoint:CPMakePoint(80, 60) text:@"Raphaël\nis\nawesome!"];
-    
+    [image setClickFunction:function() {[image rotate:startAngle+=5];}];
+}
+
+- (IBAction)demo3:(id)sender
+{
+    [raphaelView clear];
     var path = [RCPath pathWithRaphaelView:raphaelView SVGString:@"M100,100c0,50 100-50 100,0c0,50 -100-50 -100,0z"];
+    var ellipse = [RCEllipse ellipseWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) xRadius:3 yRadius:6];
+    [ellipse animateAlongPath:path duration:5000 rotate:YES];
+}
+
+- (IBAction)demo4:(id)sender
+{
+    [raphaelView clear];
+    var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) radius:80];
+    [circle setAttr:{'fill': 'yellow'}];
+    var rect1 = [RCRect rectWithRaphaelView:raphaelView rect:CPMakeRect(40, 60, 20, 40)];
+    var rect2 = [RCRect rectWithRaphaelView:raphaelView rect:CPMakeRect(110, 60, 20, 40)];
+    var ellipse = [RCEllipse ellipseWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 130) xRadius:60 yRadius:20];
+    var set = [RCSet setWithItems:[circle, rect1, rect2, ellipse]];
     
-    console.log(typeof(@"test"));
+    [set setDoubleClickFunction:function() {[set setAttr:{'fill': 'blue'}];}];
+}
+
+- (IBAction)demo5:(id)sender
+{
+    [raphaelView clear];
+    var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) radius:80];
+    [circle setAttr:{'fill': 'yellow'}];
+    var dragging = NO;
     
-    var set = [RCSet setWithItems:[circle, rect, ellipse]];
-    [set raphaelObject].attr("stroke", "#f00");
-    [set removeItem:rect];
-    [set raphaelObject].attr("stroke", "#0f0");
-    [set addItem:text];
-    [set raphaelObject].attr("stroke", "#00f");
-    [set removeAllItems];
-    [set addItem:circle];
-    [set raphaelObject].attr("stroke", "#000");    
+    [circle setMouseDownFunction:function() {dragging = YES; [circle setAttr:{'fill': 'red'}];}];
+    [circle setMouseUpFunction:function() {dragging = NO; [circle setAttr:{'fill': 'yellow'}];}];
+    [circle setMouseMoveFunction:function(event) {
+        if (dragging === YES)
+        {
+            [circle setAttr:{cx: event.x, cy: event.y}];
+        }
+    }];
+}
+
+- (IBAction)demo6:(id)sender
+{
+    [raphaelView clear];
+    var circle = [RCCircle circleWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) radius:80];
+    [circle setAttr:{'fill': 'lightblue'}];
+    var text = [RCText textWithRaphaelView:raphaelView atPoint:CPMakePoint(100, 100) text:@"Raphaël\nis\nawesome!"];
+    [text setAttr:{'font-size': 14}];
+    var recursiveRotationFunc = function() {[text rotate:0]; [text animateWithDuration:1500 toNewAttributes:{'rotation': 360} callbackFunction:recursiveRotationFunc]};
+    recursiveRotationFunc();
     
-    //[rect rotateAroundPoint:CPMakePoint(60, 60) degrees:90];
-    
-    [image2 translateByX:150 y:140];
-    [image2 setDelegate:self];
-    
-    // scaling is either messed up in raphaeljs or I don't get it.
-    [circle scaleByX:0.5 y:0.5 origin:CPMakePoint(70, 70)];
-    
-    [circle setAttr:{fill: "green"}];
-    
-    [circle setDelegate:self];    
-    [circle raphaelObject].click(function() {[circle animateWithDuration:1000 toNewAttributes:{'fill': 'red', 'r': 80}];});
-    
-    //animate along path
-    [rect setDelegate:self];
-    [rect setAttr:{'fill': 'yellow'}]
-    [rect setOnAnimationFunction:function() {console.log('animating...')}];
-    [rect raphaelObject].click(function() {console.log('click'); [rect animateAlongPath:path duration:5000];}); 
-    
-    console.log([circle bounds]);
-    
-    [circle moveToFront];
-    
-    [rect insertBefore:ellipse];
-    [rect moveToFront];
-    [rect insertAfter:ellipse];
-    
-    console.log([path totalLength]);
-    console.log([path pointAtLength:30]);
-    console.log([path subpathSVGStringFrom:30 to:200]);
+    var text2 = [RCText textWithRaphaelView:raphaelView atPoint:CPMakePoint(150, 200) text:@"...but so is Cappuccino!"];
+    [text2 setAttr:{'font-size': 24}];
+    var recursiveElasticFunc = function() {[text2 animateWithDuration:1500 toNewAttributes:{'x': [text2 attr]['x'] < 350 ? 350 : 150} animationCurve:RCAnimationElastic callbackFunction:recursiveElasticFunc]};
+    recursiveElasticFunc();
+}
+
+- (IBAction)demo7:(id)sender
+{
+    [raphaelView clear];
+    // stolen from http://net.tutsplus.com/tutorials/javascript-ajax/an-introduction-to-the-raphael-js-library/
+    var path = [RCPath pathWithRaphaelView:raphaelView SVGString:@"M 250 250 l 0 -50 l -50 0 l 0 -50 l -50 0 l 0 50 l -50 0 l 0 50 z"];
+    [path setAttr:{  
+        gradient: '90-#526c7a-#64a0c1',  
+        stroke: '#3b4449',  
+        'stroke-width': 10,  
+        'stroke-linejoin': 'round',  
+        rotation: -90  
+    }];
+    [path setDelegate:self];
+}
+
+- (IBAction)clear:(id)sender
+{
+    [raphaelView clear];
 }
 
 
@@ -106,17 +157,17 @@
 
 - (void)raphaelElementMouseDown:(RCElement)anElement atPoint:(CPPoint)aPoint
 {
-    console.log("raphaelElementMouseDown: " + anElement + " atPoint:" + aPoint);
+    console.log("raphaelElementMouseDown: " + anElement + " atPoint:" + aPoint.x + ", " + aPoint.y);
 }
 
 - (void)raphaelElementMouseUp:(RCElement)anElement atPoint:(CPPoint)aPoint
 {
-    console.log("raphaelElementMouseUp: " + anElement + " atPoint:" + aPoint);
+    console.log("raphaelElementMouseUp: " + anElement + " atPoint:" + aPoint.x + ", " + aPoint.y);
 }
 
 - (void)raphaelElementMouseDidMove:(RCElement)anElement toPoint:(CPPoint)aPoint
 {
-    console.log("raphaelElementMouseDidMove: " + anElement + " toPoint:" + aPoint);
+    console.log("raphaelElementMouseDidMove: " + anElement + " toPoint:" + aPoint.x + ", " + aPoint.y);
 }
 
 - (void)raphaelElementMouseOut:(RCElement)anElement

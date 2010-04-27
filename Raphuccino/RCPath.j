@@ -1,11 +1,27 @@
+/*
+ * Raphuccino
+ *
+ * Copyright (c) 2010 Johannes Fahrenkrug (http://springenwerk.com)
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ */
+
 @import <Foundation/CPString.j>
 @import "RCElement.j"
 
+/*! 
+    @class RCPath
+    @brief An SVG path element.
+*/
 @implementation RCPath : RCElement
 {  
    CPString _SVGString @accessors(property=SVGString, readonly);
 }
 
+/*!
+    Designated initializer: Initializes the path with the given SVG string
+    @param raphaelView the raphaelView that should contain this image
+    @param SVGString the path definition
+*/
 - (id)initWithRaphaelView:(RCRaphaelView)aRaphaelView SVGString:(CPString)anSVGString
 {
     if (self = [super initWithRaphaelView:aRaphaelView]) 
@@ -60,6 +76,11 @@
     return _raphaelObject.getSubpath(startLength, endLength);
 }
 
+/*!
+    Creates a new path with the given SVG string
+    @param raphaelView the raphaelView that should contain this image
+    @param SVGString the path definition
+*/
 + (RCPath)pathWithRaphaelView:(RCRaphaelView)aRaphaelView SVGString:(CPString)anSVGString
 {
     return [[RCPath alloc] initWithRaphaelView:aRaphaelView SVGString:anSVGString];
