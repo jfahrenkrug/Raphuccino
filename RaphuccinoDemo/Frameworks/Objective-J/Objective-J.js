@@ -1,3631 +1,4528 @@
-var ObjectiveJ={};
-(function(_1,_2){
-if(!this.JSON){
-JSON={};
+/*
+ * Objective-J.js
+ * Objective-J
+ *
+ * Created by Francisco Tolmasky.
+ * Copyright 2008-2010, 280 North, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+
+
+
+var ObjectiveJ = { };
+
+(function (global, exports)
+{
+if (!this.JSON) {
+    JSON = {};
 }
-(function(){
-function f(n){
-return n<10?"0"+n:n;
-};
-if(typeof Date.prototype.toJSON!=="function"){
-Date.prototype.toJSON=function(_3){
-return this.getUTCFullYear()+"-"+f(this.getUTCMonth()+1)+"-"+f(this.getUTCDate())+"T"+f(this.getUTCHours())+":"+f(this.getUTCMinutes())+":"+f(this.getUTCSeconds())+"Z";
-};
-String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(_4){
-return this.valueOf();
-};
-}
-var cx=new RegExp("[\\u0000\\u00ad\\u0600-\\u0604\\u070f\\u17b4\\u17b5\\u200c-\\u200f\\u2028-\\u202f\\u2060-\\u206f\\ufeff\\ufff0-\\uffff]","g");
-var _5=new RegExp("[\\\\\\\"\\x00-\\x1f\\x7f-\\x9f\\u00ad\\u0600-\\u0604\\u070f\\u17b4\\u17b5\\u200c-\\u200f\\u2028-\\u202f\\u2060-\\u206f\\ufeff\\ufff0-\\uffff]","g");
-var _6,_7,_8={"\b":"\\b","\t":"\\t","\n":"\\n","\f":"\\f","\r":"\\r","\"":"\\\"","\\":"\\\\"},_9;
-function _a(_b){
-_5.lastIndex=0;
-return _5.test(_b)?"\""+_b.replace(_5,function(a){
-var c=_8[a];
-return typeof c==="string"?c:"\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4);
-})+"\"":"\""+_b+"\"";
-};
-function _c(_d,_e){
-var i,k,v,_f,_10=_6,_11,_12=_e[_d];
-if(_12&&typeof _12==="object"&&typeof _12.toJSON==="function"){
-_12=_12.toJSON(_d);
-}
-if(typeof _9==="function"){
-_12=_9.call(_e,_d,_12);
-}
-switch(typeof _12){
-case "string":
-return _a(_12);
-case "number":
-return isFinite(_12)?String(_12):"null";
-case "boolean":
-case "null":
-return String(_12);
-case "object":
-if(!_12){
-return "null";
-}
-_6+=_7;
-_11=[];
-if(Object.prototype.toString.apply(_12)==="[object Array]"){
-_f=_12.length;
-for(i=0;i<_f;i+=1){
-_11[i]=_c(i,_12)||"null";
-}
-v=_11.length===0?"[]":_6?"[\n"+_6+_11.join(",\n"+_6)+"\n"+_10+"]":"["+_11.join(",")+"]";
-_6=_10;
-return v;
-}
-if(_9&&typeof _9==="object"){
-_f=_9.length;
-for(i=0;i<_f;i+=1){
-k=_9[i];
-if(typeof k==="string"){
-v=_c(k,_12);
-if(v){
-_11.push(_a(k)+(_6?": ":":")+v);
-}
-}
-}
-}else{
-for(k in _12){
-if(Object.hasOwnProperty.call(_12,k)){
-v=_c(k,_12);
-if(v){
-_11.push(_a(k)+(_6?": ":":")+v);
-}
-}
-}
-}
-v=_11.length===0?"{}":_6?"{\n"+_6+_11.join(",\n"+_6)+"\n"+_10+"}":"{"+_11.join(",")+"}";
-_6=_10;
-return v;
-}
-};
-if(typeof JSON.stringify!=="function"){
-JSON.stringify=function(_13,_14,_15){
-var i;
-_6="";
-_7="";
-if(typeof _15==="number"){
-for(i=0;i<_15;i+=1){
-_7+=" ";
-}
-}else{
-if(typeof _15==="string"){
-_7=_15;
-}
-}
-_9=_14;
-if(_14&&typeof _14!=="function"&&(typeof _14!=="object"||typeof _14.length!=="number")){
-throw new Error("JSON.stringify");
-}
-return _c("",{"":_13});
-};
-}
-if(typeof JSON.parse!=="function"){
-JSON.parse=function(_16,_17){
-var j;
-function _18(_19,key){
-var k,v,_1a=_19[key];
-if(_1a&&typeof _1a==="object"){
-for(k in _1a){
-if(Object.hasOwnProperty.call(_1a,k)){
-v=_18(_1a,k);
-if(v!==_44){
-_1a[k]=v;
-}else{
-delete _1a[k];
-}
-}
-}
-}
-return _17.call(_19,key,_1a);
-};
-cx.lastIndex=0;
-if(cx.test(_16)){
-_16=_16.replace(cx,function(a){
-return "\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4);
-});
-}
-if(/^[\],:{}\s]*$/.test(_16.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,"@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,"]").replace(/(?:^|:|,)(?:\s*\[)+/g,""))){
-j=eval("("+_16+")");
-return typeof _17==="function"?_18({"":j},""):j;
-}
-throw new SyntaxError("JSON.parse");
-};
-}
+(function () {
+    function f(n) {
+        return n < 10 ? '0' + n : n;
+    }
+    if (typeof Date.prototype.toJSON !== 'function') {
+        Date.prototype.toJSON = function (key) {
+            return this.getUTCFullYear() + '-' +
+                 f(this.getUTCMonth() + 1) + '-' +
+                 f(this.getUTCDate()) + 'T' +
+                 f(this.getUTCHours()) + ':' +
+                 f(this.getUTCMinutes()) + ':' +
+                 f(this.getUTCSeconds()) + 'Z';
+        };
+        String.prototype.toJSON =
+        Number.prototype.toJSON =
+        Boolean.prototype.toJSON = function (key) {
+            return this.valueOf();
+        };
+    }
+    var cx = new RegExp('[\\u0000\\u00ad\\u0600-\\u0604\\u070f\\u17b4\\u17b5\\u200c-\\u200f\\u2028-\\u202f\\u2060-\\u206f\\ufeff\\ufff0-\\uffff]', "g");
+    var escapable = new RegExp('[\\\\\\"\\x00-\\x1f\\x7f-\\x9f\\u00ad\\u0600-\\u0604\\u070f\\u17b4\\u17b5\\u200c-\\u200f\\u2028-\\u202f\\u2060-\\u206f\\ufeff\\ufff0-\\uffff]', "g");
+    var gap,
+        indent,
+        meta = {
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"' : '\\"',
+            '\\': '\\\\'
+        },
+        rep;
+    function quote(string) {
+        escapable.lastIndex = 0;
+        return escapable.test(string) ?
+            '"' + string.replace(escapable, function (a) {
+                var c = meta[a];
+                return typeof c === 'string' ? c :
+                    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + '"' :
+            '"' + string + '"';
+    }
+    function str(key, holder) {
+        var i,
+            k,
+            v,
+            length,
+            mind = gap,
+            partial,
+            value = holder[key];
+        if (value && typeof value === 'object' &&
+                typeof value.toJSON === 'function') {
+            value = value.toJSON(key);
+        }
+        if (typeof rep === 'function') {
+            value = rep.call(holder, key, value);
+        }
+        switch (typeof value) {
+        case 'string':
+            return quote(value);
+        case 'number':
+            return isFinite(value) ? String(value) : 'null';
+        case 'boolean':
+        case 'null':
+            return String(value);
+        case 'object':
+            if (!value) {
+                return 'null';
+            }
+            gap += indent;
+            partial = [];
+            if (Object.prototype.toString.apply(value) === '[object Array]') {
+                length = value.length;
+                for (i = 0; i < length; i += 1) {
+                    partial[i] = str(i, value) || 'null';
+                }
+                v = partial.length === 0 ? '[]' :
+                    gap ? '[\n' + gap +
+                            partial.join(',\n' + gap) + '\n' +
+                                mind + ']' :
+                          '[' + partial.join(',') + ']';
+                gap = mind;
+                return v;
+            }
+            if (rep && typeof rep === 'object') {
+                length = rep.length;
+                for (i = 0; i < length; i += 1) {
+                    k = rep[i];
+                    if (typeof k === 'string') {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            } else {
+                for (k in value) {
+                    if (Object.hasOwnProperty.call(value, k)) {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            }
+            v = partial.length === 0 ? '{}' :
+                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
+                        mind + '}' : '{' + partial.join(',') + '}';
+            gap = mind;
+            return v;
+        }
+    }
+    if (typeof JSON.stringify !== 'function') {
+        JSON.stringify = function (value, replacer, space) {
+            var i;
+            gap = '';
+            indent = '';
+            if (typeof space === 'number') {
+                for (i = 0; i < space; i += 1) {
+                    indent += ' ';
+                }
+            } else if (typeof space === 'string') {
+                indent = space;
+            }
+            rep = replacer;
+            if (replacer && typeof replacer !== 'function' &&
+                    (typeof replacer !== 'object' ||
+                     typeof replacer.length !== 'number')) {
+                throw new Error('JSON.stringify');
+            }
+            return str('', {'': value});
+        };
+    }
+    if (typeof JSON.parse !== 'function') {
+        JSON.parse = function (text, reviver) {
+            var j;
+            function walk(holder, key) {
+                var k, v, value = holder[key];
+                if (value && typeof value === 'object') {
+                    for (k in value) {
+                        if (Object.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
+                            }
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            }
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function (a) {
+                    return '\\u' +
+                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+            if (/^[\],:{}\s]*$/.
+test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
+replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+                j = eval('(' + text + ')');
+                return typeof reviver === 'function' ?
+                    walk({'': j}, '') : j;
+            }
+            throw new SyntaxError('JSON.parse');
+        };
+    }
 }());
-var _1b=new RegExp("([^%]+|%[\\+\\-\\ \\#0]*[0-9\\*]*(.[0-9\\*]+)?[hlL]?[cbBdieEfgGosuxXpn%@])","g");
-var _1c=new RegExp("(%)([\\+\\-\\ \\#0]*)([0-9\\*]*)((.[0-9\\*]+)?)([hlL]?)([cbBdieEfgGosuxXpn%@])");
-_2.sprintf=function(_1d){
-var _1d=arguments[0],_1e=_1d.match(_1b),_1f=0,_20="",arg=1;
-for(var i=0;i<_1e.length;i++){
-var t=_1e[i];
-if(_1d.substring(_1f,_1f+t.length)!=t){
-return _20;
-}
-_1f+=t.length;
-if(t.charAt(0)!="%"){
-_20+=t;
-}else{
-var _21=t.match(_1c);
-if(_21.length!=8||_21[0]!=t){
-return _20;
-}
-var _22=_21[1],_23=_21[2],_24=_21[3],_25=_21[4],_26=_21[6],_27=_21[7];
-var _28=null;
-if(_24=="*"){
-_28=arguments[arg++];
-}else{
-if(_24!=""){
-_28=Number(_24);
-}
-}
-var _29=null;
-if(_25==".*"){
-_29=arguments[arg++];
-}else{
-if(_25!=""){
-_29=Number(_25.substring(1));
-}
-}
-var _2a=(_23.indexOf("-")>=0);
-var _2b=(_23.indexOf("0")>=0);
-var _2c="";
-if(RegExp("[bBdiufeExXo]").test(_27)){
-var num=Number(arguments[arg++]);
-var _2d="";
-if(num<0){
-_2d="-";
-}else{
-if(_23.indexOf("+")>=0){
-_2d="+";
-}else{
-if(_23.indexOf(" ")>=0){
-_2d=" ";
-}
-}
-}
-if(_27=="d"||_27=="i"||_27=="u"){
-var _2e=String(Math.abs(Math.floor(num)));
-_2c=_2f(_2d,"",_2e,"",_28,_2a,_2b);
-}
-if(_27=="f"){
-var _2e=String((_29!=null)?Math.abs(num).toFixed(_29):Math.abs(num));
-var _30=(_23.indexOf("#")>=0&&_2e.indexOf(".")<0)?".":"";
-_2c=_2f(_2d,"",_2e,_30,_28,_2a,_2b);
-}
-if(_27=="e"||_27=="E"){
-var _2e=String(Math.abs(num).toExponential(_29!=null?_29:21));
-var _30=(_23.indexOf("#")>=0&&_2e.indexOf(".")<0)?".":"";
-_2c=_2f(_2d,"",_2e,_30,_28,_2a,_2b);
-}
-if(_27=="x"||_27=="X"){
-var _2e=String(Math.abs(num).toString(16));
-var _31=(_23.indexOf("#")>=0&&num!=0)?"0x":"";
-_2c=_2f(_2d,_31,_2e,"",_28,_2a,_2b);
-}
-if(_27=="b"||_27=="B"){
-var _2e=String(Math.abs(num).toString(2));
-var _31=(_23.indexOf("#")>=0&&num!=0)?"0b":"";
-_2c=_2f(_2d,_31,_2e,"",_28,_2a,_2b);
-}
-if(_27=="o"){
-var _2e=String(Math.abs(num).toString(8));
-var _31=(_23.indexOf("#")>=0&&num!=0)?"0":"";
-_2c=_2f(_2d,_31,_2e,"",_28,_2a,_2b);
-}
-if(RegExp("[A-Z]").test(_27)){
-_2c=_2c.toUpperCase();
-}else{
-_2c=_2c.toLowerCase();
-}
-}else{
-var _2c="";
-if(_27=="%"){
-_2c="%";
-}else{
-if(_27=="c"){
-_2c=String(arguments[arg++]).charAt(0);
-}else{
-if(_27=="s"||_27=="@"){
-_2c=String(arguments[arg++]);
-}else{
-if(_27=="p"||_27=="n"){
-arg++;
-_2c="";
-}
-}
-}
-}
-_2c=_2f("","",_2c,"",_28,_2a,false);
-}
-_20+=_2c;
-}
-}
-return _20;
-};
-function _2f(_32,_33,_34,_35,_36,_37,_38){
-var _39=(_32.length+_33.length+_34.length+_35.length);
-if(_37){
-return _32+_33+_34+_35+pad(_36-_39," ");
-}else{
-if(_38){
-return _32+_33+pad(_36-_39,"0")+_34+_35;
-}else{
-return pad(_36-_39," ")+_32+_33+_34+_35;
-}
-}
-};
-function pad(n,ch){
-return Array(MAX(0,n)+1).join(ch);
-};
-CPLogDisable=false;
-var _3a="Cappuccino";
-var _3b=["fatal","error","warn","info","debug","trace"];
-var _3c=_3b[3];
-var _3d={};
-for(var i=0;i<_3b.length;i++){
-_3d[_3b[i]]=i;
-}
-var _3e={};
-CPLogRegister=function(_3f,_40){
-CPLogRegisterRange(_3f,_3b[0],_40||_3b[_3b.length-1]);
-};
-CPLogRegisterRange=function(_41,_42,_43){
-var min=_3d[_42];
-var max=_3d[_43];
-if(min!==_44&&max!==_44){
-for(var i=0;i<=max;i++){
-CPLogRegisterSingle(_41,_3b[i]);
-}
-}
-};
-CPLogRegisterSingle=function(_45,_46){
-if(!_3e[_46]){
-_3e[_46]=[];
-}
-for(var i=0;i<_3e[_46].length;i++){
-if(_3e[_46][i]===_45){
-return;
-}
-}
-_3e[_46].push(_45);
-};
-CPLogUnregister=function(_47){
-for(var _48 in _3e){
-for(var i=0;i<_3e[_48].length;i++){
-if(_3e[_48][i]===_47){
-_3e[_48].splice(i--,1);
-}
-}
-}
-};
-function _49(_4a,_4b,_4c){
-if(_4c==_44){
-_4c=_3a;
-}
-if(_4b==_44){
-_4b=_3c;
-}
-var _4d=(typeof _4a[0]=="string"&&_4a.length>1)?_2.sprintf.apply(null,_4a):String(_4a[0]);
-if(_3e[_4b]){
-for(var i=0;i<_3e[_4b].length;i++){
-_3e[_4b][i](_4d,_4b,_4c);
-}
-}
-};
-CPLog=function(){
-_49(arguments);
-};
-for(var i=0;i<_3b.length;i++){
-CPLog[_3b[i]]=(function(_4e){
-return function(){
-_49(arguments,_4e);
-};
-})(_3b[i]);
-}
-var _4f=function(_50,_51,_52){
-var now=new Date();
-_51=(_51==null?"":" ["+_51+"]");
-if(typeof _2.sprintf=="function"){
-return _2.sprintf("%4d-%02d-%02d %02d:%02d:%02d.%03d %s%s: %s",now.getFullYear(),now.getMonth(),now.getDate(),now.getHours(),now.getMinutes(),now.getSeconds(),now.getMilliseconds(),_52,_51,_50);
-}else{
-return now+" "+_52+_51+": "+_50;
-}
-};
-CPLogConsole=function(_53,_54,_55){
-if(typeof console!="undefined"){
-var _56=_4f(_53,_54,_55);
-var _57={"fatal":"error","error":"error","warn":"warn","info":"info","debug":"debug","trace":"debug"}[_54];
-if(_57&&console[_57]){
-console[_57](_56);
-}else{
-if(console.log){
-console.log(_56);
-}
-}
-}
-};
-CPLogAlert=function(_58,_59,_5a){
-if(typeof alert!="undefined"&&!CPLogDisable){
-var _5b=_4f(_58,_59,_5a);
-CPLogDisable=!confirm(_5b+"\n\n(Click cancel to stop log alerts)");
-}
-};
-var _5c=null;
-CPLogPopup=function(_5d,_5e,_5f){
-try{
-if(CPLogDisable||window.open==_44){
-return;
-}
-if(!_5c||!_5c.document){
-_5c=window.open("","_blank","width=600,height=400,status=no,resizable=yes,scrollbars=yes");
-if(!_5c){
-CPLogDisable=!confirm(_5d+"\n\n(Disable pop-up blocking for CPLog window; Click cancel to stop log alerts)");
-return;
-}
-_60(_5c);
-}
-var _61=_5c.document.createElement("div");
-_61.setAttribute("class",_5e||"fatal");
-var _62=_4f(_5d,null,_5f);
-_61.appendChild(_5c.document.createTextNode(_62));
-_5c.log.appendChild(_61);
-if(_5c.focusEnabled.checked){
-_5c.focus();
-}
-if(_5c.blockEnabled.checked){
-_5c.blockEnabled.checked=_5c.confirm(_62+"\nContinue blocking?");
-}
-if(_5c.scrollEnabled.checked){
-_5c.scrollToBottom();
-}
-}
-catch(e){
-}
-};
-var _63="<style type=\"text/css\" media=\"screen\"> body{font:10px Monaco,Courier,\"Courier New\",monospace,mono;padding-top:15px;} div > .fatal,div > .error,div > .warn,div > .info,div > .debug,div > .trace{display:none;overflow:hidden;white-space:pre;padding:0px 5px 0px 5px;margin-top:2px;-moz-border-radius:5px;-webkit-border-radius:5px;} div[wrap=\"yes\"] > div{white-space:normal;} .fatal{background-color:#ffb2b3;} .error{background-color:#ffe2b2;} .warn{background-color:#fdffb2;} .info{background-color:#e4ffb2;} .debug{background-color:#a0e5a0;} .trace{background-color:#99b9ff;} .enfatal .fatal,.enerror .error,.enwarn .warn,.eninfo .info,.endebug .debug,.entrace .trace{display:block;} div#header{background-color:rgba(240,240,240,0.82);position:fixed;top:0px;left:0px;width:100%;border-bottom:1px solid rgba(0,0,0,0.33);text-align:center;} ul#enablers{display:inline-block;margin:1px 15px 0 15px;padding:2px 0 2px 0;} ul#enablers li{display:inline;padding:0px 5px 0px 5px;margin-left:4px;-moz-border-radius:5px;-webkit-border-radius:5px;} [enabled=\"no\"]{opacity:0.25;} ul#options{display:inline-block;margin:0 15px 0px 15px;padding:0 0px;} ul#options li{margin:0 0 0 0;padding:0 0 0 0;display:inline;} </style>";
-function _60(_64){
-var doc=_64.document;
-doc.writeln("<html><head><title></title>"+_63+"</head><body></body></html>");
-doc.title=_3a+" Run Log";
-var _65=doc.getElementsByTagName("head")[0];
-var _66=doc.getElementsByTagName("body")[0];
-var _67=window.location.protocol+"//"+window.location.host+window.location.pathname;
-_67=_67.substring(0,_67.lastIndexOf("/")+1);
-var div=doc.createElement("div");
-div.setAttribute("id","header");
-_66.appendChild(div);
-var ul=doc.createElement("ul");
-ul.setAttribute("id","enablers");
-div.appendChild(ul);
-for(var i=0;i<_3b.length;i++){
-var li=doc.createElement("li");
-li.setAttribute("id","en"+_3b[i]);
-li.setAttribute("class",_3b[i]);
-li.setAttribute("onclick","toggle(this);");
-li.setAttribute("enabled","yes");
-li.appendChild(doc.createTextNode(_3b[i]));
-ul.appendChild(li);
-}
-var ul=doc.createElement("ul");
-ul.setAttribute("id","options");
-div.appendChild(ul);
-var _68={"focus":["Focus",false],"block":["Block",false],"wrap":["Wrap",false],"scroll":["Scroll",true],"close":["Close",true]};
-for(o in _68){
-var li=doc.createElement("li");
-ul.appendChild(li);
-_64[o+"Enabled"]=doc.createElement("input");
-_64[o+"Enabled"].setAttribute("id",o);
-_64[o+"Enabled"].setAttribute("type","checkbox");
-if(_68[o][1]){
-_64[o+"Enabled"].setAttribute("checked","checked");
-}
-li.appendChild(_64[o+"Enabled"]);
-var _69=doc.createElement("label");
-_69.setAttribute("for",o);
-_69.appendChild(doc.createTextNode(_68[o][0]));
-li.appendChild(_69);
-}
-_64.log=doc.createElement("div");
-_64.log.setAttribute("class","enerror endebug enwarn eninfo enfatal entrace");
-_66.appendChild(_64.log);
-_64.toggle=function(_6a){
-var _6b=(_6a.getAttribute("enabled")=="yes")?"no":"yes";
-_6a.setAttribute("enabled",_6b);
-if(_6b=="yes"){
-_64.log.className+=" "+_6a.id;
-}else{
-_64.log.className=_64.log.className.replace(new RegExp("[\\s]*"+_6a.id,"g"),"");
-}
-};
-_64.scrollToBottom=function(){
-_64.scrollTo(0,_66.offsetHeight);
-};
-_64.wrapEnabled.addEventListener("click",function(){
-_64.log.setAttribute("wrap",_64.wrapEnabled.checked?"yes":"no");
-},false);
-_64.addEventListener("keydown",function(e){
-var e=e||_64.event;
-if(e.keyCode==75&&(e.ctrlKey||e.metaKey)){
-while(_64.log.firstChild){
-_64.log.removeChild(_64.log.firstChild);
-}
-e.preventDefault();
-}
-},"false");
-window.addEventListener("unload",function(){
-if(_64&&_64.closeEnabled&&_64.closeEnabled.checked){
-CPLogDisable=true;
-_64.close();
-}
-},false);
-_64.addEventListener("unload",function(){
-if(!CPLogDisable){
-CPLogDisable=!confirm("Click cancel to stop logging");
-}
-},false);
-};
-CPLogDefault=(typeof window==="object"&&window.console)?CPLogConsole:CPLogPopup;
-var _44;
-if(typeof window!=="undefined"){
-window.setNativeTimeout=window.setTimeout;
-window.clearNativeTimeout=window.clearTimeout;
-window.setNativeInterval=window.setInterval;
-window.clearNativeInterval=window.clearInterval;
-}
-NO=false;
-YES=true;
-nil=null;
-Nil=null;
-NULL=null;
-ABS=Math.abs;
-ASIN=Math.asin;
-ACOS=Math.acos;
-ATAN=Math.atan;
-ATAN2=Math.atan2;
-SIN=Math.sin;
-COS=Math.cos;
-TAN=Math.tan;
-EXP=Math.exp;
-POW=Math.pow;
-CEIL=Math.ceil;
-FLOOR=Math.floor;
-ROUND=Math.round;
-MIN=Math.min;
-MAX=Math.max;
-RAND=Math.random;
-SQRT=Math.sqrt;
-E=Math.E;
-LN2=Math.LN2;
-LN10=Math.LN10;
-LOG2E=Math.LOG2E;
-LOG10E=Math.LOG10E;
-PI=Math.PI;
-PI2=Math.PI*2;
-PI_2=Math.PI/2;
-SQRT1_2=Math.SQRT1_2;
-SQRT2=Math.SQRT2;
-function _6c(_6d){
-this._eventListenersForEventNames={};
-this._owner=_6d;
-};
-_6c.prototype.addEventListener=function(_6e,_6f){
-var _70=this._eventListenersForEventNames;
-if(!_71.call(_70,_6e)){
-var _72=[];
-_70[_6e]=_72;
-}else{
-var _72=_70[_6e];
-}
-var _73=_72.length;
-while(_73--){
-if(_72[_73]===_6f){
-return;
-}
-}
-_72.push(_6f);
-};
-_6c.prototype.removeEventListener=function(_74,_75){
-var _76=this._eventListenersForEventNames;
-if(!_71.call(_76,_74)){
-return;
-}
-var _77=_76[_74],_78=_77.length;
-while(_78--){
-if(_77[_78]===_75){
-return _77.splice(_78,1);
-}
-}
-};
-_6c.prototype.dispatchEvent=function(_79){
-var _7a=_79.type,_7b=this._eventListenersForEventNames;
-if(_71.call(_7b,_7a)){
-var _7c=this._eventListenersForEventNames[_7a],_7d=0,_7e=_7c.length;
-for(;_7d<_7e;++_7d){
-_7c[_7d](_79);
-}
-}
-var _7f=(this._owner||this)["on"+_7a];
-if(_7f){
-_7f(_79);
-}
-};
-var _80=0,_81=null,_82=[];
-function _83(_84){
-var _85=_80;
-if(_81===null){
-window.setNativeTimeout(function(){
-var _86=_82,_87=0,_88=_82.length;
-++_80;
-_81=null;
-_82=[];
-for(;_87<_88;++_87){
-_86[_87]();
-}
-},0);
-}
-return function(){
-var _89=arguments;
-if(_80>_85){
-_84.apply(this,_89);
-}else{
-_82.push(function(){
-_84.apply(this,_89);
+var formatRegex = new RegExp("([^%]+|%[\\+\\-\\ \\#0]*[0-9\\*]*(.[0-9\\*]+)?[hlL]?[cbBdieEfgGosuxXpn%@])", "g");
+var tagRegex = new RegExp("(%)([\\+\\-\\ \\#0]*)([0-9\\*]*)((.[0-9\\*]+)?)([hlL]?)([cbBdieEfgGosuxXpn%@])");
+exports.sprintf = function(format)
+{
+    var format = arguments[0],
+        tokens = format.match(formatRegex),
+        index = 0,
+        result = "",
+        arg = 1;
+    for (var i = 0; i < tokens.length; i++)
+    {
+        var t = tokens[i];
+        if (format.substring(index, index + t.length) != t)
+        {
+            return result;
+        }
+        index += t.length;
+        if (t.charAt(0) != "%")
+        {
+            result += t;
+        }
+        else
+        {
+            var subtokens = t.match(tagRegex);
+            if (subtokens.length != 8 || subtokens[0] != t)
+            {
+                return result;
+            }
+            var percentSign = subtokens[1],
+                flags = subtokens[2],
+                widthString = subtokens[3],
+                precisionString = subtokens[4],
+                length = subtokens[6],
+                specifier = subtokens[7];
+            var width = null;
+            if (widthString == "*")
+                width = arguments[arg++];
+            else if (widthString != "")
+                width = Number(widthString);
+            var precision = null;
+            if (precisionString == ".*")
+                precision = arguments[arg++];
+            else if (precisionString != "")
+                precision = Number(precisionString.substring(1));
+            var leftJustify = (flags.indexOf("-") >= 0);
+            var padZeros = (flags.indexOf("0") >= 0);
+            var subresult = "";
+            if (RegExp("[bBdiufeExXo]").test(specifier))
+            {
+                var num = Number(arguments[arg++]);
+                var sign = "";
+                if (num < 0)
+                {
+                    sign = "-";
+                }
+                else
+                {
+                    if (flags.indexOf("+") >= 0)
+                        sign = "+";
+                    else if (flags.indexOf(" ") >= 0)
+                        sign = " ";
+                }
+                if (specifier == "d" || specifier == "i" || specifier == "u")
+                {
+                    var number = String(Math.abs(Math.floor(num)));
+                    subresult = justify(sign, "", number, "", width, leftJustify, padZeros)
+                }
+                if (specifier == "f")
+                {
+                    var number = String((precision != null) ? Math.abs(num).toFixed(precision) : Math.abs(num));
+                    var suffix = (flags.indexOf("#") >= 0 && number.indexOf(".") < 0) ? "." : "";
+                    subresult = justify(sign, "", number, suffix, width, leftJustify, padZeros);
+                }
+                if (specifier == "e" || specifier == "E")
+                {
+                    var number = String(Math.abs(num).toExponential(precision != null ? precision : 21));
+                    var suffix = (flags.indexOf("#") >= 0 && number.indexOf(".") < 0) ? "." : "";
+                    subresult = justify(sign, "", number, suffix, width, leftJustify, padZeros);
+                }
+                if (specifier == "x" || specifier == "X")
+                {
+                    var number = String(Math.abs(num).toString(16));
+                    var prefix = (flags.indexOf("#") >= 0 && num != 0) ? "0x" : "";
+                    subresult = justify(sign, prefix, number, "", width, leftJustify, padZeros);
+                }
+                if (specifier == "b" || specifier == "B")
+                {
+                    var number = String(Math.abs(num).toString(2));
+                    var prefix = (flags.indexOf("#") >= 0 && num != 0) ? "0b" : "";
+                    subresult = justify(sign, prefix, number, "", width, leftJustify, padZeros);
+                }
+                if (specifier == "o")
+                {
+                    var number = String(Math.abs(num).toString(8));
+                    var prefix = (flags.indexOf("#") >= 0 && num != 0) ? "0" : "";
+                    subresult = justify(sign, prefix, number, "", width, leftJustify, padZeros);
+                }
+                if (RegExp("[A-Z]").test(specifier))
+                    subresult = subresult.toUpperCase();
+                else
+                    subresult = subresult.toLowerCase();
+            }
+            else
+            {
+                var subresult = "";
+                if (specifier == "%")
+                    subresult = "%";
+                else if (specifier == "c")
+                    subresult = String(arguments[arg++]).charAt(0);
+                else if (specifier == "s" || specifier == "@")
+                    subresult = String(arguments[arg++]);
+                else if (specifier == "p" || specifier == "n")
+                {
+                    arg++;
+                    subresult = "";
+                }
+                subresult = justify("", "", subresult, "", width, leftJustify, false);
+            }
+            result += subresult;
+        }
+    }
+    return result;
+}
+function justify(sign, prefix, string, suffix, width, leftJustify, padZeros)
+{
+    var length = (sign.length + prefix.length + string.length + suffix.length);
+    if (leftJustify)
+    {
+        return sign + prefix + string + suffix + pad(width - length, " ");
+    }
+    else
+    {
+        if (padZeros)
+            return sign + prefix + pad(width - length, "0") + string + suffix;
+        else
+            return pad(width - length, " ") + sign + prefix + string + suffix;
+    }
+}
+function pad(n, ch)
+{
+    return Array(MAX(0,n)+1).join(ch);
+}
+CPLogDisable = false;
+var CPLogDefaultTitle = "Cappuccino";
+var CPLogLevels = ["fatal", "error", "warn", "info", "debug", "trace"];
+var CPLogDefaultLevel = CPLogLevels[3];
+var _CPLogLevelsInverted = {};
+for (var i = 0; i < CPLogLevels.length; i++)
+    _CPLogLevelsInverted[CPLogLevels[i]] = i;
+var _CPLogRegistrations = {};
+CPLogRegister = function(aProvider, aMaxLevel)
+{
+    CPLogRegisterRange(aProvider, CPLogLevels[0], aMaxLevel || CPLogLevels[CPLogLevels.length-1]);
+}
+CPLogRegisterRange = function(aProvider, aMinLevel, aMaxLevel)
+{
+    var min = _CPLogLevelsInverted[aMinLevel];
+    var max = _CPLogLevelsInverted[aMaxLevel];
+    if (min !== undefined && max !== undefined)
+        for (var i = 0; i <= max; i++)
+            CPLogRegisterSingle(aProvider, CPLogLevels[i]);
+}
+CPLogRegisterSingle = function(aProvider, aLevel)
+{
+    if (!_CPLogRegistrations[aLevel])
+        _CPLogRegistrations[aLevel] = [];
+    for (var i = 0; i < _CPLogRegistrations[aLevel].length; i++)
+        if (_CPLogRegistrations[aLevel][i] === aProvider)
+            return;
+    _CPLogRegistrations[aLevel].push(aProvider);
+}
+CPLogUnregister = function(aProvider) {
+    for (var aLevel in _CPLogRegistrations)
+        for (var i = 0; i < _CPLogRegistrations[aLevel].length; i++)
+            if (_CPLogRegistrations[aLevel][i] === aProvider)
+                _CPLogRegistrations[aLevel].splice(i--, 1);
+}
+function _CPLogDispatch(parameters, aLevel, aTitle)
+{
+    if (aTitle == undefined)
+        aTitle = CPLogDefaultTitle;
+    if (aLevel == undefined)
+        aLevel = CPLogDefaultLevel;
+    var message = (typeof parameters[0] == "string" && parameters.length > 1) ? exports.sprintf.apply(null, parameters) : String(parameters[0]);
+    if (_CPLogRegistrations[aLevel])
+        for (var i = 0; i < _CPLogRegistrations[aLevel].length; i++)
+             _CPLogRegistrations[aLevel][i](message, aLevel, aTitle);
+}
+CPLog = function() { _CPLogDispatch(arguments); }
+for (var i = 0; i < CPLogLevels.length; i++)
+    CPLog[CPLogLevels[i]] = (function(level) { return function() { _CPLogDispatch(arguments, level); }; })(CPLogLevels[i]);
+var _CPFormatLogMessage = function(aString, aLevel, aTitle)
+{
+    var now = new Date();
+    aLevel = ( aLevel == null ? '' : ' [' + aLevel + ']' );
+    if (typeof exports.sprintf == "function")
+        return exports.sprintf("%4d-%02d-%02d %02d:%02d:%02d.%03d %s%s: %s",
+            now.getFullYear(), now.getMonth(), now.getDate(),
+            now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds(),
+            aTitle, aLevel, aString);
+    else
+        return now + " " + aTitle + aLevel + ": " + aString;
+}
+CPLogConsole = function(aString, aLevel, aTitle)
+{
+    if (typeof console != "undefined")
+    {
+        var message = _CPFormatLogMessage(aString, aLevel, aTitle);
+        var logger = {
+            "fatal": "error",
+            "error": "error",
+            "warn": "warn",
+            "info": "info",
+            "debug": "debug",
+            "trace": "debug"
+        }[aLevel];
+        if (logger && console[logger])
+            console[logger](message);
+        else if (console.log)
+            console.log(message);
+    }
+}
+CPLogAlert = function(aString, aLevel, aTitle)
+{
+    if (typeof alert != "undefined" && !CPLogDisable)
+    {
+        var message = _CPFormatLogMessage(aString, aLevel, aTitle);
+        CPLogDisable = !confirm(message + "\n\n(Click cancel to stop log alerts)");
+    }
+}
+var CPLogWindow = null;
+CPLogPopup = function(aString, aLevel, aTitle)
+{
+    try {
+        if (CPLogDisable || window.open == undefined)
+            return;
+        if (!CPLogWindow || !CPLogWindow.document)
+        {
+            CPLogWindow = window.open("", "_blank", "width=600,height=400,status=no,resizable=yes,scrollbars=yes");
+            if (!CPLogWindow) {
+                CPLogDisable = !confirm(aString + "\n\n(Disable pop-up blocking for CPLog window; Click cancel to stop log alerts)");
+                return;
+            }
+            _CPLogInitPopup(CPLogWindow);
+        }
+        var logDiv = CPLogWindow.document.createElement("div");
+        logDiv.setAttribute("class", aLevel || "fatal");
+        var message = _CPFormatLogMessage(aString, null, aTitle);
+        logDiv.appendChild(CPLogWindow.document.createTextNode(message));
+        CPLogWindow.log.appendChild(logDiv);
+        if (CPLogWindow.focusEnabled.checked)
+            CPLogWindow.focus();
+        if (CPLogWindow.blockEnabled.checked)
+            CPLogWindow.blockEnabled.checked = CPLogWindow.confirm(message+"\nContinue blocking?");
+        if (CPLogWindow.scrollEnabled.checked)
+            CPLogWindow.scrollToBottom();
+    } catch(e) {
+    }
+}
+var CPLogPopupStyle ='<style type="text/css" media="screen"> body{font:10px Monaco,Courier,"Courier New",monospace,mono;padding-top:15px;} div > .fatal,div > .error,div > .warn,div > .info,div > .debug,div > .trace{display:none;overflow:hidden;white-space:pre;padding:0px 5px 0px 5px;margin-top:2px;-moz-border-radius:5px;-webkit-border-radius:5px;} div[wrap="yes"] > div{white-space:normal;} .fatal{background-color:#ffb2b3;} .error{background-color:#ffe2b2;} .warn{background-color:#fdffb2;} .info{background-color:#e4ffb2;} .debug{background-color:#a0e5a0;} .trace{background-color:#99b9ff;} .enfatal .fatal,.enerror .error,.enwarn .warn,.eninfo .info,.endebug .debug,.entrace .trace{display:block;} div#header{background-color:rgba(240,240,240,0.82);position:fixed;top:0px;left:0px;width:100%;border-bottom:1px solid rgba(0,0,0,0.33);text-align:center;} ul#enablers{display:inline-block;margin:1px 15px 0 15px;padding:2px 0 2px 0;} ul#enablers li{display:inline;padding:0px 5px 0px 5px;margin-left:4px;-moz-border-radius:5px;-webkit-border-radius:5px;} [enabled="no"]{opacity:0.25;} ul#options{display:inline-block;margin:0 15px 0px 15px;padding:0 0px;} ul#options li{margin:0 0 0 0;padding:0 0 0 0;display:inline;} </style>';
+function _CPLogInitPopup(logWindow)
+{
+    var doc = logWindow.document;
+    doc.writeln("<html><head><title></title>"+CPLogPopupStyle+"</head><body></body></html>");
+    doc.title = CPLogDefaultTitle + " Run Log";
+    var head = doc.getElementsByTagName("head")[0];
+    var body = doc.getElementsByTagName("body")[0];
+    var base = window.location.protocol + "//" + window.location.host + window.location.pathname;
+    base = base.substring(0,base.lastIndexOf("/")+1);
+    var div = doc.createElement("div");
+    div.setAttribute("id", "header");
+    body.appendChild(div);
+    var ul = doc.createElement("ul");
+    ul.setAttribute("id", "enablers");
+    div.appendChild(ul);
+    for (var i = 0; i < CPLogLevels.length; i++) {
+        var li = doc.createElement("li");
+        li.setAttribute("id", "en"+CPLogLevels[i]);
+        li.setAttribute("class", CPLogLevels[i]);
+        li.setAttribute("onclick", "toggle(this);");
+        li.setAttribute("enabled", "yes");
+        li.appendChild(doc.createTextNode(CPLogLevels[i]));
+        ul.appendChild(li);
+    }
+    var ul = doc.createElement("ul");
+    ul.setAttribute("id", "options");
+    div.appendChild(ul);
+    var options = {"focus":["Focus",false], "block":["Block",false], "wrap":["Wrap",false], "scroll":["Scroll",true], "close":["Close",true]};
+    for (o in options) {
+        var li = doc.createElement("li");
+        ul.appendChild(li);
+        logWindow[o+"Enabled"] = doc.createElement("input");
+        logWindow[o+"Enabled"].setAttribute("id", o);
+        logWindow[o+"Enabled"].setAttribute("type", "checkbox");
+        if (options[o][1])
+            logWindow[o+"Enabled"].setAttribute("checked", "checked");
+        li.appendChild(logWindow[o+"Enabled"]);
+        var label = doc.createElement("label");
+        label.setAttribute("for", o);
+        label.appendChild(doc.createTextNode(options[o][0]));
+        li.appendChild(label);
+    }
+    logWindow.log = doc.createElement("div");
+    logWindow.log.setAttribute("class", "enerror endebug enwarn eninfo enfatal entrace");
+    body.appendChild(logWindow.log);
+    logWindow.toggle = function(elem) {
+        var enabled = (elem.getAttribute("enabled") == "yes") ? "no" : "yes";
+        elem.setAttribute("enabled", enabled);
+        if (enabled == "yes")
+            logWindow.log.className += " " + elem.id
+        else
+            logWindow.log.className = logWindow.log.className.replace(new RegExp("[\\s]*"+elem.id, "g"), "");
+    }
+    logWindow.scrollToBottom = function() {
+        logWindow.scrollTo(0, body.offsetHeight);
+    }
+    logWindow.wrapEnabled.addEventListener("click", function() {
+        logWindow.log.setAttribute("wrap", logWindow.wrapEnabled.checked ? "yes" : "no");
+    }, false);
+    logWindow.addEventListener("keydown", function(e) {
+        var e = e || logWindow.event;
+        if (e.keyCode == 75 && (e.ctrlKey || e.metaKey)) {
+            while (logWindow.log.firstChild) {
+                logWindow.log.removeChild(logWindow.log.firstChild);
+            }
+            e.preventDefault();
+        }
+    }, "false");
+    window.addEventListener("unload", function() {
+        if (logWindow && logWindow.closeEnabled && logWindow.closeEnabled.checked) {
+            CPLogDisable = true;
+            logWindow.close();
+        }
+    }, false);
+    logWindow.addEventListener("unload", function() {
+        if (!CPLogDisable) {
+            CPLogDisable = !confirm("Click cancel to stop logging");
+        }
+    }, false);
+}
+CPLogDefault = (typeof window === "object" && window.console) ? CPLogConsole : CPLogPopup;
+var undefined;
+if (typeof window !== "undefined")
+{
+    window.setNativeTimeout = window.setTimeout;
+    window.clearNativeTimeout = window.clearTimeout;
+    window.setNativeInterval = window.setInterval;
+    window.clearNativeInterval = window.clearInterval;
+}
+NO = false;
+YES = true;
+nil = null;
+Nil = null;
+NULL = null;
+ABS = Math.abs;
+ASIN = Math.asin;
+ACOS = Math.acos;
+ATAN = Math.atan;
+ATAN2 = Math.atan2;
+SIN = Math.sin;
+COS = Math.cos;
+TAN = Math.tan;
+EXP = Math.exp;
+POW = Math.pow;
+CEIL = Math.ceil;
+FLOOR = Math.floor;
+ROUND = Math.round;
+MIN = Math.min;
+MAX = Math.max;
+RAND = Math.random;
+SQRT = Math.sqrt;
+E = Math.E;
+LN2 = Math.LN2;
+LN10 = Math.LN10;
+LOG2E = Math.LOG2E;
+LOG10E = Math.LOG10E;
+PI = Math.PI;
+PI2 = Math.PI * 2.0;
+PI_2 = Math.PI / 2.0;
+SQRT1_2 = Math.SQRT1_2;
+SQRT2 = Math.SQRT2;
+function EventDispatcher( anOwner)
+{
+    this._eventListenersForEventNames = { };
+    this._owner = anOwner;
+}
+EventDispatcher.prototype.addEventListener = function( anEventName, anEventListener)
+{
+    var eventListenersForEventNames = this._eventListenersForEventNames;
+    if (!hasOwnProperty.call(eventListenersForEventNames, anEventName))
+    {
+        var eventListenersForEventName = [];
+        eventListenersForEventNames[anEventName] = eventListenersForEventName;
+    }
+    else
+        var eventListenersForEventName = eventListenersForEventNames[anEventName];
+    var index = eventListenersForEventName.length;
+    while (index--)
+        if (eventListenersForEventName[index] === anEventListener)
+            return;
+    eventListenersForEventName.push(anEventListener);
+}
+EventDispatcher.prototype.removeEventListener = function( anEventName, anEventListener)
+{
+    var eventListenersForEventNames = this._eventListenersForEventNames;
+    if (!hasOwnProperty.call(eventListenersForEventNames, anEventName))
+        return;
+    var eventListenersForEventName = eventListenersForEventNames[anEventName],
+        index = eventListenersForEventName.length;
+    while (index--)
+        if (eventListenersForEventName[index] === anEventListener)
+            return eventListenersForEventName.splice(index, 1);
+}
+EventDispatcher.prototype.dispatchEvent = function( anEvent)
+{
+    var type = anEvent.type,
+        eventListenersForEventNames = this._eventListenersForEventNames;
+    if (hasOwnProperty.call(eventListenersForEventNames, type))
+    {
+        var eventListenersForEventName = this._eventListenersForEventNames[type],
+            index = 0,
+            count = eventListenersForEventName.length;
+        for (; index < count; ++index)
+            eventListenersForEventName[index](anEvent);
+    }
+    var manual = (this._owner || this)["on" + type];
+    if (manual)
+        manual(anEvent);
+}
+var asynchronousTimeoutCount = 0,
+    asynchronousTimeoutId = null,
+    asynchronousFunctionQueue = [];
+function Asynchronous( aFunction)
+{
+    var currentAsynchronousTimeoutCount = asynchronousTimeoutCount;
+    if (asynchronousTimeoutId === null)
+    {
+        window.setNativeTimeout(function()
+        {
+            var queue = asynchronousFunctionQueue,
+                index = 0,
+                count = asynchronousFunctionQueue.length;
+            ++asynchronousTimeoutCount;
+            asynchronousTimeoutId = null;
+            asynchronousFunctionQueue = [];
+            for (; index < count; ++index)
+                queue[index]();
+        }, 0);
+    }
+    return function()
+    {
+        var args = arguments;
+        if (asynchronousTimeoutCount > currentAsynchronousTimeoutCount)
+            aFunction.apply(this, args);
+        else
+            asynchronousFunctionQueue.push(function() { aFunction.apply(this, args) });
+    };
+}
+var NativeRequest = null;
+if (window.ActiveXObject !== undefined)
+{
+    var MSXML_XMLHTTP_OBJECTS = ["Msxml2.XMLHTTP.3.0", "Msxml2.XMLHTTP.6.0"],
+        index = MSXML_XMLHTTP_OBJECTS.length;
+    while (index--)
+    {
+        try
+        {
+            var MSXML_XMLHTTP = MSXML_XMLHTTP_OBJECTS[index];
+            new ActiveXObject(MSXML_XMLHTTP);
+            NativeRequest = function()
+            {
+                return new ActiveXObject(MSXML_XMLHTTP);
+            }
+            break;
+        }
+        catch (anException)
+        {
+        }
+    }
+}
+if (!NativeRequest)
+    NativeRequest = window.XMLHttpRequest;
+CFHTTPRequest = function()
+{
+    this._requestHeaders = {};
+    this._mimeType = null;
+    this._eventDispatcher = new EventDispatcher(this);
+    this._nativeRequest = new NativeRequest();
+    var self = this;
+    this._stateChangeHandler = function()
+    {
+        determineAndDispatchHTTPRequestEvents(self);
+    }
+    this._nativeRequest.onreadystatechange = this._stateChangeHandler;
+    if (CFHTTPRequest.AuthenticationDelegate !== nil)
+        this._eventDispatcher.addEventListener("HTTP403", function(){CFHTTPRequest.AuthenticationDelegate(self)});
+}
+CFHTTPRequest.UninitializedState = 0;
+CFHTTPRequest.LoadingState = 1;
+CFHTTPRequest.LoadedState = 2;
+CFHTTPRequest.InteractiveState = 3;
+CFHTTPRequest.CompleteState = 4;
+CFHTTPRequest.AuthenticationDelegate = nil;
+CFHTTPRequest.prototype.status = function()
+{
+    try
+    {
+        return this._nativeRequest.status || 0;
+    }
+    catch (anException)
+    {
+        return 0;
+    }
+}
+CFHTTPRequest.prototype.statusText = function()
+{
+    try
+    {
+        return this._nativeRequest.statusText || "";
+    }
+    catch (anException)
+    {
+        return "";
+    }
+}
+CFHTTPRequest.prototype.readyState = function()
+{
+    return this._nativeRequest.readyState;
+}
+CFHTTPRequest.prototype.success = function()
+{
+    var status = this.status();
+    if (status >= 200 && status < 300)
+        return YES;
+    return status === 0 && this.responseText() && this.responseText().length;
+}
+CFHTTPRequest.prototype.responseXML = function()
+{
+    var responseXML = this._nativeRequest.responseXML;
+    if (responseXML && (NativeRequest === window.XMLHttpRequest))
+        return responseXML;
+    return parseXML(this.responseText());
+}
+CFHTTPRequest.prototype.responsePropertyList = function()
+{
+    var responseText = this.responseText();
+    if (CFPropertyList.sniffedFormatOfString(responseText) === CFPropertyList.FormatXML_v1_0)
+        return CFPropertyList.propertyListFromXML(this.responseXML());
+    return CFPropertyList.propertyListFromString(responseText);
+}
+CFHTTPRequest.prototype.responseText = function()
+{
+    return this._nativeRequest.responseText;
+}
+CFHTTPRequest.prototype.setRequestHeader = function( aHeader, aValue)
+{
+    this._requestHeaders[aHeader] = aValue;
+}
+CFHTTPRequest.prototype.getResponseHeader = function( aHeader)
+{
+    return this._nativeRequest.getResponseHeader(aHeader);
+}
+CFHTTPRequest.prototype.getAllResponseHeaders = function()
+{
+    return this._nativeRequest.getAllResponseHeaders();
+}
+CFHTTPRequest.prototype.overrideMimeType = function( aMimeType)
+{
+    this._mimeType = aMimeType;
+}
+CFHTTPRequest.prototype.open = function( aMethod, aURL, isAsynchronous, aUser, aPassword)
+{
+    this._URL = aURL;
+    this._async = isAsynchronous;
+    this._method = aMethod;
+    this._user = aUser;
+    this._password = aPassword;
+    return this._nativeRequest.open(aMethod, aURL, isAsynchronous, aUser, aPassword);
+}
+CFHTTPRequest.prototype.send = function( aBody)
+{
+    delete this._nativeRequest.onreadystatechange;
+    for (var i in this._requestHeaders)
+    {
+        if (this._requestHeaders.hasOwnProperty(i))
+            this._nativeRequest.setRequestHeader(i, this._requestHeaders[i]);
+    }
+    if (this._mimeType && "overrideMimeType" in this._nativeRequest)
+        this._nativeRequest.overrideMimeType(this._mimeType);
+    this._nativeRequest.open(this._method, this._URL, this._async, this._user, this._password);
+    this._nativeRequest.onreadystatechange = this._stateChangeHandler;
+    try
+    {
+        return this._nativeRequest.send(aBody);
+    }
+    catch (anException)
+    {
+        this._eventDispatcher.dispatchEvent({ type:"failure", request:this });
+    }
+}
+CFHTTPRequest.prototype.abort = function()
+{
+    return this._nativeRequest.abort();
+}
+CFHTTPRequest.prototype.addEventListener = function( anEventName, anEventListener)
+{
+    this._eventDispatcher.addEventListener(anEventName, anEventListener);
+}
+CFHTTPRequest.prototype.removeEventListener = function( anEventName, anEventListener)
+{
+    this._eventDispatcher.removeEventListener(anEventName, anEventListener);
+}
+function determineAndDispatchHTTPRequestEvents( aRequest)
+{
+    var eventDispatcher = aRequest._eventDispatcher;
+    eventDispatcher.dispatchEvent({ type:"readystatechange", request:aRequest});
+    var nativeRequest = aRequest._nativeRequest,
+        readyStates = ["uninitialized", "loading", "loaded", "interactive", "complete"];
+    if (readyStates[aRequest.readyState()] === "complete")
+    {
+        var status = "HTTP" + aRequest.status();
+        eventDispatcher.dispatchEvent({ type:status, request:aRequest });
+        var result = aRequest.success() ? "success" : "failure";
+        eventDispatcher.dispatchEvent({ type:result, request:aRequest });
+        eventDispatcher.dispatchEvent({ type:readyStates[aRequest.readyState()], request:aRequest});
+    }
+    else
+        eventDispatcher.dispatchEvent({ type:readyStates[aRequest.readyState()], request:aRequest});
+}
+function FileRequest( aURL, onsuccess, onfailure)
+{
+    var request = new CFHTTPRequest();
+    if (aURL.pathExtension() === "plist")
+        request.overrideMimeType("text/xml");
+    if (exports.asyncLoader)
+    {
+        request.onsuccess = Asynchronous(onsuccess);
+        request.onfailure = Asynchronous(onfailure);
+    }
+    else
+    {
+        request.onsuccess = onsuccess;
+        request.onfailure = onfailure;
+    }
+    request.open("GET", aURL.absoluteString(), exports.asyncLoader);
+    request.send("");
+}
+exports.asyncLoader = YES;
+exports.Asynchronous = Asynchronous;
+exports.determineAndDispatchHTTPRequestEvents = determineAndDispatchHTTPRequestEvents;
+var OBJECT_COUNT = 0;
+objj_generateObjectUID = function()
+{
+    return OBJECT_COUNT++;
+}
+CFPropertyList = function()
+{
+    this._UID = objj_generateObjectUID();
+}
+CFPropertyList.DTDRE = /^\s*(?:<\?\s*xml\s+version\s*=\s*\"1.0\"[^>]*\?>\s*)?(?:<\!DOCTYPE[^>]*>\s*)?/i
+CFPropertyList.XMLRE = /^\s*(?:<\?\s*xml\s+version\s*=\s*\"1.0\"[^>]*\?>\s*)?(?:<\!DOCTYPE[^>]*>\s*)?<\s*plist[^>]*\>/i;
+CFPropertyList.FormatXMLDTD = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">";
+CFPropertyList.Format280NorthMagicNumber = "280NPLIST";
+CFPropertyList.FormatOpenStep = 1,
+CFPropertyList.FormatXML_v1_0 = 100,
+CFPropertyList.FormatBinary_v1_0 = 200,
+CFPropertyList.Format280North_v1_0 = -1000;
+CFPropertyList.sniffedFormatOfString = function( aString)
+{
+    if (aString.match(CFPropertyList.XMLRE))
+        return CFPropertyList.FormatXML_v1_0;
+    if (aString.substr(0, CFPropertyList.Format280NorthMagicNumber.length) === CFPropertyList.Format280NorthMagicNumber)
+       return CFPropertyList.Format280North_v1_0;
+    return NULL;
+}
+CFPropertyList.dataFromPropertyList = function( aPropertyList, aFormat)
+{
+    var data = new CFMutableData();
+    data.setRawString(CFPropertyList.stringFromPropertyList(aPropertyList, aFormat));
+    return data;
+}
+CFPropertyList.stringFromPropertyList = function( aPropertyList, aFormat)
+{
+    if (!aFormat)
+        aFormat = CFPropertyList.Format280North_v1_0;
+    var serializers = CFPropertyListSerializers[aFormat];
+    return serializers["start"]() +
+            serializePropertyList(aPropertyList, serializers) +
+            serializers["finish"]();
+}
+function serializePropertyList( aPropertyList, serializers)
+{
+    var type = typeof aPropertyList,
+        valueOf = aPropertyList.valueOf(),
+        typeValueOf = typeof valueOf;
+    if (type !== typeValueOf)
+    {
+        type = typeValueOf;
+        aPropertyList = valueOf;
+    }
+    if (aPropertyList === YES || aPropertyList === NO)
+        type = "boolean";
+    else if (type === "number")
+    {
+        if (FLOOR(aPropertyList) === aPropertyList)
+            type = "integer";
+        else
+            type = "real";
+    }
+    else if (type !== "string")
+    {
+        if (aPropertyList.slice)
+            type = "array";
+        else
+            type = "dictionary";
+    }
+    return serializers[type](aPropertyList, serializers);
+}
+var CFPropertyListSerializers = { };
+CFPropertyListSerializers[CFPropertyList.FormatXML_v1_0] =
+{
+    "start": function()
+                    {
+                        return CFPropertyList.FormatXMLDTD + "<plist version = \"1.0\">";
+                    },
+    "finish": function()
+                    {
+                        return "</plist>";
+                    },
+    "string": function( aString)
+                    {
+                        return "<string>" + encodeHTMLComponent(aString) + "</string>";;
+                    },
+    "boolean" : function( aBoolean)
+                    {
+                        return aBoolean ? "<true/>" : "<false/>";
+                    },
+    "integer": function( anInteger)
+                    {
+                        return "<integer>" + anInteger + "</integer>";
+                    },
+    "real": function( aFloat)
+                    {
+                        return "<real>" + aFloat + "</real>";
+                    },
+    "array": function( anArray, serializers)
+                    {
+                        var index = 0,
+                            count = anArray.length,
+                            string = "<array>";
+                        for (; index < count; ++index)
+                            string += serializePropertyList(anArray[index], serializers);
+                        return string + "</array>";
+                    },
+    "dictionary": function( aDictionary, serializers)
+                    {
+                        var keys = aDictionary._keys,
+                            index = 0,
+                            count = keys.length,
+                            string = "<dict>";
+                        for (; index < count; ++index)
+                        {
+                            var key = keys[index];
+                            string += "<key>" + key + "</key>";
+                            string += serializePropertyList(aDictionary.valueForKey(key), serializers);
+                        }
+                        return string + "</dict>";
+                    }
+}
+var ARRAY_MARKER = "A",
+    DICTIONARY_MARKER = "D",
+    FLOAT_MARKER = "f",
+    INTEGER_MARKER = "d",
+    STRING_MARKER = "S",
+    TRUE_MARKER = "T",
+    FALSE_MARKER = "F",
+    KEY_MARKER = "K",
+    END_MARKER = "E";
+CFPropertyListSerializers[CFPropertyList.Format280North_v1_0] =
+{
+    "start": function()
+                    {
+                        return CFPropertyList.Format280NorthMagicNumber + ";1.0;";
+                    },
+    "finish": function()
+                    {
+                        return "";
+                    },
+    "string" : function( aString)
+                    {
+                        return STRING_MARKER + ';' + aString.length + ';' + aString;
+                    },
+    "boolean" : function( aBoolean)
+                    {
+                        return (aBoolean ? TRUE_MARKER : FALSE_MARKER) + ';';
+                    },
+    "integer": function( anInteger)
+                    {
+                        var string = "" + anInteger;
+                        return INTEGER_MARKER + ';' + string.length + ';' + string;
+                    },
+    "real": function( aFloat)
+                    {
+                        var string = "" + aFloat;
+                        return FLOAT_MARKER + ';' + string.length + ';' + string;
+                    },
+    "array": function( anArray, serializers)
+                    {
+                        var index = 0,
+                            count = anArray.length,
+                            string = ARRAY_MARKER + ';';
+                        for (; index < count; ++index)
+                            string += serializePropertyList(anArray[index], serializers);
+                        return string + END_MARKER + ';';
+                    },
+    "dictionary": function( aDictionary, serializers)
+                    {
+                        var keys = aDictionary._keys,
+                            index = 0,
+                            count = keys.length,
+                            string = DICTIONARY_MARKER +';';
+                        for (; index < count; ++index)
+                        {
+                            var key = keys[index];
+                            string += KEY_MARKER + ';' + key.length + ';' + key;
+                            string += serializePropertyList(aDictionary.valueForKey(key), serializers);
+                        }
+                        return string + END_MARKER + ';';
+                    }
+}
+var XML_XML = "xml",
+    XML_DOCUMENT = "#document",
+    PLIST_PLIST = "plist",
+    PLIST_KEY = "key",
+    PLIST_DICTIONARY = "dict",
+    PLIST_ARRAY = "array",
+    PLIST_STRING = "string",
+    PLIST_BOOLEAN_TRUE = "true",
+    PLIST_BOOLEAN_FALSE = "false",
+    PLIST_NUMBER_REAL = "real",
+    PLIST_NUMBER_INTEGER = "integer",
+    PLIST_DATA = "data";
+var _plist_traverseNextNode = function(anXMLNode, stayWithin, stack)
+{
+    var node = anXMLNode;
+    node = (node.firstChild); if (node !== NULL && ((node.nodeType) === 8 || (node.nodeType) === 3)) while ((node = (node.nextSibling)) && ((node.nodeType) === 8 || (node.nodeType) === 3)) ;;
+    if (node)
+        return node;
+    if ((String(anXMLNode.nodeName)) === PLIST_ARRAY || (String(anXMLNode.nodeName)) === PLIST_DICTIONARY)
+        stack.pop();
+    else
+    {
+        if (node === stayWithin)
+            return NULL;
+        node = anXMLNode;
+        while ((node = (node.nextSibling)) && ((node.nodeType) === 8 || (node.nodeType) === 3)) ;;
+        if (node)
+            return node;
+    }
+    node = anXMLNode;
+    while (node)
+    {
+        var next = node;
+        while ((next = (next.nextSibling)) && ((next.nodeType) === 8 || (next.nodeType) === 3)) ;;
+        if (next)
+            return next;
+        var node = (node.parentNode);
+        if (stayWithin && node === stayWithin)
+            return NULL;
+        stack.pop();
+    }
+    return NULL;
+}
+CFPropertyList.propertyListFromData = function( aData, aFormat)
+{
+    return CFPropertyList.propertyListFromString(aData.rawString(), aFormat);
+}
+CFPropertyList.propertyListFromString = function( aString, aFormat)
+{
+    if (!aFormat)
+        aFormat = CFPropertyList.sniffedFormatOfString(aString);
+    if (aFormat === CFPropertyList.FormatXML_v1_0)
+        return CFPropertyList.propertyListFromXML(aString);
+    if (aFormat === CFPropertyList.Format280North_v1_0)
+        return propertyListFrom280NorthString(aString);
+    return NULL;
+}
+var ARRAY_MARKER = "A",
+    DICTIONARY_MARKER = "D",
+    FLOAT_MARKER = "f",
+    INTEGER_MARKER = "d",
+    STRING_MARKER = "S",
+    TRUE_MARKER = "T",
+    FALSE_MARKER = "F",
+    KEY_MARKER = "K",
+    END_MARKER = "E";
+function propertyListFrom280NorthString( aString)
+{
+    var stream = new MarkedStream(aString),
+        marker = NULL,
+        key = "",
+        object = NULL,
+        plistObject = NULL,
+        containers = [],
+        currentContainer = NULL;
+    while (marker = stream.getMarker())
+    {
+        if (marker === END_MARKER)
+        {
+            containers.pop();
+            continue;
+        }
+        var count = containers.length;
+        if (count)
+            currentContainer = containers[count - 1];
+        if (marker === KEY_MARKER)
+        {
+            key = stream.getString();
+            marker = stream.getMarker();
+        }
+        switch (marker)
+        {
+            case ARRAY_MARKER: object = []
+                                    containers.push(object);
+                                    break;
+            case DICTIONARY_MARKER: object = new CFMutableDictionary();
+                                    containers.push(object);
+                                    break;
+            case FLOAT_MARKER: object = parseFloat(stream.getString());
+                                    break;
+            case INTEGER_MARKER: object = parseInt(stream.getString(), 10);
+                                    break;
+            case STRING_MARKER: object = stream.getString();
+                                    break;
+            case TRUE_MARKER: object = YES;
+                                    break;
+            case FALSE_MARKER: object = NO;
+                                    break;
+            default: throw new Error("*** " + marker + " marker not recognized in Plist.");
+        }
+        if (!plistObject)
+            plistObject = object;
+        else if (currentContainer)
+            if (currentContainer.slice)
+                currentContainer.push(object);
+            else
+                currentContainer.setValueForKey(key, object);
+    }
+    return plistObject;
+}
+function encodeHTMLComponent( aString)
+{
+    return aString.replace(/&/g,'&amp;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function decodeHTMLComponent( aString)
+{
+    return aString.replace(/&quot;/g, '"').replace(/&apos;/g, '\'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+}
+function parseXML( aString)
+{
+    if (window.DOMParser)
+        return (new window.DOMParser().parseFromString(aString, "text/xml").documentElement);
+    else if (window.ActiveXObject)
+    {
+        XMLNode = new ActiveXObject("Microsoft.XMLDOM");
+        var matches = aString.match(CFPropertyList.DTDRE);
+        if (matches)
+            aString = aString.substr(matches[0].length);
+        XMLNode.loadXML(aString);
+        return XMLNode
+    }
+    return NULL;
+}
+CFPropertyList.propertyListFromXML = function( aStringOrXMLNode)
+{
+    var XMLNode = aStringOrXMLNode;
+    if (aStringOrXMLNode.valueOf && typeof aStringOrXMLNode.valueOf() === "string")
+        XMLNode = parseXML(aStringOrXMLNode);
+    while (((String(XMLNode.nodeName)) === XML_DOCUMENT) || ((String(XMLNode.nodeName)) === XML_XML))
+        XMLNode = (XMLNode.firstChild); if (XMLNode !== NULL && ((XMLNode.nodeType) === 8 || (XMLNode.nodeType) === 3)) while ((XMLNode = (XMLNode.nextSibling)) && ((XMLNode.nodeType) === 8 || (XMLNode.nodeType) === 3)) ;;
+    if (((XMLNode.nodeType) === 10))
+        while ((XMLNode = (XMLNode.nextSibling)) && ((XMLNode.nodeType) === 8 || (XMLNode.nodeType) === 3)) ;;
+    if (!((String(XMLNode.nodeName)) === PLIST_PLIST))
+        return NULL;
+    var key = "",
+        object = NULL,
+        plistObject = NULL,
+        plistNode = XMLNode,
+        containers = [],
+        currentContainer = NULL;
+    while (XMLNode = _plist_traverseNextNode(XMLNode, plistNode, containers))
+    {
+        var count = containers.length;
+        if (count)
+            currentContainer = containers[count - 1];
+        if ((String(XMLNode.nodeName)) === PLIST_KEY)
+        {
+            key = ((String((XMLNode.firstChild).nodeValue)));
+            while ((XMLNode = (XMLNode.nextSibling)) && ((XMLNode.nodeType) === 8 || (XMLNode.nodeType) === 3)) ;;
+        }
+        switch (String((String(XMLNode.nodeName))))
+        {
+            case PLIST_ARRAY: object = []
+                                        containers.push(object);
+                                        break;
+            case PLIST_DICTIONARY: object = new CFMutableDictionary();
+                                        containers.push(object);
+                                        break;
+            case PLIST_NUMBER_REAL: object = parseFloat(((String((XMLNode.firstChild).nodeValue))));
+                                        break;
+            case PLIST_NUMBER_INTEGER: object = parseInt(((String((XMLNode.firstChild).nodeValue))), 10);
+                                        break;
+            case PLIST_STRING: object = decodeHTMLComponent((XMLNode.firstChild) ? ((String((XMLNode.firstChild).nodeValue))) : "");
+                                        break;
+            case PLIST_BOOLEAN_TRUE: object = YES;
+                                        break;
+            case PLIST_BOOLEAN_FALSE: object = NO;
+                                        break;
+            case PLIST_DATA: object = new CFMutableData();
+                                        object.bytes = (XMLNode.firstChild) ? CFData.decodeBase64ToArray(((String((XMLNode.firstChild).nodeValue))), YES) : [];
+                                        break;
+            default: throw new Error("*** " + (String(XMLNode.nodeName)) + " tag not recognized in Plist.");
+        }
+        if (!plistObject)
+            plistObject = object;
+        else if (currentContainer)
+            if (currentContainer.slice)
+                currentContainer.push(object);
+            else
+                currentContainer.setValueForKey(key, object);
+    }
+    return plistObject;
+}
+kCFPropertyListOpenStepFormat = CFPropertyList.FormatOpenStep;
+kCFPropertyListXMLFormat_v1_0 = CFPropertyList.FormatXML_v1_0;
+kCFPropertyListBinaryFormat_v1_0 = CFPropertyList.FormatBinary_v1_0;
+kCFPropertyList280NorthFormat_v1_0 = CFPropertyList.Format280North_v1_0;
+CFPropertyListCreate = function()
+{
+    return new CFPropertyList();
+}
+CFPropertyListCreateFromXMLData = function( data)
+{
+    return CFPropertyList.propertyListFromData(data, CFPropertyList.FormatXML_v1_0);
+}
+CFPropertyListCreateXMLData = function( aPropertyList)
+{
+    return CFPropertyList.dataFromPropertyList(aPropertyList, CFPropertyList.FormatXML_v1_0);
+}
+CFPropertyListCreateFrom280NorthData = function( data)
+{
+    return CFPropertyList.propertyListFromData(data, CFPropertyList.Format280North_v1_0);
+}
+CFPropertyListCreate280NorthData = function( aPropertyList)
+{
+    return CFPropertyList.dataFromPropertyList(aPropertyList, CFPropertyList.Format280North_v1_0);
+}
+CPPropertyListCreateFromData = function( data, aFormat)
+{
+    return CFPropertyList.propertyListFromData(data, aFormat);
+}
+CPPropertyListCreateData = function( aPropertyList, aFormat)
+{
+    return CFPropertyList.dataFromPropertyList(aPropertyList, aFormat);
+}
+CFDictionary = function( aDictionary)
+{
+    this._keys = [];
+    this._count = 0;
+    this._buckets = { };
+    this._UID = objj_generateObjectUID();
+}
+var indexOf = Array.prototype.indexOf,
+    hasOwnProperty = Object.prototype.hasOwnProperty;
+CFDictionary.prototype.copy = function()
+{
+    return this;
+}
+CFDictionary.prototype.mutableCopy = function()
+{
+    var newDictionary = new CFMutableDictionary(),
+        keys = this._keys,
+        count = this._count;
+    newDictionary._keys = keys.slice();
+    newDictionary._count = count;
+    var index = 0,
+        buckets = this._buckets,
+        newBuckets = newDictionary._buckets;
+    for (; index < count; ++index)
+    {
+        var key = keys[index];
+        newBuckets[key] = buckets[key];
+    }
+    return newDictionary;
+}
+CFDictionary.prototype.containsKey = function( aKey)
+{
+    return hasOwnProperty.apply(this._buckets, [aKey]);
+}
+CFDictionary.prototype.containsKey.displayName = "CFDictionary.prototype.containsKey";
+CFDictionary.prototype.containsValue = function( anObject)
+{
+    var keys = this._keys,
+        buckets = this._buckets,
+        index = 0,
+        count = keys.length;
+    for (; index < count; ++index)
+        if (buckets[keys] === anObject)
+            return YES;
+    return NO;
+}
+CFDictionary.prototype.containsValue.displayName = "CFDictionary.prototype.containsValue";
+CFDictionary.prototype.count = function()
+{
+    return this._count;
+}
+CFDictionary.prototype.count.displayName = "CFDictionary.prototype.count";
+CFDictionary.prototype.countOfKey = function( aKey)
+{
+    return this.containsKey(aKey) ? 1 : 0;
+}
+CFDictionary.prototype.countOfKey.displayName = "CFDictionary.prototype.countOfKey";
+CFDictionary.prototype.countOfValue = function( anObject)
+{
+    var keys = this._keys,
+        buckets = this._buckets,
+        index = 0,
+        count = keys.length,
+        countOfValue = 0;
+    for (; index < count; ++index)
+        if (buckets[keys] === anObject)
+            return ++countOfValue;
+    return countOfValue;
+}
+CFDictionary.prototype.countOfValue.displayName = "CFDictionary.prototype.countOfValue";
+CFDictionary.prototype.keys = function()
+{
+    return this._keys.slice();
+}
+CFDictionary.prototype.keys.displayName = "CFDictionary.prototype.keys";
+CFDictionary.prototype.valueForKey = function( aKey)
+{
+    var buckets = this._buckets;
+    if (!hasOwnProperty.apply(buckets, [aKey]))
+        return nil;
+    return buckets[aKey];
+}
+CFDictionary.prototype.valueForKey.displayName = "CFDictionary.prototype.valueForKey";
+CFDictionary.prototype.toString = function()
+{
+    var string = "{\n",
+        keys = this._keys,
+        index = 0,
+        count = this._count;
+    for (; index < count; ++index)
+    {
+        var key = keys[index];
+        string += "\t" + key + " = \"" + String(this.valueForKey(key)).split('\n').join("\n\t") + "\"\n";
+    }
+    return string + "}";
+}
+CFDictionary.prototype.toString.displayName = "CFDictionary.prototype.toString";
+CFMutableDictionary = function( aDictionary)
+{
+    CFDictionary.apply(this, []);
+}
+CFMutableDictionary.prototype = new CFDictionary();
+CFMutableDictionary.prototype.copy = function()
+{
+    return this.mutableCopy();
+}
+CFMutableDictionary.prototype.addValueForKey = function( aKey, aValue)
+{
+    if (this.containsKey(aKey))
+        return;
+    ++this._count;
+    this._keys.push(aKey);
+    this._buckets[aKey] = aValue;
+}
+CFMutableDictionary.prototype.addValueForKey.displayName = "CFMutableDictionary.prototype.addValueForKey";
+CFMutableDictionary.prototype.removeValueForKey = function( aKey)
+{
+    var indexOfKey = -1;
+    if (indexOf)
+        indexOfKey = indexOf.call(this._keys, aKey);
+    else
+    {
+        var keys = this._keys,
+            index = 0,
+            count = keys.length;
+        for (; index < count; ++index)
+            if (keys[index] === aKey)
+            {
+                indexOfKey = index;
+                break;
+            }
+    }
+    if (indexOfKey === -1)
+        return;
+    --this._count;
+    this._keys.splice(indexOfKey, 1);
+    delete this._buckets[aKey];
+}
+CFMutableDictionary.prototype.removeValueForKey.displayName = "CFMutableDictionary.prototype.removeValueForKey";
+CFMutableDictionary.prototype.removeAllValues = function()
+{
+    this._count = 0;
+    this._keys = [];
+    this._buckets = { };
+}
+CFMutableDictionary.prototype.removeAllValues.displayName = "CFMutableDictionary.prototype.removeAllValues";
+CFMutableDictionary.prototype.replaceValueForKey = function( aKey, aValue)
+{
+    if (!this.containsKey(aKey))
+        return;
+    this._buckets[aKey] = aValue;
+}
+CFMutableDictionary.prototype.replaceValueForKey.displayName = "CFMutableDictionary.prototype.replaceValueForKey";
+CFMutableDictionary.prototype.setValueForKey = function( aKey, aValue)
+{
+    if (aValue === nil || aValue === undefined)
+        this.removeValueForKey(aKey);
+    else if (this.containsKey(aKey))
+        this.replaceValueForKey(aKey, aValue);
+    else
+        this.addValueForKey(aKey, aValue);
+}
+CFMutableDictionary.prototype.setValueForKey.displayName = "CFMutableDictionary.prototype.setValueForKey";
+CFData = function()
+{
+    this._rawString = NULL;
+    this._propertyList = NULL;
+    this._propertyListFormat = NULL;
+    this._JSONObject = NULL;
+    this._bytes = NULL;
+    this._base64 = NULL;
+}
+CFData.prototype.propertyList = function()
+{
+    if (!this._propertyList)
+        this._propertyList = CFPropertyList.propertyListFromString(this.rawString());
+    return this._propertyList;
+}
+CFData.prototype.JSONObject = function()
+{
+    if (!this._JSONObject)
+    {
+        try
+        {
+            this._JSONObject = JSON.parse(this.rawString());
+        }
+        catch (anException)
+        {
+        }
+    }
+    return this._JSONObject;
+}
+CFData.prototype.rawString = function()
+{
+    if (this._rawString === NULL)
+    {
+        if (this._propertyList)
+            this._rawString = CFPropertyList.stringFromPropertyList(this._propertyList, this._propertyListFormat);
+        else if (this._JSONObject)
+            this._rawString = JSON.stringify(this._JSONObject);
+        else
+            throw new Error("Can't convert data to string.");
+    }
+    return this._rawString;
+}
+CFData.prototype.bytes = function()
+{
+    return this._bytes;
+}
+CFData.prototype.base64 = function()
+{
+    return this._base64;
+}
+CFMutableData = function()
+{
+    CFData.call(this);
+}
+CFMutableData.prototype = new CFData();
+function clearMutableData( aData)
+{
+    this._rawString = NULL;
+    this._propertyList = NULL;
+    this._propertyListFormat = NULL;
+    this._JSONObject = NULL;
+    this._bytes = NULL;
+    this._base64 = NULL;
+}
+CFMutableData.prototype.setPropertyList = function( aPropertyList, aFormat)
+{
+    clearMutableData(this);
+    this._propertyList = aPropertyList;
+    this._propertyListFormat = aFormat;
+}
+CFMutableData.prototype.setJSONObject = function( anObject)
+{
+    clearMutableData(this);
+    this._JSONObject = anObject
+}
+CFMutableData.prototype.setRawString = function( aString)
+{
+    clearMutableData(this);
+    this._rawString = aString;
+}
+CFMutableData.prototype.setBytes = function( bytes)
+{
+    clearMutableData(this);
+    this._bytes = bytes;
+}
+CFMutableData.prototype.setBase64String = function( aBase64String)
+{
+    clearMutableData(this);
+    this._base64 = aBase64String;
+}
+var base64_map_to = [
+        "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
+        "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
+        "0","1","2","3","4","5","6","7","8","9","+","/","="],
+    base64_map_from = [];
+for (var i = 0; i < base64_map_to.length; i++)
+    base64_map_from[base64_map_to[i].charCodeAt(0)] = i;
+CFData.decodeBase64ToArray = function(input, strip)
+{
+    if (strip)
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+    var pad = (input[input.length-1] == "=" ? 1 : 0) + (input[input.length-2] == "=" ? 1 : 0),
+        length = input.length,
+        output = [];
+    var i = 0;
+    while (i < length)
+    {
+        var bits = (base64_map_from[input.charCodeAt(i++)] << 18) |
+                    (base64_map_from[input.charCodeAt(i++)] << 12) |
+                    (base64_map_from[input.charCodeAt(i++)] << 6) |
+                    (base64_map_from[input.charCodeAt(i++)]);
+        output.push((bits & 0xFF0000) >> 16);
+        output.push((bits & 0xFF00) >> 8);
+        output.push(bits & 0xFF);
+    }
+    if (pad > 0)
+        return output.slice(0, -1 * pad);
+    return output;
+}
+CFData.encodeBase64Array = function(input)
+{
+    var pad = (3 - (input.length % 3)) % 3,
+        length = input.length + pad,
+        output = [];
+    if (pad > 0) input.push(0);
+    if (pad > 1) input.push(0);
+    var i = 0;
+    while (i < length)
+    {
+        var bits = (input[i++] << 16) |
+                    (input[i++] << 8) |
+                    (input[i++]);
+        output.push(base64_map_to[(bits & 0xFC0000) >> 18]);
+        output.push(base64_map_to[(bits & 0x3F000) >> 12]);
+        output.push(base64_map_to[(bits & 0xFC0) >> 6]);
+        output.push(base64_map_to[bits & 0x3F]);
+    }
+    if (pad > 0)
+    {
+        output[output.length-1] = "=";
+        input.pop();
+    }
+    if (pad > 1)
+    {
+        output[output.length-2] = "=";
+        input.pop();
+    }
+    return output.join("");
+}
+CFData.decodeBase64ToString = function(input, strip)
+{
+    return CFData.bytesToString(CFData.decodeBase64ToArray(input, strip));
+}
+CFData.bytesToString = function(bytes)
+{
+    return String.fromCharCode.apply(NULL, bytes);
+}
+CFData.encodeBase64String = function(input)
+{
+    var temp = [];
+    for (var i = 0; i < input.length; i++)
+        temp.push(input.charCodeAt(i));
+    return CFData.encodeBase64Array(temp);
+}
+var CFURLsForCachedUIDs,
+    CFURLPartsForURLStrings,
+    CFURLCachingEnableCount = 0;
+function enableCFURLCaching()
+{
+    if (++CFURLCachingEnableCount !== 1)
+        return;
+    CFURLsForCachedUIDs = { };
+    CFURLPartsForURLStrings = { };
+}
+function disableCFURLCaching()
+{
+    CFURLCachingEnableCount = MAX(CFURLCachingEnableCount - 1, 0);
+    if (CFURLCachingEnableCount !== 0)
+        return;
+    delete CFURLsForCachedUIDs;
+    delete CFURLPartsForURLStrings;
+}
+var URL_RE = new RegExp(
+    "^" +
+    "(?:" +
+        "([^:/?#]+):" +
+    ")?" +
+    "(?:" +
+        "(//)" +
+        "(" +
+            "(?:" +
+                "(" +
+                    "([^:@]*)" +
+                    ":?" +
+                    "([^:@]*)" +
+                ")?" +
+                "@" +
+            ")?" +
+            "([^:/?#]*)" +
+            "(?::(\\d*))?" +
+        ")" +
+    ")?" +
+    "([^?#]*)" +
+    "(?:\\?([^#]*))?" +
+    "(?:#(.*))?"
+);
+var URI_KEYS =
+[
+    "url",
+    "scheme",
+    "authorityRoot",
+    "authority",
+        "userInfo",
+            "user",
+            "password",
+        "domain",
+        "portNumber",
+    "path",
+    "queryString",
+    "fragment"
+];
+function CFURLGetParts( aURL)
+{
+    if (aURL._parts)
+        return aURL._parts;
+    var URLString = aURL.string(),
+        isMHTMLURL = URLString.match(/^mhtml:/);
+    if (isMHTMLURL)
+        URLString = URLString.substr("mhtml:".length);
+    if (CFURLCachingEnableCount > 0 && hasOwnProperty.call(CFURLPartsForURLStrings, URLString))
+    {
+        aURL._parts = CFURLPartsForURLStrings[URLString];
+        return aURL._parts;
+    }
+    aURL._parts = { };
+    var parts = aURL._parts,
+        results = URL_RE.exec(URLString),
+        index = results.length;
+    while (index--)
+        parts[URI_KEYS[index]] = results[index] || NULL;
+    parts.portNumber = parseInt(parts.portNumber, 10);
+    if (isNaN(parts.portNumber))
+        parts.portNumber = -1;
+    parts.pathComponents = [];
+    if (parts.path)
+    {
+        var split = parts.path.split("/"),
+            pathComponents = parts.pathComponents,
+            index = 0,
+            count = split.length;
+        for (; index < count; ++index)
+        {
+            var component = split[index];
+            if (component)
+                pathComponents.push(component);
+            else if (index === 0)
+                pathComponents.push("/");
+        }
+        parts.pathComponents = pathComponents;
+    }
+    if (isMHTMLURL)
+    {
+        parts.url = "mhtml:" + parts.url;
+        parts.scheme = "mhtml:" + parts.scheme;
+    }
+    if (CFURLCachingEnableCount > 0)
+        CFURLPartsForURLStrings[URLString] = parts;
+    return parts;
+}
+CFURL = function( aURL, aBaseURL)
+{
+    aURL = aURL || "";
+    if (aURL instanceof CFURL)
+    {
+        if (!aBaseURL)
+            return aURL;
+        var existingBaseURL = aURL.baseURL();
+        if (existingBaseURL)
+            aBaseURL = new CFURL(existingBaseURL.absoluteURL(), aBaseURL);
+        aURL = aURL.string();
+    }
+    if (CFURLCachingEnableCount > 0)
+    {
+        var cacheUID = aURL + " " + (aBaseURL && aBaseURL.UID() || "");
+        if (hasOwnProperty.call(CFURLsForCachedUIDs, cacheUID))
+            return CFURLsForCachedUIDs[cacheUID];
+        CFURLsForCachedUIDs[cacheUID] = this;
+    }
+    if (aURL.match(/^data:/))
+    {
+        var parts = { },
+            index = URI_KEYS.length;
+        while (index--)
+            parts[URI_KEYS[index]] = "";
+        parts.url = aURL;
+        parts.scheme = "data";
+        parts.pathComponents = [];
+        this._parts = parts;
+        this._standardizedURL = this;
+        this._absoluteURL = this;
+    }
+    this._UID = objj_generateObjectUID();
+    this._string = aURL;
+    this._baseURL = aBaseURL;
+}
+CFURL.displayName = "CFURL";
+CFURL.prototype.UID = function()
+{
+    return this._UID;
+}
+CFURL.prototype.UID.displayName = "CFURL.prototype.UID";
+var URLMap = { };
+CFURL.prototype.mappedURL = function()
+{
+    return URLMap[this.absoluteString()] || this;
+}
+CFURL.prototype.mappedURL.displayName = "CFURL.prototype.mappedURL";
+CFURL.setMappedURLForURL = function( fromURL, toURL)
+{
+    URLMap[fromURL.absoluteString()] = toURL;
+}
+CFURL.setMappedURLForURL.displayName = "CFURL.setMappedURLForURL";
+CFURL.prototype.schemeAndAuthority = function()
+{
+    var string = "",
+        scheme = this.scheme();
+    if (scheme)
+        string += scheme + ":";
+    var authority = this.authority();
+    if (authority)
+        string += "//" + authority;
+    return string;
+}
+CFURL.prototype.schemeAndAuthority.displayName = "CFURL.prototype.schemeAndAuthority";
+CFURL.prototype.absoluteString = function()
+{
+    if (this._absoluteString === undefined)
+        this._absoluteString = this.absoluteURL().string();
+    return this._absoluteString;
+}
+CFURL.prototype.absoluteString.displayName = "CFURL.prototype.absoluteString";
+CFURL.prototype.toString = function()
+{
+    return this.absoluteString();
+}
+CFURL.prototype.toString.displayName = "CFURL.prototype.toString";
+function resolveURL(aURL)
+{
+    aURL = aURL.standardizedURL();
+    var baseURL = aURL.baseURL();
+    if (!baseURL)
+        return aURL;
+    var parts = ((aURL)._parts || CFURLGetParts(aURL)),
+        resolvedParts,
+        absoluteBaseURL = baseURL.absoluteURL(),
+        baseParts = ((absoluteBaseURL)._parts || CFURLGetParts(absoluteBaseURL));
+    if (parts.scheme || parts.authority)
+        resolvedParts = parts;
+    else
+    {
+        resolvedParts = { };
+        resolvedParts.scheme = baseParts.scheme;
+        resolvedParts.authority = baseParts.authority;
+        resolvedParts.userInfo = baseParts.userInfo;
+        resolvedParts.user = baseParts.user;
+        resolvedParts.password = baseParts.password;
+        resolvedParts.domain = baseParts.domain;
+        resolvedParts.portNumber = baseParts.portNumber;
+        resolvedParts.queryString = parts.queryString;
+        resolvedParts.fragment = parts.fragment;
+        var pathComponents = parts.pathComponents
+        if (pathComponents.length && pathComponents[0] === "/")
+        {
+            resolvedParts.path = parts.path;
+            resolvedParts.pathComponents = pathComponents;
+        }
+        else
+        {
+            var basePathComponents = baseParts.pathComponents,
+                resolvedPathComponents = basePathComponents.concat(pathComponents);
+            if (!baseURL.hasDirectoryPath() && basePathComponents.length)
+                resolvedPathComponents.splice(basePathComponents.length - 1, 1);
+            if (pathComponents.length && (pathComponents[0] === ".." || pathComponents[0] === "."))
+                standardizePathComponents(resolvedPathComponents, YES);
+            resolvedParts.pathComponents = resolvedPathComponents;
+            resolvedParts.path = pathFromPathComponents(resolvedPathComponents, pathComponents.length <= 0 || aURL.hasDirectoryPath());
+        }
+    }
+    var resolvedString = URLStringFromParts(resolvedParts),
+        resolvedURL = new CFURL(resolvedString);
+    resolvedURL._parts = resolvedParts;
+    resolvedURL._standardizedURL = resolvedURL;
+    resolvedURL._standardizedString = resolvedString;
+    resolvedURL._absoluteURL = resolvedURL;
+    resolvedURL._absoluteString = resolvedString;
+    return resolvedURL;
+}
+function pathFromPathComponents( pathComponents, isDirectoryPath)
+{
+    var path = pathComponents.join("/");
+    if (path.length && path.charAt(0) === "/")
+        path = path.substr(1);
+    if (isDirectoryPath)
+        path += "/";
+    return path;
+}
+function standardizePathComponents( pathComponents, inPlace)
+{
+    var index = 0,
+        resultIndex = 0,
+        count = pathComponents.length,
+        result = inPlace ? pathComponents : [],
+        startsWithPeriod = NO;
+    for (; index < count; ++index)
+    {
+        var component = pathComponents[index];
+        if (component === "")
+             continue;
+        if (component === ".")
+        {
+            startsWithPeriod = resultIndex === 0;
+            continue;
+        }
+        if (component !== ".." || resultIndex === 0 || result[resultIndex - 1] === "..")
+        {
+            result[resultIndex] = component;
+            resultIndex++;
+            continue;
+        }
+        if (resultIndex > 0 && result[resultIndex - 1] !== "/")
+            --resultIndex;
+    }
+    if (startsWithPeriod && resultIndex === 0)
+        result[resultIndex++] = ".";
+    result.length = resultIndex;
+    return result;
+}
+function URLStringFromParts( parts)
+{
+    var string = "",
+        scheme = parts.scheme;
+    if (scheme)
+        string += scheme + ":";
+    var authority = parts.authority;
+    if (authority)
+        string += "//" + authority;
+    string += parts.path;
+    var queryString = parts.queryString;
+    if (queryString)
+        string += "?" + queryString;
+    var fragment = parts.fragment;
+    if (fragment)
+        string += "#" + fragment;
+    return string;
+}
+CFURL.prototype.absoluteURL = function()
+{
+    if (this._absoluteURL === undefined)
+        this._absoluteURL = resolveURL(this);
+    return this._absoluteURL;
+}
+CFURL.prototype.absoluteURL.displayName = "CFURL.prototype.absoluteURL";
+CFURL.prototype.standardizedURL = function()
+{
+    if (this._standardizedURL === undefined)
+    {
+        var parts = ((this)._parts || CFURLGetParts(this)),
+            pathComponents = parts.pathComponents,
+            standardizedPathComponents = standardizePathComponents(pathComponents, NO);
+        var standardizedPath = pathFromPathComponents(standardizedPathComponents, this.hasDirectoryPath());
+        if (parts.path === standardizedPath)
+            this._standardizedURL = this;
+        else
+        {
+            var standardizedParts = CFURLPartsCreateCopy(parts);
+            standardizedParts.pathComponents = standardizedPathComponents;
+            standardizedParts.path = standardizedPath;
+            var standardizedURL = new CFURL(URLStringFromParts(standardizedParts), this.baseURL());
+            standardizedURL._parts = standardizedParts;
+            standardizedURL._standardizedURL = standardizedURL;
+            this._standardizedURL = standardizedURL;
+        }
+    }
+    return this._standardizedURL;
+}
+CFURL.prototype.standardizedURL.displayName = "CFURL.prototype.standardizedURL";
+function CFURLPartsCreateCopy(parts)
+{
+    var copiedParts = { },
+        count = URI_KEYS.length;
+    while (count--)
+    {
+        var partName = URI_KEYS[count];
+        copiedParts[partName] = parts[partName];
+    }
+    return copiedParts;
+}
+CFURL.prototype.string = function()
+{
+    return this._string;
+}
+CFURL.prototype.string.displayName = "CFURL.prototype.string";
+CFURL.prototype.authority = function()
+{
+    var authority = ((this)._parts || CFURLGetParts(this)).authority;
+    if (authority)
+        return authority;
+    var baseURL = this.baseURL();
+    return baseURL && baseURL.authority() || "";
+}
+CFURL.prototype.authority.displayName = "CFURL.prototype.authority";
+CFURL.prototype.hasDirectoryPath = function()
+{
+    var hasDirectoryPath = this._hasDirectoryPath;
+    if (hasDirectoryPath === undefined)
+    {
+        var path = this.path();
+        if (!path)
+            return NO;
+        if (path.charAt(path.length - 1) === "/")
+            return YES;
+        var lastPathComponent = this.lastPathComponent();
+        hasDirectoryPath = lastPathComponent === "." || lastPathComponent === "..";
+        this._hasDirectoryPath = hasDirectoryPath;
+    }
+    return hasDirectoryPath;
+}
+CFURL.prototype.hasDirectoryPath.displayName = "CFURL.prototype.hasDirectoryPath";
+CFURL.prototype.hostName = function()
+{
+    return this.authority();
+}
+CFURL.prototype.hostName.displayName = "CFURL.prototype.hostName";
+CFURL.prototype.fragment = function()
+{
+    return ((this)._parts || CFURLGetParts(this)).fragment;
+}
+CFURL.prototype.fragment.displayName = "CFURL.prototype.fragment";
+CFURL.prototype.lastPathComponent = function()
+{
+    if (this._lastPathComponent === undefined)
+    {
+        var pathComponents = this.pathComponents(),
+            pathComponentCount = pathComponents.length;
+        if (!pathComponentCount)
+            this._lastPathComponent = "";
+        else
+            this._lastPathComponent = pathComponents[pathComponentCount - 1];
+    }
+    return this._lastPathComponent;
+}
+CFURL.prototype.lastPathComponent.displayName = "CFURL.prototype.lastPathComponent";
+CFURL.prototype.path = function()
+{
+    return ((this)._parts || CFURLGetParts(this)).path;
+}
+CFURL.prototype.path.displayName = "CFURL.prototype.path";
+CFURL.prototype.pathComponents = function()
+{
+    return ((this)._parts || CFURLGetParts(this)).pathComponents;
+}
+CFURL.prototype.pathComponents.displayName = "CFURL.prototype.pathComponents";
+CFURL.prototype.pathExtension = function()
+{
+    var lastPathComponent = this.lastPathComponent();
+    if (!lastPathComponent)
+        return NULL;
+    lastPathComponent = lastPathComponent.replace(/^\.*/, '');
+    var index = lastPathComponent.lastIndexOf(".");
+    return index <= 0 ? "" : lastPathComponent.substring(index + 1);
+}
+CFURL.prototype.pathExtension.displayName = "CFURL.prototype.pathExtension";
+CFURL.prototype.queryString = function()
+{
+    return ((this)._parts || CFURLGetParts(this)).queryString;
+}
+CFURL.prototype.queryString.displayName = "CFURL.prototype.queryString";
+CFURL.prototype.scheme = function()
+{
+    var scheme = this._scheme;
+    if (scheme === undefined)
+    {
+        scheme = ((this)._parts || CFURLGetParts(this)).scheme;
+        if (!scheme)
+        {
+            var baseURL = this.baseURL();
+            scheme = baseURL && baseURL.scheme();
+        }
+        this._scheme = scheme;
+    }
+    return scheme;
+}
+CFURL.prototype.scheme.displayName = "CFURL.prototype.scheme";
+CFURL.prototype.user = function()
+{
+    return ((this)._parts || CFURLGetParts(this)).user;
+}
+CFURL.prototype.user.displayName = "CFURL.prototype.user";
+CFURL.prototype.password = function()
+{
+    return ((this)._parts || CFURLGetParts(this)).password;
+}
+CFURL.prototype.password.displayName = "CFURL.prototype.password";
+CFURL.prototype.portNumber = function()
+{
+    return ((this)._parts || CFURLGetParts(this)).portNumber;
+}
+CFURL.prototype.portNumber.displayName = "CFURL.prototype.portNumber";
+CFURL.prototype.domain = function()
+{
+    return ((this)._parts || CFURLGetParts(this)).domain;
+}
+CFURL.prototype.domain.displayName = "CFURL.prototype.domain";
+CFURL.prototype.baseURL = function()
+{
+    return this._baseURL;
+}
+CFURL.prototype.baseURL.displayName = "CFURL.prototype.baseURL";
+CFURL.prototype.asDirectoryPathURL = function()
+{
+    if (this.hasDirectoryPath())
+        return this;
+    var lastPathComponent = this.lastPathComponent();
+    if (lastPathComponent !== "/")
+        lastPathComponent = "./" + lastPathComponent;
+    return new CFURL(lastPathComponent + "/", this);
+}
+CFURL.prototype.asDirectoryPathURL.displayName = "CFURL.prototype.asDirectoryPathURL";
+function CFURLGetResourcePropertiesForKeys( aURL)
+{
+    if (!aURL._resourcePropertiesForKeys)
+        aURL._resourcePropertiesForKeys = new CFMutableDictionary();
+    return aURL._resourcePropertiesForKeys;
+}
+CFURL.prototype.resourcePropertyForKey = function( aKey)
+{
+    return CFURLGetResourcePropertiesForKeys(this).valueForKey(aKey);
+}
+CFURL.prototype.resourcePropertyForKey.displayName = "CFURL.prototype.resourcePropertyForKey";
+CFURL.prototype.setResourcePropertyForKey = function( aKey, aValue)
+{
+    CFURLGetResourcePropertiesForKeys(this).setValueForKey(aKey, aValue);
+}
+CFURL.prototype.setResourcePropertyForKey.displayName = "CFURL.prototype.setResourcePropertyForKey";
+CFURL.prototype.staticResourceData = function()
+{
+    var data = new CFMutableData();
+    data.setRawString(StaticResource.resourceAtURL(this).contents());
+    return data;
+}
+CFURL.prototype.staticResourceData.displayName = "CFURL.prototype.staticResourceData";
+function MarkedStream( aString)
+{
+    this._string = aString;
+    var index = aString.indexOf(";");
+    this._magicNumber = aString.substr(0, index);
+    this._location = aString.indexOf(";", ++index);
+    this._version = aString.substring(index, this._location++);
+}
+MarkedStream.prototype.magicNumber = function()
+{
+    return this._magicNumber;
+}
+MarkedStream.prototype.magicNumber.displayName = "MarkedStream.prototype.magicNumber";
+MarkedStream.prototype.version = function()
+{
+    return this._version;
+}
+MarkedStream.prototype.version.displayName = "MarkedStream.prototype.version";
+MarkedStream.prototype.getMarker = function()
+{
+    var string = this._string,
+        location = this._location;
+    if (location >= string.length)
+        return null;
+    var next = string.indexOf(';', location);
+    if (next < 0)
+        return null;
+    var marker = string.substring(location, next);
+    if (marker === 'e')
+        return null;
+    this._location = next + 1;
+    return marker;
+}
+MarkedStream.prototype.getMarker.displayName = "MarkedStream.prototype.getMarker";
+MarkedStream.prototype.getString = function()
+{
+    var string = this._string,
+        location = this._location;
+    if (location >= string.length)
+        return null;
+    var next = string.indexOf(';', location);
+    if (next < 0)
+        return null;
+    var size = parseInt(string.substring(location, next), 10),
+        text = string.substr(next + 1, size);
+    this._location = next + 1 + size;
+    return text;
+}
+MarkedStream.prototype.getString.displayName = "MarkedStream.prototype.getString";
+var CFBundleUnloaded = 0,
+    CFBundleLoading = 1 << 0,
+    CFBundleLoadingInfoPlist = 1 << 1,
+    CFBundleLoadingExecutable = 1 << 2,
+    CFBundleLoadingSpritedImages = 1 << 3,
+    CFBundleLoaded = 1 << 4;
+var CFBundlesForURLStrings = { },
+    CFBundlesForClasses = { },
+    CFCacheBuster = new Date().getTime(),
+    CFTotalBytesLoaded = 0,
+    CPApplicationSizeInBytes = 0;
+CFBundle = function( aURL)
+{
+    aURL = makeAbsoluteURL(aURL).asDirectoryPathURL();
+    var URLString = aURL.absoluteString(),
+        existingBundle = CFBundlesForURLStrings[URLString];
+    if (existingBundle)
+        return existingBundle;
+    CFBundlesForURLStrings[URLString] = this;
+    this._bundleURL = aURL;
+    this._resourcesDirectoryURL = new CFURL("Resources/", aURL);
+    this._staticResource = NULL;
+    this._isValid = NO;
+    this._loadStatus = CFBundleUnloaded;
+    this._loadRequests = [];
+    this._infoDictionary = new CFDictionary();
+    this._eventDispatcher = new EventDispatcher(this);
+}
+CFBundle.displayName = "CFBundle";
+CFBundle.environments = function()
+{
+    return ["Browser","ObjJ"];
+}
+CFBundle.environments.displayName = "CFBundle.environments";
+CFBundle.bundleContainingURL = function( aURL)
+{
+    aURL = new CFURL(".", makeAbsoluteURL(aURL));
+    var previousURLString,
+        URLString = aURL.absoluteString();
+    while (!previousURLString || previousURLString !== URLString)
+    {
+        var bundle = CFBundlesForURLStrings[URLString];
+        if (bundle && bundle._isValid)
+            return bundle;
+        aURL = new CFURL("..", aURL);
+        previousURLString = URLString;
+        URLString = aURL.absoluteString();
+    }
+    return NULL;
+}
+CFBundle.bundleContainingURL.displayName = "CFBundle.bundleContainingURL";
+CFBundle.mainBundle = function()
+{
+    return new CFBundle(mainBundleURL);
+}
+CFBundle.mainBundle.displayName = "CFBundle.mainBundle";
+function addClassToBundle(aClass, aBundle)
+{
+    if (aBundle)
+        CFBundlesForClasses[aClass.name] = aBundle;
+}
+CFBundle.bundleForClass = function( aClass)
+{
+    return CFBundlesForClasses[aClass.name] || CFBundle.mainBundle();
+}
+CFBundle.bundleForClass.displayName = "CFBundle.bundleForClass";
+CFBundle.prototype.bundleURL = function()
+{
+    return this._bundleURL;
+}
+CFBundle.prototype.bundleURL.displayName = "CFBundle.prototype.bundleURL";
+CFBundle.prototype.resourcesDirectoryURL = function()
+{
+    return this._resourcesDirectoryURL;
+}
+CFBundle.prototype.resourcesDirectoryURL.displayName = "CFBundle.prototype.resourcesDirectoryURL";
+CFBundle.prototype.resourceURL = function( aResourceName, aType, aSubDirectory)
+ {
+    if (aType)
+        aResourceName = aResourceName + "." + aType;
+    if (aSubDirectory)
+        aResourceName = aSubDirectory + "/" + aResourceName;
+    var resourceURL = (new CFURL(aResourceName, this.resourcesDirectoryURL())).mappedURL();
+    return resourceURL.absoluteURL();
+}
+CFBundle.prototype.resourceURL.displayName = "CFBundle.prototype.resourceURL";
+CFBundle.prototype.mostEligibleEnvironmentURL = function()
+{
+    if (this._mostEligibleEnvironmentURL === undefined)
+        this._mostEligibleEnvironmentURL = new CFURL(this.mostEligibleEnvironment() + ".environment/", this.bundleURL());
+    return this._mostEligibleEnvironmentURL;
+}
+CFBundle.prototype.mostEligibleEnvironmentURL.displayName = "CFBundle.prototype.mostEligibleEnvironmentURL";
+CFBundle.prototype.executableURL = function()
+{
+    if (this._executableURL === undefined)
+    {
+        var executableSubPath = this.valueForInfoDictionaryKey("CPBundleExecutable");
+        if (!executableSubPath)
+            this._executableURL = NULL;
+        else
+            this._executableURL = new CFURL(executableSubPath, this.mostEligibleEnvironmentURL());
+    }
+    return this._executableURL;
+}
+CFBundle.prototype.executableURL.displayName = "CFBundle.prototype.executableURL";
+CFBundle.prototype.infoDictionary = function()
+{
+    return this._infoDictionary;
+}
+CFBundle.prototype.infoDictionary.displayName = "CFBundle.prototype.infoDictionary";
+CFBundle.prototype.valueForInfoDictionaryKey = function( aKey)
+{
+    return this._infoDictionary.valueForKey(aKey);
+}
+CFBundle.prototype.valueForInfoDictionaryKey.displayName = "CFBundle.prototype.valueForInfoDictionaryKey";
+CFBundle.prototype.hasSpritedImages = function()
+{
+    var environments = this._infoDictionary.valueForKey("CPBundleEnvironmentsWithImageSprites") || [],
+        index = environments.length,
+        mostEligibleEnvironment = this.mostEligibleEnvironment();
+    while (index--)
+        if (environments[index] === mostEligibleEnvironment)
+            return YES;
+    return NO;
+}
+CFBundle.prototype.hasSpritedImages.displayName = "CFBundle.prototype.hasSpritedImages";
+CFBundle.prototype.environments = function()
+{
+    return this._infoDictionary.valueForKey("CPBundleEnvironments") || ["ObjJ"];
+}
+CFBundle.prototype.environments.displayName = "CFBundle.prototype.environments";
+CFBundle.prototype.mostEligibleEnvironment = function( environments)
+{
+    environments = environments || this.environments();
+    var objj_environments = CFBundle.environments(),
+        index = 0,
+        count = objj_environments.length,
+        innerCount = environments.length;
+    for(; index < count; ++index)
+    {
+        var innerIndex = 0,
+            environment = objj_environments[index];
+        for (; innerIndex < innerCount; ++innerIndex)
+            if(environment === environments[innerIndex])
+                return environment;
+    }
+    return NULL;
+}
+CFBundle.prototype.mostEligibleEnvironment.displayName = "CFBundle.prototype.mostEligibleEnvironment";
+CFBundle.prototype.isLoading = function()
+{
+    return this._loadStatus & CFBundleLoading;
+}
+CFBundle.prototype.isLoading.displayName = "CFBundle.prototype.isLoading";
+CFBundle.prototype.load = function( shouldExecute)
+{
+    if (this._loadStatus !== CFBundleUnloaded)
+        return;
+    this._loadStatus = CFBundleLoading | CFBundleLoadingInfoPlist;
+    var self = this,
+        bundleURL = this.bundleURL(),
+        parentURL = new CFURL("..", bundleURL);
+    if (parentURL.absoluteString() === bundleURL.absoluteString())
+        parentURL = parentURL.schemeAndAuthority();
+    StaticResource.resolveResourceAtURL(parentURL, YES, function(aStaticResource)
+    {
+        var resourceName = bundleURL.absoluteURL().lastPathComponent();
+        self._staticResource = aStaticResource._children[resourceName] ||
+                                new StaticResource(bundleURL, aStaticResource, YES, NO);
+        function onsuccess( anEvent)
+        {
+            self._loadStatus &= ~CFBundleLoadingInfoPlist;
+            var infoDictionary = anEvent.request.responsePropertyList();
+            self._isValid = !!infoDictionary || CFBundle.mainBundle() === self;
+            if (infoDictionary)
+                self._infoDictionary = infoDictionary;
+            if (!self._infoDictionary)
+            {
+                finishBundleLoadingWithError(self, new Error("Could not load bundle at \"" + path + "\""));
+                return;
+            }
+            if (self === CFBundle.mainBundle() && self.valueForInfoDictionaryKey("CPApplicationSize"))
+                CPApplicationSizeInBytes = self.valueForInfoDictionaryKey("CPApplicationSize").valueForKey("executable") || 0;
+            loadExecutableAndResources(self, shouldExecute);
+        }
+        function onfailure()
+        {
+            self._isValid = CFBundle.mainBundle() === self;
+            self._loadStatus = CFBundleUnloaded;
+            finishBundleLoadingWithError(self, new Error("Could not load bundle at \"" + self.bundleURL() + "\""));
+        }
+        new FileRequest(new CFURL("Info.plist", self.bundleURL()), onsuccess, onfailure);
+    });
+}
+CFBundle.prototype.load.displayName = "CFBundle.prototype.load";
+function finishBundleLoadingWithError( aBundle, anError)
+{
+    resolveStaticResource(aBundle._staticResource);
+    aBundle._eventDispatcher.dispatchEvent(
+    {
+        type:"error",
+        error:anError,
+        bundle:aBundle
+    });
+}
+function loadExecutableAndResources( aBundle, shouldExecute)
+{
+    if (!aBundle.mostEligibleEnvironment())
+        return failure();
+    loadExecutableForBundle(aBundle, success, failure);
+    loadSpritedImagesForBundle(aBundle, success, failure);
+    if (aBundle._loadStatus === CFBundleLoading)
+        return success();
+    function failure( anError)
+    {
+        var loadRequests = aBundle._loadRequests,
+            count = loadRequests.length;
+        while (count--)
+            loadRequests[count].abort();
+        this._loadRequests = [];
+        aBundle._loadStatus = CFBundleUnloaded;
+        finishBundleLoadingWithError(aBundle, anError || new Error("Could not recognize executable code format in Bundle " + aBundle));
+    }
+    function success()
+    {
+        if ((typeof CPApp === "undefined" || !CPApp || !CPApp._finishedLaunching) &&
+             typeof OBJJ_PROGRESS_CALLBACK === "function" && CPApplicationSizeInBytes)
+        {
+            OBJJ_PROGRESS_CALLBACK(MAX(MIN(1.0, CFTotalBytesLoaded / CPApplicationSizeInBytes), 0.0), CPApplicationSizeInBytes, aBundle.path())
+        }
+        if (aBundle._loadStatus === CFBundleLoading)
+            aBundle._loadStatus = CFBundleLoaded;
+        else
+            return;
+        resolveStaticResource(aBundle._staticResource);
+        function complete()
+        {
+            aBundle._eventDispatcher.dispatchEvent(
+            {
+                type:"load",
+                bundle:aBundle
+            });
+        }
+        if (shouldExecute)
+            executeBundle(aBundle, complete);
+        else
+            complete();
+    }
+}
+function loadExecutableForBundle( aBundle, success, failure)
+{
+    var executableURL = aBundle.executableURL();
+    if (!executableURL)
+        return;
+    aBundle._loadStatus |= CFBundleLoadingExecutable;
+    new FileRequest(executableURL, function( anEvent)
+    {
+        try
+        {
+            CFTotalBytesLoaded += anEvent.request.responseText().length;
+            decompileStaticFile(aBundle, anEvent.request.responseText(), executableURL);
+            aBundle._loadStatus &= ~CFBundleLoadingExecutable;
+            success();
+        }
+        catch(anException)
+        {
+            failure(anException);
+        }
+    }, failure);
+}
+function spritedImagesTestURLStringForBundle( aBundle)
+{
+    return "mhtml:" + new CFURL("MHTMLTest.txt", aBundle.mostEligibleEnvironmentURL());
+}
+function spritedImagesURLForBundle( aBundle)
+{
+    if (CFBundleSupportedSpriteType === CFBundleDataURLSpriteType)
+        return new CFURL("dataURLs.txt", aBundle.mostEligibleEnvironmentURL());
+    if (CFBundleSupportedSpriteType === CFBundleMHTMLSpriteType ||
+        CFBundleSupportedSpriteType === CFBundleMHTMLUncachedSpriteType)
+        return new CFURL("MHTMLPaths.txt", aBundle.mostEligibleEnvironmentURL());
+    return NULL;
+}
+function loadSpritedImagesForBundle( aBundle, success, failure)
+{
+    if (!aBundle.hasSpritedImages())
+        return;
+    aBundle._loadStatus |= CFBundleLoadingSpritedImages;
+    if (!CFBundleHasTestedSpriteSupport())
+        return CFBundleTestSpriteSupport(spritedImagesTestURLStringForBundle(aBundle), function()
+        {
+            loadSpritedImagesForBundle(aBundle, success, failure);
+        });
+    var spritedImagesURL = spritedImagesURLForBundle(aBundle);
+    if (!spritedImagesURL)
+    {
+        aBundle._loadStatus &= ~CFBundleLoadingSpritedImages;
+        return success();
+    }
+    new FileRequest(spritedImagesURL, function( anEvent)
+    {
+        try
+        {
+            CFTotalBytesLoaded += anEvent.request.responseText().length;
+            decompileStaticFile(aBundle, anEvent.request.responseText(), spritedImagesURL);
+            aBundle._loadStatus &= ~CFBundleLoadingSpritedImages;
+        }
+        catch(anException)
+        {
+            failure(anException);
+        }
+        success();
+    }, failure);
+}
+var CFBundleSpriteSupportListeners = [],
+    CFBundleSupportedSpriteType = -1,
+    CFBundleNoSpriteType = 0,
+    CFBundleDataURLSpriteType = 1,
+    CFBundleMHTMLSpriteType = 2,
+    CFBundleMHTMLUncachedSpriteType = 3;
+function CFBundleHasTestedSpriteSupport()
+{
+    return CFBundleSupportedSpriteType !== -1;
+}
+function CFBundleTestSpriteSupport( MHTMLPath, aCallback)
+{
+    if (CFBundleHasTestedSpriteSupport())
+        return;
+    CFBundleSpriteSupportListeners.push(aCallback);
+    if (CFBundleSpriteSupportListeners.length > 1)
+        return;
+    CFBundleSpriteSupportListeners.push(function()
+    {
+        var size = 0,
+            sizeDictionary = CFBundle.mainBundle().valueForInfoDictionaryKey("CPApplicationSize");
+        if (!sizeDictionary)
+            return;
+        switch (CFBundleSupportedSpriteType)
+        {
+            case CFBundleDataURLSpriteType:
+                size = sizeDictionary.valueForKey("data");
+                break;
+            case CFBundleMHTMLSpriteType:
+            case CFBundleMHTMLUncachedSpriteType:
+                size = sizeDictionary.valueForKey("mhtml");
+                break;
+        }
+        CPApplicationSizeInBytes += size;
+    })
+    CFBundleTestSpriteTypes([
+        CFBundleDataURLSpriteType,
+        "data:image/gif;base64,R0lGODlhAQABAIAAAMc9BQAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",
+        CFBundleMHTMLSpriteType,
+        MHTMLPath+"!test",
+        CFBundleMHTMLUncachedSpriteType,
+        MHTMLPath+"?"+CFCacheBuster+"!test"
+    ]);
+}
+function CFBundleNotifySpriteSupportListeners()
+{
+    var count = CFBundleSpriteSupportListeners.length;
+    while (count--)
+        CFBundleSpriteSupportListeners[count]();
+}
+function CFBundleTestSpriteTypes( spriteTypes)
+{
+    if (spriteTypes.length < 2)
+    {
+        CFBundleSupportedSpriteType = CFBundleNoSpriteType;
+        CFBundleNotifySpriteSupportListeners();
+        return;
+    }
+    var image = new Image();
+    image.onload = function()
+    {
+        if (image.width === 1 && image.height === 1)
+        {
+            CFBundleSupportedSpriteType = spriteTypes[0];
+            CFBundleNotifySpriteSupportListeners();
+        }
+        else
+            image.onerror();
+    }
+    image.onerror = function()
+    {
+        CFBundleTestSpriteTypes(spriteTypes.slice(2));
+    }
+    image.src = spriteTypes[1];
+}
+function executeBundle( aBundle, aCallback)
+{
+    var staticResources = [aBundle._staticResource];
+    function executeStaticResources(index)
+    {
+        for (; index < staticResources.length; ++index)
+        {
+            var staticResource = staticResources[index];
+            if (staticResource.isNotFound())
+                continue;
+            if (staticResource.isFile())
+            {
+                var executable = new FileExecutable(staticResource.URL());
+                if (executable.hasLoadedFileDependencies())
+                    executable.execute();
+                else
+                {
+                    executable.loadFileDependencies(function()
+                    {
+                        executeStaticResources(index);
+                    });
+                    return;
+                }
+            }
+            else
+            {
+                if (staticResource.URL().absoluteString() === aBundle.resourcesDirectoryURL().absoluteString())
+                    continue;
+                var children = staticResource.children();
+                for (var name in children)
+                    if (hasOwnProperty.call(children, name))
+                        staticResources.push(children[name]);
+            }
+        }
+        aCallback();
+    }
+    executeStaticResources(0);
+}
+var STATIC_MAGIC_NUMBER = "@STATIC",
+    MARKER_PATH = "p",
+    MARKER_URI = "u",
+    MARKER_CODE = "c",
+    MARKER_TEXT = "t",
+    MARKER_IMPORT_STD = 'I',
+    MARKER_IMPORT_LOCAL = 'i';
+function decompileStaticFile( aBundle, aString, aPath)
+{
+    var stream = new MarkedStream(aString);
+    if (stream.magicNumber() !== STATIC_MAGIC_NUMBER)
+        throw new Error("Could not read static file: " + aPath);
+    if (stream.version() !== "1.0")
+        throw new Error("Could not read static file: " + aPath);
+    var marker,
+        bundleURL = aBundle.bundleURL(),
+        file = NULL;
+    while (marker = stream.getMarker())
+    {
+        var text = stream.getString();
+        if (marker === MARKER_PATH)
+        {
+            var fileURL = new CFURL(text, bundleURL),
+                parent = StaticResource.resourceAtURL(new CFURL(".", fileURL), YES);
+            file = new StaticResource(fileURL, parent, NO, YES);
+        }
+        else if (marker === MARKER_URI)
+        {
+            var URL = new CFURL(text, bundleURL),
+                mappedURLString = stream.getString();
+            if (mappedURLString.indexOf("mhtml:") === 0)
+            {
+                mappedURLString = "mhtml:" + new CFURL(mappedURLString.substr("mhtml:".length), bundleURL);
+                if (CFBundleSupportedSpriteType === CFBundleMHTMLUncachedSpriteType)
+                {
+                    var exclamationIndex = URLString.indexOf("!"),
+                        firstPart = URLString.substring(0, exclamationIndex),
+                        lastPart = URLString.substring(exclamationIndex);
+                    mappedURLString = firstPart + "?" + CFCacheBuster + lastPart;
+                }
+            }
+            CFURL.setMappedURLForURL(URL, new CFURL(mappedURLString));
+            var parent = StaticResource.resourceAtURL(new CFURL(".", URL), YES);
+            new StaticResource(URL, parent, NO, YES);
+        }
+        else if (marker === MARKER_TEXT)
+            file.write(text);
+    }
+}
+CFBundle.prototype.addEventListener = function( anEventName, anEventListener)
+{
+    this._eventDispatcher.addEventListener(anEventName, anEventListener);
+}
+CFBundle.prototype.addEventListener.displayName = "CFBundle.prototype.addEventListener";
+CFBundle.prototype.removeEventListener = function( anEventName, anEventListener)
+{
+    this._eventDispatcher.removeEventListener(anEventName, anEventListener);
+}
+CFBundle.prototype.removeEventListener.displayName = "CFBundle.prototype.removeEventListener";
+CFBundle.prototype.onerror = function( anEvent)
+{
+    throw anEvent.error;
+}
+CFBundle.prototype.onerror.displayName = "CFBundle.prototype.onerror";
+CFBundle.prototype.bundlePath = function()
+{
+    return this._bundleURL.absoluteURL().path();
+}
+CFBundle.prototype.path = function()
+{
+    CPLog.warn("CFBundle.prototype.path is deprecated, use CFBundle.prototype.bundlePath instead.");
+    return this.bundlePath.apply(this, arguments);
+}
+CFBundle.prototype.pathForResource = function(aResource)
+{
+    return this.resourceURL(aResource).absoluteString();
+}
+var rootResources = { };
+function StaticResource( aURL, aParent, isDirectory, isResolved)
+{
+    this._parent = aParent;
+    this._eventDispatcher = new EventDispatcher(this);
+    var name = aURL.absoluteURL().lastPathComponent() || aURL.schemeAndAuthority();
+    this._name = name;
+    this._URL = aURL;
+    this._isResolved = !!isResolved;
+    if (isDirectory)
+        this._URL = this._URL.asDirectoryPathURL();
+    if (!aParent)
+        rootResources[name] = this;
+    this._isDirectory = !!isDirectory;
+    this._isNotFound = NO;
+    if (aParent)
+        aParent._children[name] = this;
+    if (isDirectory)
+        this._children = { };
+    else
+        this._contents = "";
+}
+StaticResource.rootResources = function()
+{
+    return rootResources;
+}
+exports.StaticResource = StaticResource;
+function resolveStaticResource( aResource)
+{
+    aResource._isResolved = YES;
+    aResource._eventDispatcher.dispatchEvent(
+    {
+        type:"resolve",
+        staticResource:aResource
+    });
+}
+StaticResource.prototype.resolve = function()
+{
+    if (this.isDirectory())
+    {
+        var bundle = new CFBundle(this.URL());
+        bundle.onerror = function() { };
+        bundle.load(NO);
+    }
+    else
+    {
+        var self = this;
+        function onsuccess( anEvent)
+        {
+            self._contents = anEvent.request.responseText();
+            resolveStaticResource(self);
+        }
+        function onfailure()
+        {
+            self._isNotFound = YES;
+            resolveStaticResource(self);
+        }
+        new FileRequest(this.URL(), onsuccess, onfailure);
+    }
+}
+StaticResource.prototype.name = function()
+{
+    return this._name;
+}
+StaticResource.prototype.URL = function()
+{
+    return this._URL;
+}
+StaticResource.prototype.contents = function()
+{
+    return this._contents;
+}
+StaticResource.prototype.children = function()
+{
+    return this._children;
+}
+StaticResource.prototype.parent = function()
+{
+    return this._parent;
+}
+StaticResource.prototype.isResolved = function()
+{
+    return this._isResolved;
+}
+StaticResource.prototype.write = function( aString)
+{
+    this._contents += aString;
+}
+function rootResourceForAbsoluteURL( anAbsoluteURL)
+{
+    var schemeAndAuthority = anAbsoluteURL.schemeAndAuthority(),
+        resource = rootResources[schemeAndAuthority];
+    if (!resource)
+        resource = new StaticResource(new CFURL(schemeAndAuthority), NULL, YES, YES);
+    return resource;
+}
+StaticResource.resourceAtURL = function( aURL, resolveAsDirectoriesIfNecessary)
+{
+    aURL = makeAbsoluteURL(aURL).absoluteURL();
+    var resource = rootResourceForAbsoluteURL(aURL),
+        components = aURL.pathComponents(),
+        index = 0,
+        count = components.length;
+    for (; index < count; ++index)
+    {
+        var name = components[index];
+        if (hasOwnProperty.call(resource._children, name))
+            resource = resource._children[name];
+        else if (resolveAsDirectoriesIfNecessary)
+        {
+            if (name !== "/")
+                name = "./" + name;
+            resource = new StaticResource(new CFURL(name, resource.URL()), resource, YES, YES);
+        }
+        else
+            throw new Error("Static Resource at " + aURL + " is not resolved (\"" + name + "\")");
+    }
+    return resource;
+}
+StaticResource.prototype.resourceAtURL = function( aURL, resolveAsDirectoriesIfNecessary)
+{
+    return StaticResource.resourceAtURL(new CFURL(aURL, this.URL()), resolveAsDirectoriesIfNecessary);
+}
+StaticResource.resolveResourceAtURL = function( aURL, isDirectory, aCallback)
+{
+    aURL = makeAbsoluteURL(aURL).absoluteURL();
+    resolveResourceComponents(rootResourceForAbsoluteURL(aURL), isDirectory, aURL.pathComponents(), 0, aCallback);
+}
+StaticResource.prototype.resolveResourceAtURL = function( aURL, isDirectory, aCallback)
+{
+    StaticResource.resolveResourceAtURL(new CFURL(aURL, this.URL()).absoluteURL(), isDirectory, aCallback);
+}
+function resolveResourceComponents( aResource, isDirectory, components, index, aCallback)
+{
+    var count = components.length;
+    for (; index < count; ++index)
+    {
+        var name = components[index],
+            child = hasOwnProperty.call(aResource._children, name) && aResource._children[name];
+        if (!child)
+        {
+            child = new StaticResource(new CFURL(name, aResource.URL()), aResource, index + 1 < count || isDirectory , NO);
+            child.resolve();
+        }
+        if (!child.isResolved())
+            return child.addEventListener("resolve", function()
+            {
+                resolveResourceComponents(aResource, isDirectory, components, index, aCallback);
+            });
+        if (child.isNotFound())
+            return aCallback(null, new Error("File not found: " + components.join("/")));
+        if ((index + 1 < count) && child.isFile())
+            return aCallback(null, new Error("File is not a directory: " + components.join("/")));
+        aResource = child;
+    }
+    aCallback(aResource);
+}
+function resolveResourceAtURLSearchingIncludeURLs( aURL, anIndex, aCallback)
+{
+    var includeURLs = StaticResource.includeURLs(),
+        searchURL = new CFURL(aURL, includeURLs[anIndex]).absoluteURL();
+    StaticResource.resolveResourceAtURL(searchURL, NO, function( aStaticResource)
+    {
+        if (!aStaticResource)
+        {
+            if (anIndex + 1 < includeURLs.length)
+                resolveResourceAtURLSearchingIncludeURLs(aURL, anIndex + 1, aCallback);
+            else
+                aCallback(NULL);
+            return;
+        }
+        aCallback(aStaticResource);
+    });
+}
+StaticResource.resolveResourceAtURLSearchingIncludeURLs = function( aURL, aCallback)
+{
+    resolveResourceAtURLSearchingIncludeURLs(aURL, 0, aCallback);
+}
+StaticResource.prototype.addEventListener = function( anEventName, anEventListener)
+{
+    this._eventDispatcher.addEventListener(anEventName, anEventListener);
+}
+StaticResource.prototype.removeEventListener = function( anEventName, anEventListener)
+{
+    this._eventDispatcher.removeEventListener(anEventName, anEventListener);
+}
+StaticResource.prototype.isNotFound = function()
+{
+    return this._isNotFound;
+}
+StaticResource.prototype.isFile = function()
+{
+    return !this._isDirectory;
+}
+StaticResource.prototype.isDirectory = function()
+{
+    return this._isDirectory;
+}
+StaticResource.prototype.toString = function( includeNotFounds)
+{
+    if (this.isNotFound())
+        return "<file not found: " + this.name() + ">";
+    var string = this.name();
+    if (this.isDirectory())
+    {
+        var children = this._children;
+        for (var name in children)
+            if (children.hasOwnProperty(name))
+            {
+                var child = children[name];
+                if (includeNotFounds || !child.isNotFound())
+                    string += "\n\t" + children[name].toString(includeNotFounds).split('\n').join("\n\t");
+            }
+    }
+    return string;
+}
+var includeURLs = NULL;
+StaticResource.includeURLs = function()
+{
+    if (includeURLs)
+        return includeURLs;
+    var includeURLs = [];
+    if (!global.OBJJ_INCLUDE_PATHS && !global.OBJJ_INCLUDE_URLS)
+        includeURLs = ["Frameworks", "Frameworks/Debug"];
+    else
+        includeURLs = (global.OBJJ_INCLUDE_PATHS || []).concat(global.OBJJ_INCLUDE_URLS || []);
+    var count = includeURLs.length;
+    while (count--)
+        includeURLs[count] = new CFURL(includeURLs[count]).asDirectoryPathURL();
+    return includeURLs;
+}
+var TOKEN_ACCESSORS = "accessors",
+    TOKEN_CLASS = "class",
+    TOKEN_END = "end",
+    TOKEN_FUNCTION = "function",
+    TOKEN_IMPLEMENTATION = "implementation",
+    TOKEN_IMPORT = "import",
+    TOKEN_EACH = "each",
+    TOKEN_OUTLET = "outlet",
+    TOKEN_ACTION = "action",
+    TOKEN_NEW = "new",
+    TOKEN_SELECTOR = "selector",
+    TOKEN_SUPER = "super",
+    TOKEN_VAR = "var",
+    TOKEN_IN = "in",
+    TOKEN_PRAGMA = "pragma",
+    TOKEN_MARK = "mark",
+    TOKEN_EQUAL = '=',
+    TOKEN_PLUS = '+',
+    TOKEN_MINUS = '-',
+    TOKEN_COLON = ':',
+    TOKEN_COMMA = ',',
+    TOKEN_PERIOD = '.',
+    TOKEN_ASTERISK = '*',
+    TOKEN_SEMICOLON = ';',
+    TOKEN_LESS_THAN = '<',
+    TOKEN_OPEN_BRACE = '{',
+    TOKEN_CLOSE_BRACE = '}',
+    TOKEN_GREATER_THAN = '>',
+    TOKEN_OPEN_BRACKET = '[',
+    TOKEN_DOUBLE_QUOTE = '"',
+    TOKEN_PREPROCESSOR = '@',
+    TOKEN_HASH = '#',
+    TOKEN_CLOSE_BRACKET = ']',
+    TOKEN_QUESTION_MARK = '?',
+    TOKEN_OPEN_PARENTHESIS = '(',
+    TOKEN_CLOSE_PARENTHESIS = ')',
+    TOKEN_WHITESPACE = /^(?:(?:\s+$)|(?:\/(?:\/|\*)))/,
+    TOKEN_NUMBER = /^[+-]?\d+(([.]\d+)*([eE][+-]?\d+))?$/,
+    TOKEN_IDENTIFIER = /^[a-zA-Z_$](\w|$)*$/;
+function Lexer( aString)
+{
+    this._index = -1;
+    this._tokens = (aString + '\n').match(/\/\/.*(\r|\n)?|\/\*(?:.|\n|\r)*?\*\/|\w+\b|[+-]?\d+(([.]\d+)*([eE][+-]?\d+))?|"[^"\\]*(\\[\s\S][^"\\]*)*"|'[^'\\]*(\\[\s\S][^'\\]*)*'|\s+|./g);
+    this._context = [];
+    return this;
+}
+Lexer.prototype.push = function()
+{
+    this._context.push(this._index);
+}
+Lexer.prototype.pop = function()
+{
+    this._index = this._context.pop();
+}
+Lexer.prototype.peak = function(shouldSkipWhitespace)
+{
+    if (shouldSkipWhitespace)
+    {
+        this.push();
+        var token = this.skip_whitespace();
+        this.pop();
+        return token;
+    }
+    return this._tokens[this._index + 1];
+}
+Lexer.prototype.next = function()
+{
+    return this._tokens[++this._index];
+}
+Lexer.prototype.previous = function()
+{
+    return this._tokens[--this._index];
+}
+Lexer.prototype.last = function()
+{
+    if (this._index < 0)
+        return NULL;
+    return this._tokens[this._index - 1];
+}
+Lexer.prototype.skip_whitespace= function(shouldMoveBackwards)
+{
+    var token;
+    if (shouldMoveBackwards)
+        while((token = this.previous()) && TOKEN_WHITESPACE.test(token)) ;
+    else
+        while((token = this.next()) && TOKEN_WHITESPACE.test(token)) ;
+    return token;
+}
+exports.Lexer = Lexer;
+function StringBuffer()
+{
+    this.atoms = [];
+}
+StringBuffer.prototype.toString = function()
+{
+    return this.atoms.join("");
+}
+exports.preprocess = function( aString, aURL, flags)
+{
+    return new Preprocessor(aString, aURL, flags).executable();
+}
+exports.eval = function( aString)
+{
+    return eval(exports.preprocess(aString).code());
+}
+var Preprocessor = function( aString, aURL, flags)
+{
+    this._URL = new CFURL(aURL);
+    aString = aString.replace(/^#[^\n]+\n/, "\n");
+    this._currentSelector = "";
+    this._currentClass = "";
+    this._currentSuperClass = "";
+    this._currentSuperMetaClass = "";
+    this._buffer = new StringBuffer();
+    this._preprocessed = NULL;
+    this._dependencies = [];
+    this._tokens = new Lexer(aString);
+    this._flags = flags;
+    this._classMethod = false;
+    this._executable = NULL;
+    this._classLookupTable = {};
+    this._classVars = {};
+    var classObject = new objj_class();
+    for (var i in classObject)
+        this._classVars[i] = 1;
+    this.preprocess(this._tokens, this._buffer);
+}
+Preprocessor.prototype.setClassInfo = function(className, superClassName, ivars)
+{
+    this._classLookupTable[className] = {superClassName:superClassName, ivars:ivars};
+}
+Preprocessor.prototype.getClassInfo = function(className)
+{
+    return this._classLookupTable[className];
+}
+Preprocessor.prototype.allIvarNamesForClassName = function(className)
+{
+    var names = {},
+        classInfo = this.getClassInfo(className);
+    while (classInfo)
+    {
+        for (var i in classInfo.ivars)
+            names[i] = 1;
+        classInfo = this.getClassInfo(classInfo.superClassName);
+    }
+    return names;
+}
+exports.Preprocessor = Preprocessor;
+Preprocessor.Flags = { };
+Preprocessor.Flags.IncludeDebugSymbols = 1 << 0;
+Preprocessor.Flags.IncludeTypeSignatures = 1 << 1;
+Preprocessor.prototype.executable = function()
+{
+    if (!this._executable)
+        this._executable = new Executable(this._buffer.toString(), this._dependencies, this._URL);
+    return this._executable;
+}
+Preprocessor.prototype.accessors = function(tokens)
+{
+    var token = tokens.skip_whitespace(),
+        attributes = {};
+    if (token != TOKEN_OPEN_PARENTHESIS)
+    {
+        tokens.previous();
+        return attributes;
+    }
+    while ((token = tokens.skip_whitespace()) != TOKEN_CLOSE_PARENTHESIS)
+    {
+        var name = token,
+            value = true;
+        if (!/^\w+$/.test(name))
+            throw new SyntaxError(this.error_message("*** @property attribute name not valid."));
+        if ((token = tokens.skip_whitespace()) == TOKEN_EQUAL)
+        {
+            value = tokens.skip_whitespace();
+            if (!/^\w+$/.test(value))
+                throw new SyntaxError(this.error_message("*** @property attribute value not valid."));
+            if (name == "setter")
+            {
+                if ((token = tokens.next()) != TOKEN_COLON)
+                    throw new SyntaxError(this.error_message("*** @property setter attribute requires argument with \":\" at end of selector name."));
+                value += ":";
+            }
+            token = tokens.skip_whitespace();
+        }
+        attributes[name] = value;
+        if (token == TOKEN_CLOSE_PARENTHESIS)
+            break;
+        if (token != TOKEN_COMMA)
+            throw new SyntaxError(this.error_message("*** Expected ',' or ')' in @property attribute list."));
+    }
+    return attributes;
+}
+Preprocessor.prototype.brackets = function( tokens, aStringBuffer)
+{
+    var tuples = [];
+    while (this.preprocess(tokens, NULL, NULL, NULL, tuples[tuples.length] = [])) ;
+    if (tuples[0].length === 1)
+    {
+        aStringBuffer.atoms[aStringBuffer.atoms.length] = '[';
+        aStringBuffer.atoms[aStringBuffer.atoms.length] = tuples[0][0];
+        aStringBuffer.atoms[aStringBuffer.atoms.length] = ']';
+    }
+    else
+    {
+        var selector = new StringBuffer();
+        if (tuples[0][0].atoms[0] == TOKEN_SUPER)
+        {
+            aStringBuffer.atoms[aStringBuffer.atoms.length] = "objj_msgSendSuper(";
+            aStringBuffer.atoms[aStringBuffer.atoms.length] = "{ receiver:self, super_class:" + (this._classMethod ? this._currentSuperMetaClass : this._currentSuperClass ) + " }";
+        }
+        else
+        {
+            aStringBuffer.atoms[aStringBuffer.atoms.length] = "objj_msgSend(";
+            aStringBuffer.atoms[aStringBuffer.atoms.length] = tuples[0][0];
+        }
+        selector.atoms[selector.atoms.length] = tuples[0][1];
+        var index = 1,
+            count = tuples.length,
+            marg_list = new StringBuffer();
+        for(; index < count; ++index)
+        {
+            var pair = tuples[index];
+            selector.atoms[selector.atoms.length] = pair[1]
+            marg_list.atoms[marg_list.atoms.length] = ", " + pair[0];
+        }
+        aStringBuffer.atoms[aStringBuffer.atoms.length] = ", \"";
+        aStringBuffer.atoms[aStringBuffer.atoms.length] = selector;
+        aStringBuffer.atoms[aStringBuffer.atoms.length] = '\"';
+        aStringBuffer.atoms[aStringBuffer.atoms.length] = marg_list;
+        aStringBuffer.atoms[aStringBuffer.atoms.length] = ')';
+    }
+}
+Preprocessor.prototype.directive = function(tokens, aStringBuffer, allowedDirectivesFlags)
+{
+    var buffer = aStringBuffer ? aStringBuffer : new StringBuffer(),
+        token = tokens.next();
+    if (token.charAt(0) == TOKEN_DOUBLE_QUOTE)
+        buffer.atoms[buffer.atoms.length] = token;
+    else if (token === TOKEN_CLASS)
+    {
+        tokens.skip_whitespace();
+        return;
+    }
+    else if (token === TOKEN_IMPLEMENTATION)
+        this.implementation(tokens, buffer);
+    else if (token === TOKEN_IMPORT)
+        this._import(tokens);
+    else if (token === TOKEN_SELECTOR)
+        this.selector(tokens, buffer);
+    if (!aStringBuffer)
+        return buffer;
+}
+Preprocessor.prototype.hash = function(tokens, aStringBuffer)
+{
+    var buffer = aStringBuffer ? aStringBuffer : new StringBuffer(),
+        token = tokens.next();
+    if (token === TOKEN_PRAGMA)
+    {
+        token = tokens.skip_whitespace();
+        if (token === TOKEN_MARK)
+        {
+            while ((token = tokens.next()).indexOf("\n") < 0);
+        }
+    }
+    else
+        throw new SyntaxError(this.error_message("*** Expected \"pragma\" to follow # but instead saw \"" + token + "\"."));
+}
+Preprocessor.prototype.implementation = function(tokens, aStringBuffer)
+{
+    var buffer = aStringBuffer,
+        token = "",
+        category = NO,
+        class_name = tokens.skip_whitespace(),
+        superclass_name = "Nil",
+        instance_methods = new StringBuffer(),
+        class_methods = new StringBuffer();
+    if (!(/^\w/).test(class_name))
+        throw new Error(this.error_message("*** Expected class name, found \"" + class_name + "\"."));
+    this._currentSuperClass = "objj_getClass(\"" + class_name + "\").super_class";
+    this._currentSuperMetaClass = "objj_getMetaClass(\"" + class_name + "\").super_class";
+    this._currentClass = class_name;
+    this._currentSelector = "";
+    if((token = tokens.skip_whitespace()) == TOKEN_OPEN_PARENTHESIS)
+    {
+        token = tokens.skip_whitespace();
+        if (token == TOKEN_CLOSE_PARENTHESIS)
+            throw new SyntaxError(this.error_message("*** Can't Have Empty Category Name for class \"" + class_name + "\"."));
+        if (tokens.skip_whitespace() != TOKEN_CLOSE_PARENTHESIS)
+            throw new SyntaxError(this.error_message("*** Improper Category Definition for class \"" + class_name + "\"."));
+        buffer.atoms[buffer.atoms.length] = "{\nvar the_class = objj_getClass(\"" + class_name + "\")\n";
+        buffer.atoms[buffer.atoms.length] = "if(!the_class) throw new SyntaxError(\"*** Could not find definition for class \\\"" + class_name + "\\\"\");\n";
+        buffer.atoms[buffer.atoms.length] = "var meta_class = the_class.isa;";
+    }
+    else
+    {
+        if(token == TOKEN_COLON)
+        {
+            token = tokens.skip_whitespace();
+            if (!TOKEN_IDENTIFIER.test(token))
+                throw new SyntaxError(this.error_message("*** Expected class name, found \"" + token + "\"."));
+            superclass_name = token;
+            token = tokens.skip_whitespace();
+        }
+        buffer.atoms[buffer.atoms.length] = "{var the_class = objj_allocateClassPair(" + superclass_name + ", \"" + class_name + "\"),\nmeta_class = the_class.isa;";
+        if (token == TOKEN_OPEN_BRACE)
+        {
+            var ivar_names = {},
+                ivar_count = 0,
+                declaration = [],
+                attributes,
+                accessors = {};
+            while((token = tokens.skip_whitespace()) && token != TOKEN_CLOSE_BRACE)
+            {
+                if (token === TOKEN_PREPROCESSOR)
+                {
+                    token = tokens.next();
+                    if (token === TOKEN_ACCESSORS)
+                        attributes = this.accessors(tokens);
+                    else if (token !== TOKEN_OUTLET)
+                        throw new SyntaxError(this.error_message("*** Unexpected '@' token in ivar declaration ('@"+token+"')."));
+                }
+                else if (token == TOKEN_SEMICOLON)
+                {
+                    if (ivar_count++ === 0)
+                        buffer.atoms[buffer.atoms.length] = "class_addIvars(the_class, [";
+                    else
+                        buffer.atoms[buffer.atoms.length] = ", ";
+                    var name = declaration[declaration.length - 1];
+                    buffer.atoms[buffer.atoms.length] = "new objj_ivar(\"" + name + "\")";
+                    ivar_names[name] = 1;
+                    declaration = [];
+                    if (attributes)
+                    {
+                        accessors[name] = attributes;
+                        attributes = NULL;
+                    }
+                }
+                else
+                    declaration.push(token);
+            }
+            if (declaration.length)
+                throw new SyntaxError(this.error_message("*** Expected ';' in ivar declaration, found '}'."));
+            if (ivar_count)
+                buffer.atoms[buffer.atoms.length] = "]);\n";
+            if (!token)
+                throw new SyntaxError(this.error_message("*** Expected '}'"));
+            this.setClassInfo(class_name, superclass_name === "Nil" ? null : superclass_name, ivar_names);
+            var ivar_names = this.allIvarNamesForClassName(class_name);
+            for (ivar_name in accessors)
+            {
+                var accessor = accessors[ivar_name],
+                    property = accessor["property"] || ivar_name;
+                var getterName = accessor["getter"] || property,
+                    getterCode = "(id)" + getterName + "\n{\nreturn " + ivar_name + ";\n}";
+                if (instance_methods.atoms.length !== 0)
+                    instance_methods.atoms[instance_methods.atoms.length] = ",\n";
+                instance_methods.atoms[instance_methods.atoms.length] = this.method(new Lexer(getterCode), ivar_names);
+                if (accessor["readonly"])
+                    continue;
+                var setterName = accessor["setter"];
+                if (!setterName)
+                {
+                    var start = property.charAt(0) == '_' ? 1 : 0;
+                    setterName = (start ? "_" : "") + "set" + property.substr(start, 1).toUpperCase() + property.substring(start + 1) + ":";
+                }
+                var setterCode = "(void)" + setterName + "(id)newValue\n{\n";
+                if (accessor["copy"])
+                    setterCode += "if (" + ivar_name + " !== newValue)\n" + ivar_name + " = [newValue copy];\n}";
+                else
+                    setterCode += ivar_name + " = newValue;\n}";
+                if (instance_methods.atoms.length !== 0)
+                    instance_methods.atoms[instance_methods.atoms.length] = ",\n";
+                instance_methods.atoms[instance_methods.atoms.length] = this.method(new Lexer(setterCode), ivar_names);
+            }
+        }
+        else
+            tokens.previous();
+        buffer.atoms[buffer.atoms.length] = "objj_registerClassPair(the_class);\n";
+    }
+    if (!ivar_names)
+        var ivar_names = this.allIvarNamesForClassName(class_name);
+    while ((token = tokens.skip_whitespace()))
+    {
+        if (token == TOKEN_PLUS)
+        {
+            this._classMethod = true;
+            if (class_methods.atoms.length !== 0)
+                class_methods.atoms[class_methods.atoms.length] = ", ";
+            class_methods.atoms[class_methods.atoms.length] = this.method(tokens, this._classVars);
+        }
+        else if (token == TOKEN_MINUS)
+        {
+            this._classMethod = false;
+            if (instance_methods.atoms.length !== 0)
+                instance_methods.atoms[instance_methods.atoms.length] = ", ";
+            instance_methods.atoms[instance_methods.atoms.length] = this.method(tokens, ivar_names);
+        }
+        else if (token == TOKEN_HASH)
+        {
+            this.hash(tokens, buffer);
+        }
+        else if (token == TOKEN_PREPROCESSOR)
+        {
+            if ((token = tokens.next()) == TOKEN_END)
+                break;
+            else
+                throw new SyntaxError(this.error_message("*** Expected \"@end\", found \"@" + token + "\"."));
+        }
+    }
+    if (instance_methods.atoms.length !== 0)
+    {
+        buffer.atoms[buffer.atoms.length] = "class_addMethods(the_class, [";
+        buffer.atoms[buffer.atoms.length] = instance_methods;
+        buffer.atoms[buffer.atoms.length] = "]);\n";
+    }
+    if (class_methods.atoms.length !== 0)
+    {
+        buffer.atoms[buffer.atoms.length] = "class_addMethods(meta_class, [";
+        buffer.atoms[buffer.atoms.length] = class_methods;
+        buffer.atoms[buffer.atoms.length] = "]);\n";
+    }
+    buffer.atoms[buffer.atoms.length] = '}';
+    this._currentClass = "";
+}
+Preprocessor.prototype._import = function(tokens)
+{
+    var URLString = "",
+        token = tokens.skip_whitespace(),
+        isQuoted = (token !== TOKEN_LESS_THAN);
+    if (token === TOKEN_LESS_THAN)
+    {
+        while((token = tokens.next()) && token !== TOKEN_GREATER_THAN)
+            URLString += token;
+        if(!token)
+            throw new SyntaxError(this.error_message("*** Unterminated import statement."));
+    }
+    else if (token.charAt(0) === TOKEN_DOUBLE_QUOTE)
+        URLString = token.substr(1, token.length - 2);
+    else
+        throw new SyntaxError(this.error_message("*** Expecting '<' or '\"', found \"" + token + "\"."));
+    this._buffer.atoms[this._buffer.atoms.length] = "objj_executeFile(\"";
+    this._buffer.atoms[this._buffer.atoms.length] = URLString;
+    this._buffer.atoms[this._buffer.atoms.length] = isQuoted ? "\", YES);" : "\", NO);";
+    this._dependencies.push(new FileDependency(new CFURL(URLString), isQuoted));
+}
+Preprocessor.prototype.method = function( tokens, ivar_names)
+{
+    var buffer = new StringBuffer(),
+        token,
+        selector = "",
+        parameters = [],
+        types = [null];
+    ivar_names = ivar_names || {};
+    while((token = tokens.skip_whitespace()) && token !== TOKEN_OPEN_BRACE && token !== TOKEN_SEMICOLON)
+    {
+        if (token == TOKEN_COLON)
+        {
+            var type = "";
+            selector += token;
+            token = tokens.skip_whitespace();
+            if (token == TOKEN_OPEN_PARENTHESIS)
+            {
+                while((token = tokens.skip_whitespace()) && token != TOKEN_CLOSE_PARENTHESIS)
+                    type += token;
+                token = tokens.skip_whitespace();
+            }
+            types[parameters.length+1] = type || null;
+            parameters[parameters.length] = token;
+            if (token in ivar_names)
+                throw new SyntaxError(this.error_message("*** Method ( "+selector+" ) uses a parameter name that is already in use ( "+token+" )"));
+        }
+        else if (token == TOKEN_OPEN_PARENTHESIS)
+        {
+            var type = "";
+            while((token = tokens.skip_whitespace()) && token != TOKEN_CLOSE_PARENTHESIS)
+                type += token;
+            types[0] = type || null;
+        }
+        else if (token == TOKEN_COMMA)
+        {
+            if ((token = tokens.skip_whitespace()) != TOKEN_PERIOD || tokens.next() != TOKEN_PERIOD || tokens.next() != TOKEN_PERIOD)
+                throw new SyntaxError(this.error_message("*** Argument list expected after ','."));
+        }
+        else
+            selector += token;
+    }
+    if (token === TOKEN_SEMICOLON)
+    {
+        token = tokens.skip_whitespace();
+        if (token !== TOKEN_OPEN_BRACE)
+        {
+            throw new SyntaxError(this.error_message("Invalid semi-colon in method declaration. "+
+            "Semi-colons are allowed only to terminate the method signature, before the open brace."));
+        }
+    }
+    var index = 0,
+        count = parameters.length;
+    buffer.atoms[buffer.atoms.length] = "new objj_method(sel_getUid(\"";
+    buffer.atoms[buffer.atoms.length] = selector;
+    buffer.atoms[buffer.atoms.length] = "\"), function";
+    this._currentSelector = selector;
+    if (this._flags & Preprocessor.Flags.IncludeDebugSymbols)
+        buffer.atoms[buffer.atoms.length] = " $" + this._currentClass + "__" + selector.replace(/:/g, "_");
+    buffer.atoms[buffer.atoms.length] = "(self, _cmd";
+    for(; index < count; ++index)
+    {
+        buffer.atoms[buffer.atoms.length] = ", ";
+        buffer.atoms[buffer.atoms.length] = parameters[index];
+    }
+    buffer.atoms[buffer.atoms.length] = ")\n{ with(self)\n{";
+    buffer.atoms[buffer.atoms.length] = this.preprocess(tokens, NULL, TOKEN_CLOSE_BRACE, TOKEN_OPEN_BRACE);
+    buffer.atoms[buffer.atoms.length] = "}\n}";
+    if (this._flags & Preprocessor.Flags.IncludeDebugSymbols)
+        buffer.atoms[buffer.atoms.length] = ","+JSON.stringify(types);
+    buffer.atoms[buffer.atoms.length] = ")";
+    this._currentSelector = "";
+    return buffer;
+}
+Preprocessor.prototype.preprocess = function(tokens, aStringBuffer, terminator, instigator, tuple)
+{
+    var buffer = aStringBuffer ? aStringBuffer : new StringBuffer(),
+        count = 0,
+        token = "";
+    if (tuple)
+    {
+        tuple[0] = buffer;
+        var bracket = false,
+            closures = [0, 0, 0];
+    }
+    while ((token = tokens.next()) && ((token !== terminator) || count))
+    {
+        if (tuple)
+        {
+            if (token === TOKEN_QUESTION_MARK)
+                ++closures[2];
+            else if (token === TOKEN_OPEN_BRACE)
+                ++closures[0];
+            else if (token === TOKEN_CLOSE_BRACE)
+                --closures[0];
+            else if (token === TOKEN_OPEN_PARENTHESIS)
+                ++closures[1];
+            else if (token === TOKEN_CLOSE_PARENTHESIS)
+                --closures[1];
+            else if ((token === TOKEN_COLON && closures[2]-- === 0 ||
+                    (bracket = (token === TOKEN_CLOSE_BRACKET))) &&
+                    closures[0] === 0 && closures[1] === 0)
+            {
+                tokens.push();
+                var label = bracket ? tokens.skip_whitespace(true) : tokens.previous(),
+                    isEmptyLabel = TOKEN_WHITESPACE.test(label);
+                if (isEmptyLabel || TOKEN_IDENTIFIER.test(label) && TOKEN_WHITESPACE.test(tokens.previous()))
+                {
+                    tokens.push();
+                    var last = tokens.skip_whitespace(true),
+                        operatorCheck = true,
+                        isDoubleOperator = false;
+                    if (last === '+' || last === '-'){
+                        if (tokens.previous() !== last)
+                            operatorCheck = false;
+                        else
+                        {
+                            last = tokens.skip_whitespace(true);
+                            isDoubleOperator = true;
+                        }}
+                    tokens.pop();
+                    tokens.pop();
+                    if (operatorCheck && (
+                        (!isDoubleOperator && (last === TOKEN_CLOSE_BRACE)) ||
+                        last === TOKEN_CLOSE_PARENTHESIS || last === TOKEN_CLOSE_BRACKET ||
+                        last === TOKEN_PERIOD || TOKEN_NUMBER.test(last) ||
+                        last.charAt(last.length - 1) === '\"' || last.charAt(last.length - 1) === '\'' ||
+                        TOKEN_IDENTIFIER.test(last) && !/^(new|return|case|var)$/.test(last)))
+                    {
+                        if (isEmptyLabel)
+                            tuple[1] = ':';
+                        else
+                        {
+                            tuple[1] = label;
+                            if (!bracket)
+                                tuple[1] += ':';
+                            var count = buffer.atoms.length;
+                            while (buffer.atoms[count--] !== label) ;
+                            buffer.atoms.length = count;
+                        }
+                        return !bracket;
+                    }
+                    if (bracket)
+                        return NO;
+                }
+                tokens.pop();
+                if (bracket)
+                    return NO;
+            }
+            closures[2] = MAX(closures[2], 0);
+        }
+        if (instigator)
+        {
+            if (token === instigator)
+                ++count;
+            else if (token === terminator)
+                --count;
+        }
+        if (token === TOKEN_FUNCTION)
+        {
+            var accumulator = "";
+            while((token = tokens.next()) && token !== TOKEN_OPEN_PARENTHESIS && !(/^\w/).test(token))
+                accumulator += token;
+            if (token === TOKEN_OPEN_PARENTHESIS)
+            {
+                if (instigator === TOKEN_OPEN_PARENTHESIS)
+                    ++count;
+                buffer.atoms[buffer.atoms.length] = "function" + accumulator + '(';
+                if (tuple)
+                    ++closures[1];
+            }
+            else
+            {
+                buffer.atoms[buffer.atoms.length] = token + "= function";
+            }
+        }
+        else if (token == TOKEN_PREPROCESSOR)
+            this.directive(tokens, buffer);
+        else if (token == TOKEN_HASH)
+            this.hash(tokens, buffer);
+        else if (token == TOKEN_OPEN_BRACKET)
+            this.brackets(tokens, buffer);
+        else
+            buffer.atoms[buffer.atoms.length] = token;
+    }
+    if (tuple)
+        throw new SyntaxError(this.error_message("*** Expected ']' - Unterminated message send or array."));
+    if (!aStringBuffer)
+        return buffer;
+}
+Preprocessor.prototype.selector = function(tokens, aStringBuffer)
+{
+    var buffer = aStringBuffer ? aStringBuffer : new StringBuffer();
+    buffer.atoms[buffer.atoms.length] = "sel_getUid(\"";
+    if (tokens.skip_whitespace() != TOKEN_OPEN_PARENTHESIS)
+        throw new SyntaxError(this.error_message("*** Expected '('"));
+    var selector = tokens.skip_whitespace();
+    if (selector == TOKEN_CLOSE_PARENTHESIS)
+        throw new SyntaxError(this.error_message("*** Unexpected ')', can't have empty @selector()"));
+    aStringBuffer.atoms[aStringBuffer.atoms.length] = selector;
+    var token,
+        starting = true;
+    while ((token = tokens.next()) && token != TOKEN_CLOSE_PARENTHESIS)
+    {
+        if (starting && /^\d+$/.test(token) || !(/^(\w|$|\:)/.test(token)))
+        {
+            if (!(/\S/).test(token))
+                if (tokens.skip_whitespace() == TOKEN_CLOSE_PARENTHESIS)
+                    break;
+                else
+                    throw new SyntaxError(this.error_message("*** Unexpected whitespace in @selector()."));
+            else
+                throw new SyntaxError(this.error_message("*** Illegal character '" + token + "' in @selector()."));
+        }
+        buffer.atoms[buffer.atoms.length] = token;
+        starting = (token == TOKEN_COLON);
+    }
+    buffer.atoms[buffer.atoms.length] = "\")";
+    if (!aStringBuffer)
+        return buffer;
+}
+Preprocessor.prototype.error_message = function(errorMessage)
+{
+    return errorMessage + " <Context File: "+ this._URL +
+                                (this._currentClass ? " Class: "+this._currentClass : "") +
+                                (this._currentSelector ? " Method: "+this._currentSelector : "") +">";
+}
+function FileDependency( aURL, isLocal)
+{
+    this._URL = aURL;
+    this._isLocal = isLocal;
+}
+exports.FileDependency = FileDependency;
+FileDependency.prototype.URL = function()
+{
+    return this._URL;
+}
+FileDependency.prototype.isLocal = function()
+{
+    return this._isLocal;
+}
+FileDependency.prototype.toMarkedString = function()
+{
+    var URLString = this.URL().absoluteString();
+    return (this.isLocal() ? MARKER_IMPORT_LOCAL : MARKER_IMPORT_STD) + ";" +
+            URLString.length + ";" + URLString;
+}
+FileDependency.prototype.toString = function()
+{
+    return (this.isLocal() ? "LOCAL: " : "STD: ") + this.URL();
+}
+var ExecutableUnloadedFileDependencies = 0,
+    ExecutableLoadingFileDependencies = 1,
+    ExecutableLoadedFileDependencies = 2,
+    AnonymousExecutableCount = 0;
+function Executable( aCode, fileDependencies, aURL, aFunction)
+{
+    if (arguments.length === 0)
+        return this;
+    this._code = aCode;
+    this._function = aFunction || NULL;
+    this._URL = makeAbsoluteURL(aURL || new CFURL("(Anonymous" + (AnonymousExecutableCount++) + ")"));
+    this._fileDependencies = fileDependencies;
+    if (fileDependencies.length)
+    {
+        this._fileDependencyStatus = ExecutableUnloadedFileDependencies;
+        this._fileDependencyCallbacks = [];
+    }
+    else
+        this._fileDependencyStatus = ExecutableLoadedFileDependencies;
+    if (this._function)
+        return;
+    this.setCode(aCode);
+}
+exports.Executable = Executable;
+Executable.prototype.path = function()
+{
+    return this.URL().path();
+}
+Executable.prototype.URL = function()
+{
+    return this._URL;
+}
+Executable.prototype.URL.displayName = "Executable.prototype.URL";
+Executable.prototype.functionParameters = function()
+{
+    var functionParameters = ["global", "objj_executeFile", "objj_importFile"];
+    return functionParameters;
+}
+Executable.prototype.functionParameters.displayName = "Executable.prototype.functionParameters";
+Executable.prototype.functionArguments = function()
+{
+    var functionArguments = [global, this.fileExecuter(), this.fileImporter()];
+    return functionArguments;
+}
+Executable.prototype.functionArguments.displayName = "Executable.prototype.functionArguments";
+Executable.prototype.execute = function()
+{
+    var oldContextBundle = CONTEXT_BUNDLE;
+    CONTEXT_BUNDLE = CFBundle.bundleContainingURL(this.URL());
+    var result = this._function.apply(global, this.functionArguments());
+    CONTEXT_BUNDLE = oldContextBundle;
+    return result;
+}
+Executable.prototype.execute.displayName = "Executable.prototype.execute";
+Executable.prototype.code = function()
+{
+    return this._code;
+}
+Executable.prototype.code.displayName = "Executable.prototype.code";
+Executable.prototype.setCode = function(code)
+{
+    this._code = code;
+    var parameters = this.functionParameters().join(",");
+        var absoluteString = this.URL().absoluteString();
+        code += "/**/\n//@ sourceURL=" + absoluteString;
+        this._function = new Function(parameters, code);
+    this._function.displayName = absoluteString;
+}
+Executable.prototype.setCode.displayName = "Executable.prototype.setCode";
+Executable.prototype.fileDependencies = function()
+{
+    return this._fileDependencies;
+}
+Executable.prototype.fileDependencies.displayName = "Executable.prototype.fileDependencies";
+Executable.prototype.hasLoadedFileDependencies = function()
+{
+    return this._fileDependencyStatus === ExecutableLoadedFileDependencies;
+}
+Executable.prototype.hasLoadedFileDependencies.displayName = "Executable.prototype.hasLoadedFileDependencies";
+var fileDependencyLoadCount = 0,
+    fileDependencyExecutables = [],
+    fileDependencyMarkers = { };
+Executable.prototype.loadFileDependencies = function(aCallback)
+{
+    var status = this._fileDependencyStatus;
+    if (aCallback)
+    {
+        if (status === ExecutableLoadedFileDependencies)
+            return aCallback();
+        this._fileDependencyCallbacks.push(aCallback);
+    }
+    if (status === ExecutableUnloadedFileDependencies)
+    {
+        if (fileDependencyLoadCount)
+            throw "Can't load";
+        loadFileDependenciesForExecutable(this);
+    }
+}
+Executable.prototype.loadFileDependencies.displayName = "Executable.prototype.loadFileDependencies";
+function loadFileDependenciesForExecutable( anExecutable)
+{
+    fileDependencyExecutables.push(anExecutable);
+    anExecutable._fileDependencyStatus = ExecutableLoadingFileDependencies;
+    var fileDependencies = anExecutable.fileDependencies(),
+        index = 0,
+        count = fileDependencies.length,
+        referenceURL = anExecutable.referenceURL(),
+        referenceURLString = referenceURL.absoluteString(),
+        fileExecutableSearcher = anExecutable.fileExecutableSearcher();
+    fileDependencyLoadCount += count;
+    for (; index < count; ++index)
+    {
+        var fileDependency = fileDependencies[index],
+            isQuoted = fileDependency.isLocal(),
+            URL = fileDependency.URL(),
+            marker = (isQuoted && (referenceURLString + " ") || "") + URL;
+        if (fileDependencyMarkers[marker])
+        {
+            if (--fileDependencyLoadCount === 0)
+                fileExecutableDependencyLoadFinished();
+            continue;
+        }
+        fileDependencyMarkers[marker] = YES;
+        fileExecutableSearcher(URL, isQuoted, fileExecutableSearchFinished);
+    }
+}
+function fileExecutableSearchFinished( aFileExecutable)
+{
+    --fileDependencyLoadCount;
+    if (aFileExecutable._fileDependencyStatus === ExecutableUnloadedFileDependencies)
+        loadFileDependenciesForExecutable(aFileExecutable);
+    else if (fileDependencyLoadCount === 0)
+        fileExecutableDependencyLoadFinished();
+}
+function fileExecutableDependencyLoadFinished()
+{
+    var executables = fileDependencyExecutables,
+        index = 0,
+        count = executables.length;
+    fileDependencyExecutables = [];
+    for (; index < count; ++index)
+        executables[index]._fileDependencyStatus = ExecutableLoadedFileDependencies;
+    for (index = 0; index < count; ++index)
+    {
+        var executable = executables[index],
+            callbacks = executable._fileDependencyCallbacks,
+            callbackIndex = 0,
+            callbackCount = callbacks.length;
+        for (; callbackIndex < callbackCount; ++callbackIndex)
+            callbacks[callbackIndex]();
+        executable._fileDependencyCallbacks = [];
+    }
+}
+Executable.prototype.referenceURL = function()
+{
+    if (this._referenceURL === undefined)
+        this._referenceURL = new CFURL(".", this.URL());
+    return this._referenceURL;
+}
+Executable.prototype.referenceURL.displayName = "Executable.prototype.referenceURL";
+Executable.prototype.fileImporter = function()
+{
+    return Executable.fileImporterForURL(this.referenceURL());
+}
+Executable.prototype.fileImporter.displayName = "Executable.prototype.fileImporter";
+Executable.prototype.fileExecuter = function()
+{
+    return Executable.fileExecuterForURL(this.referenceURL());
+}
+Executable.prototype.fileExecuter.displayName = "Executable.prototype.fileExecuter";
+Executable.prototype.fileExecutableSearcher = function()
+{
+    return Executable.fileExecutableSearcherForURL(this.referenceURL());
+}
+Executable.prototype.fileExecutableSearcher.displayName = "Executable.prototype.fileExecutableSearcher";
+var cachedFileExecuters = { };
+Executable.fileExecuterForURL = function( aURL)
+{
+    var referenceURL = makeAbsoluteURL(aURL),
+        referenceURLString = referenceURL.absoluteString(),
+        cachedFileExecuter = cachedFileExecuters[referenceURLString];
+    if (!cachedFileExecuter)
+    {
+        cachedFileExecuter = function( aURL, isQuoted, shouldForce)
+        {
+            Executable.fileExecutableSearcherForURL(referenceURL)(aURL, isQuoted,
+            function( aFileExecutable)
+            {
+                if (!aFileExecutable.hasLoadedFileDependencies())
+                    throw "No executable loaded for file at URL " + aURL;
+                aFileExecutable.execute(shouldForce);
+            });
+        }
+        cachedFileExecuters[referenceURLString] = cachedFileExecuter;
+    }
+    return cachedFileExecuter;
+}
+Executable.fileExecuterForURL.displayName = "Executable.fileExecuterForURL";
+var cachedFileImporters = { };
+Executable.fileImporterForURL = function( aURL)
+{
+    var referenceURL = makeAbsoluteURL(aURL),
+        referenceURLString = referenceURL.absoluteString(),
+        cachedFileImporter = cachedFileImporters[referenceURLString];
+    if (!cachedFileImporter)
+    {
+        cachedFileImporter = function( aURL, isQuoted, aCallback)
+        {
+            enableCFURLCaching();
+            Executable.fileExecutableSearcherForURL(referenceURL)(aURL, isQuoted,
+            function( aFileExecutable)
+            {
+                aFileExecutable.loadFileDependencies(function()
+                {
+                    aFileExecutable.execute();
+                    disableCFURLCaching();
+                    if (aCallback)
+                        aCallback();
+                });
+            });
+        }
+        cachedFileImporters[referenceURLString] = cachedFileImporter;
+    }
+    return cachedFileImporter;
+}
+Executable.fileImporterForURL.displayName = "Executable.fileImporterForURL";
+var cachedFileExecutableSearchers = { },
+    cachedFileExecutableSearchResults = { };
+Executable.fileExecutableSearcherForURL = function( referenceURL)
+{
+    var referenceURLString = referenceURL.absoluteString(),
+        cachedFileExecutableSearcher = cachedFileExecutableSearchers[referenceURLString],
+        cachedSearchResults = { };
+    if (!cachedFileExecutableSearcher)
+    {
+        cachedFileExecutableSearcher = function( aURL, isQuoted, success)
+        {
+            var cacheUID = (isQuoted && referenceURL || "") + aURL,
+                cachedResult = cachedFileExecutableSearchResults[cacheUID];
+            if (cachedResult)
+                return completed(cachedResult);
+            var isAbsoluteURL = (aURL instanceof CFURL) && aURL.scheme();
+            if (isQuoted || isAbsoluteURL)
+            {
+                if (!isAbsoluteURL)
+                    aURL = new CFURL(aURL, referenceURL);
+                StaticResource.resolveResourceAtURL(aURL, NO, completed);
+            }
+            else
+                StaticResource.resolveResourceAtURLSearchingIncludeURLs(aURL, completed);
+            function completed( aStaticResource)
+            {
+                if (!aStaticResource)
+                    throw new Error("Could not load file at " + aURL);
+                cachedFileExecutableSearchResults[cacheUID] = aStaticResource;
+                success(new FileExecutable(aStaticResource.URL()));
+            }
+        };
+        cachedFileExecutableSearchers[referenceURLString] = cachedFileExecutableSearcher;
+    }
+    return cachedFileExecutableSearcher;
+}
+Executable.fileExecutableSearcherForURL.displayName = "Executable.fileExecutableSearcherForURL";
+var FileExecutablesForURLStrings = { };
+function FileExecutable( aURL)
+{
+    aURL = makeAbsoluteURL(aURL);
+    var URLString = aURL.absoluteString(),
+        existingFileExecutable = FileExecutablesForURLStrings[URLString];
+    if (existingFileExecutable)
+        return existingFileExecutable;
+    FileExecutablesForURLStrings[URLString] = this;
+    var fileContents = StaticResource.resourceAtURL(aURL).contents(),
+        executable = NULL,
+        extension = aURL.pathExtension();
+    if (fileContents.match(/^@STATIC;/))
+        executable = decompile(fileContents, aURL);
+    else if (extension === "j" || !extension)
+        executable = exports.preprocess(fileContents, aURL, Preprocessor.Flags.IncludeDebugSymbols);
+    else
+        executable = new Executable(fileContents, [], aURL);
+    Executable.apply(this, [executable.code(), executable.fileDependencies(), aURL, executable._function]);
+    this._hasExecuted = NO;
+}
+exports.FileExecutable = FileExecutable;
+FileExecutable.prototype = new Executable();
+FileExecutable.prototype.execute = function( shouldForce)
+{
+    if (this._hasExecuted && !shouldForce)
+        return;
+    this._hasExecuted = YES;
+    Executable.prototype.execute.call(this);
+}
+FileExecutable.prototype.execute.displayName = "FileExecutable.prototype.execute";
+FileExecutable.prototype.hasExecuted = function()
+{
+    return this._hasExecuted;
+}
+FileExecutable.prototype.hasExecuted.displayName = "FileExecutable.prototype.hasExecuted";
+function decompile( aString, aURL)
+{
+    var stream = new MarkedStream(aString);
+    var marker = NULL,
+        code = "",
+        dependencies = [];
+    while (marker = stream.getMarker())
+    {
+        var text = stream.getString();
+        if (marker === MARKER_TEXT)
+            code += text;
+        else if (marker === MARKER_IMPORT_STD)
+            dependencies.push(new FileDependency(new CFURL(text), NO));
+        else if (marker === MARKER_IMPORT_LOCAL)
+            dependencies.push(new FileDependency(new CFURL(text), YES));
+    }
+    var fn = FileExecutable._lookupCachedFunction(aURL)
+    if (fn)
+        return new Executable(code, dependencies, aURL, fn);
+    return new Executable(code, dependencies, aURL);
+}
+var FunctionCache = { };
+FileExecutable._cacheFunction = function( aURL, fn)
+{
+    aURL = typeof aURL === "string" ? aURL : aURL.absoluteString();
+    FunctionCache[aURL] = fn;
+}
+FileExecutable._lookupCachedFunction = function( aURL)
+{
+    aURL = typeof aURL === "string" ? aURL : aURL.absoluteString();
+    return FunctionCache[aURL];
+}
+var CLS_CLASS = 0x1,
+    CLS_META = 0x2,
+    CLS_INITIALIZED = 0x4,
+    CLS_INITIALIZING = 0x8;
+objj_ivar = function( aName, aType)
+{
+    this.name = aName;
+    this.type = aType;
+}
+objj_ivar.displayName = "objj_ivar";
+objj_method = function( aName, anImplementation, types)
+{
+    this.name = aName;
+    this.method_imp = anImplementation;
+    this.types = types;
+}
+objj_method.displayName = "objj_method";
+objj_class = function()
+{
+    this.isa = NULL;
+    this.super_class = NULL;
+    this.sub_classes = [];
+    this.name = NULL;
+    this.info = 0;
+    this.ivars = [];
+    this.method_list = [];
+    this.method_hash = {};
+    this.method_store = function() { };
+    this.method_dtable = this.method_store.prototype;
+    this.allocator = function() { };
+    this._UID = -1;
+}
+objj_class.displayName = "objj_class";
+objj_object = function()
+{
+    this.isa = NULL;
+    this._UID = -1;
+}
+objj_object.displayName = "objj_object";
+class_getName = function( aClass)
+{
+    if (aClass == Nil)
+        return "";
+    return aClass.name;
+}
+class_getName.displayName = "class_getName";
+class_isMetaClass = function( aClass)
+{
+    if (!aClass)
+        return NO;
+    return ((aClass.info & (CLS_META)));
+}
+class_isMetaClass.displayName = "class_isMetaClass";
+class_getSuperclass = function( aClass)
+{
+    if (aClass == Nil)
+        return Nil;
+    return aClass.super_class;
+}
+class_getSuperclass.displayName = "class_getSuperclass"
+class_setSuperclass = function( aClass, aSuperClass)
+{
+    aClass.super_class = aSuperClass;
+    aClass.isa.super_class = aSuperClass.isa;
+}
+class_setSuperclass.displayName = "class_setSuperclass";
+class_addIvar = function( aClass, aName, aType)
+{
+    var thePrototype = aClass.allocator.prototype;
+    if (typeof thePrototype[aName] != "undefined")
+        return NO;
+    aClass.ivars.push(new objj_ivar(aName, aType));
+    thePrototype[aName] = NULL;
+    return YES;
+}
+class_addIvar.displayName = "class_addIvar";
+class_addIvars = function( aClass, ivars)
+{
+    var index = 0,
+        count = ivars.length,
+        thePrototype = aClass.allocator.prototype;
+    for (; index < count; ++index)
+    {
+        var ivar = ivars[index],
+            name = ivar.name;
+        if (typeof thePrototype[name] === "undefined")
+        {
+            aClass.ivars.push(ivar);
+            thePrototype[name] = NULL;
+        }
+    }
+}
+class_addIvars.displayName = "class_addIvars";
+class_copyIvarList = function( aClass)
+{
+    return aClass.ivars.slice(0);
+}
+class_copyIvarList.displayName = "class_copyIvarList";
+class_addMethod = function( aClass, aName, anImplementation, types)
+{
+    if (aClass.method_hash[aName])
+        return NO;
+    var method = new objj_method(aName, anImplementation, types);
+    aClass.method_list.push(method);
+    aClass.method_dtable[aName] = method;
+    method.method_imp.displayName = (((aClass.info & (CLS_META))) ? '+' : '-') + " [" + class_getName(aClass) + ' ' + method_getName(method) + ']';
+    if (!((aClass.info & (CLS_META))) && (((aClass.info & (CLS_META))) ? aClass : aClass.isa).isa === (((aClass.info & (CLS_META))) ? aClass : aClass.isa))
+        class_addMethod((((aClass.info & (CLS_META))) ? aClass : aClass.isa), aName, anImplementation, types);
+    return YES;
+}
+class_addMethod.displayName = "class_addMethod";
+class_addMethods = function( aClass, methods)
+{
+    var index = 0,
+        count = methods.length,
+        method_list = aClass.method_list,
+        method_dtable = aClass.method_dtable;
+    for (; index < count; ++index)
+    {
+        var method = methods[index];
+        if (aClass.method_hash[method.name])
+            continue;
+        method_list.push(method);
+        method_dtable[method.name] = method;
+        method.method_imp.displayName = (((aClass.info & (CLS_META))) ? '+' : '-') + " [" + class_getName(aClass) + ' ' + method_getName(method) + ']';
+    }
+    if (!((aClass.info & (CLS_META))) && (((aClass.info & (CLS_META))) ? aClass : aClass.isa).isa === (((aClass.info & (CLS_META))) ? aClass : aClass.isa))
+        class_addMethods((((aClass.info & (CLS_META))) ? aClass : aClass.isa), methods);
+}
+class_addMethods.displayName = "class_addMethods";
+class_getInstanceMethod = function( aClass, aSelector)
+{
+    if (!aClass || !aSelector)
+        return NULL;
+    var method = aClass.method_dtable[aSelector];
+    return method ? method : NULL;
+}
+class_getInstanceMethod.displayName = "class_getInstanceMethod";
+class_getClassMethod = function( aClass, aSelector)
+{
+    if (!aClass || !aSelector)
+        return NULL;
+    var method = (((aClass.info & (CLS_META))) ? aClass : aClass.isa).method_dtable[aSelector];
+    return method ? method : NULL;
+}
+class_getClassMethod.displayName = "class_getClassMethod";
+class_copyMethodList = function( aClass)
+{
+    return aClass.method_list.slice(0);
+}
+class_copyMethodList.displayName = "class_copyMethodList";
+class_replaceMethod = function( aClass, aSelector, aMethodImplementation)
+{
+    if (!aClass || !aSelector)
+        return NULL;
+    var method = aClass.method_dtable[aSelector],
+        method_imp = NULL;
+    if (method)
+        method_imp = method.method_imp;
+    method.method_imp = aMethodImplementation;
+    return method_imp;
+}
+class_replaceMethod.displayName = "class_replaceMethod";
+var _class_initialize = function( aClass)
+{
+    var meta = (((aClass.info & (CLS_META))) ? aClass : aClass.isa);
+    if ((aClass.info & (CLS_META)))
+        aClass = objj_getClass(aClass.name);
+    if (aClass.super_class && !((((aClass.super_class.info & (CLS_META))) ? aClass.super_class : aClass.super_class.isa).info & (CLS_INITIALIZED)))
+        _class_initialize(aClass.super_class);
+    if (!(meta.info & (CLS_INITIALIZED)) && !(meta.info & (CLS_INITIALIZING)))
+    {
+        meta.info = (meta.info | (CLS_INITIALIZING)) & ~(0);
+        objj_msgSend(aClass, "initialize");
+        meta.info = (meta.info | (CLS_INITIALIZED)) & ~(CLS_INITIALIZING);
+    }
+}
+var _objj_forward = new objj_method("forward", function(self, _cmd)
+{
+    return objj_msgSend(self, "forward::", _cmd, arguments);
 });
-}
-};
-};
-var _8a=null;
-if(window.ActiveXObject!==_44){
-var _8b=["Msxml2.XMLHTTP.3.0","Msxml2.XMLHTTP.6.0"],_8c=_8b.length;
-while(_8c--){
-try{
-var _8d=_8b[_8c];
-new ActiveXObject(_8d);
-_8a=function(){
-return new ActiveXObject(_8d);
-};
-break;
-}
-catch(anException){
-}
-}
-}
-if(!_8a){
-_8a=window.XMLHttpRequest;
-}
-CFHTTPRequest=function(){
-this._eventDispatcher=new _6c(this);
-this._nativeRequest=new _8a();
-var _8e=this;
-this._nativeRequest.onreadystatechange=function(){
-_8f(_8e);
-};
-};
-CFHTTPRequest.UninitializedState=0;
-CFHTTPRequest.LoadingState=1;
-CFHTTPRequest.LoadedState=2;
-CFHTTPRequest.InteractiveState=3;
-CFHTTPRequest.CompleteState=4;
-CFHTTPRequest.prototype.status=function(){
-try{
-return this._nativeRequest.status||0;
-}
-catch(anException){
-return 0;
-}
-};
-CFHTTPRequest.prototype.statusText=function(){
-try{
-return this._nativeRequest.statusText||"";
-}
-catch(anException){
-return "";
-}
-};
-CFHTTPRequest.prototype.readyState=function(){
-return this._nativeRequest.readyState;
-};
-CFHTTPRequest.prototype.success=function(){
-var _90=this.status();
-if(_90>=200&&_90<300){
-return YES;
-}
-return _90===0&&this.responseText()&&this.responseText().length;
-};
-CFHTTPRequest.prototype.responseXML=function(){
-var _91=this._nativeRequest.responseXML;
-if(_91&&(_8a===window.XMLHttpRequest)){
-return _91;
-}
-return _92(this.responseText());
-};
-CFHTTPRequest.prototype.responsePropertyList=function(){
-var _93=this.responseText();
-if(CFPropertyList.sniffedFormatOfString(_93)===CFPropertyList.FormatXML_v1_0){
-return CFPropertyList.propertyListFromXML(this.responseXML());
-}
-return CFPropertyList.propertyListFromString(_93);
-};
-CFHTTPRequest.prototype.responseText=function(){
-return this._nativeRequest.responseText;
-};
-CFHTTPRequest.prototype.setRequestHeader=function(_94,_95){
-return this._nativeRequest.setRequestHeader(_94,_95);
-};
-CFHTTPRequest.prototype.getResponseHeader=function(_96){
-return this._nativeRequest.getResponseHeader(_96);
-};
-CFHTTPRequest.prototype.getAllResponseHeaders=function(){
-return this._nativeRequest.getAllResponseHeaders();
-};
-CFHTTPRequest.prototype.overrideMimeType=function(_97){
-if("overrideMimeType" in this._nativeRequest){
-return this._nativeRequest.overrideMimeType(_97);
-}
-};
-CFHTTPRequest.prototype.open=function(_98,_99,_9a,_9b,_9c){
-return this._nativeRequest.open(_98,_99,_9a,_9b,_9c);
-};
-CFHTTPRequest.prototype.send=function(_9d){
-try{
-return this._nativeRequest.send(_9d);
-}
-catch(anException){
-this._eventDispatcher.dispatchEvent({type:"failure",request:this});
-}
-};
-CFHTTPRequest.prototype.abort=function(){
-return this._nativeRequest.abort();
-};
-CFHTTPRequest.prototype.addEventListener=function(_9e,_9f){
-this._eventDispatcher.addEventListener(_9e,_9f);
-};
-CFHTTPRequest.prototype.removeEventListener=function(_a0,_a1){
-this._eventDispatcher.removeEventListener(_a0,_a1);
-};
-function _8f(_a2){
-var _a3=_a2._eventDispatcher;
-_a3.dispatchEvent({type:"readystatechange",request:_a2});
-var _a4=_a2._nativeRequest,_a5=["uninitialized","loading","loaded","interactive","complete"][_a2.readyState()];
-_a3.dispatchEvent({type:_a5,request:_a2});
-if(_a5==="complete"){
-var _a6="HTTP"+_a2.status();
-_a3.dispatchEvent({type:_a6,request:_a2});
-var _a7=_a2.success()?"success":"failure";
-_a3.dispatchEvent({type:_a7,request:_a2});
-}
-};
-function _a8(_a9,_aa,_ab){
-var _ac=new CFHTTPRequest();
-if(_a9.pathExtension()==="plist"){
-_ac.overrideMimeType("text/xml");
-}
-if(_2.asyncLoader){
-_ac.onsuccess=_83(_aa);
-_ac.onfailure=_83(_ab);
-}else{
-_ac.onsuccess=_aa;
-_ac.onfailure=_ab;
-}
-_ac.open("GET",_a9.absoluteString(),_2.asyncLoader);
-_ac.send("");
-};
-_2.asyncLoader=YES;
-_2.Asynchronous=_83;
-_2.determineAndDispatchHTTPRequestEvents=_8f;
-var _ad=0;
-objj_generateObjectUID=function(){
-return _ad++;
-};
-CFPropertyList=function(){
-this._UID=objj_generateObjectUID();
-};
-CFPropertyList.DTDRE=/^\s*(?:<\?\s*xml\s+version\s*=\s*\"1.0\"[^>]*\?>\s*)?(?:<\!DOCTYPE[^>]*>\s*)?/i;
-CFPropertyList.XMLRE=/^\s*(?:<\?\s*xml\s+version\s*=\s*\"1.0\"[^>]*\?>\s*)?(?:<\!DOCTYPE[^>]*>\s*)?<\s*plist[^>]*\>/i;
-CFPropertyList.FormatXMLDTD="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">";
-CFPropertyList.Format280NorthMagicNumber="280NPLIST";
-CFPropertyList.FormatOpenStep=1,CFPropertyList.FormatXML_v1_0=100,CFPropertyList.FormatBinary_v1_0=200,CFPropertyList.Format280North_v1_0=-1000;
-CFPropertyList.sniffedFormatOfString=function(_ae){
-if(_ae.match(CFPropertyList.XMLRE)){
-return CFPropertyList.FormatXML_v1_0;
-}
-if(_ae.substr(0,CFPropertyList.Format280NorthMagicNumber.length)===CFPropertyList.Format280NorthMagicNumber){
-return CFPropertyList.Format280North_v1_0;
-}
-return NULL;
-};
-CFPropertyList.dataFromPropertyList=function(_af,_b0){
-var _b1=new CFMutableData();
-_b1.setRawString(CFPropertyList.stringFromPropertyList(_af,_b0));
-return _b1;
-};
-CFPropertyList.stringFromPropertyList=function(_b2,_b3){
-if(!_b3){
-_b3=CFPropertyList.Format280North_v1_0;
-}
-var _b4=_b5[_b3];
-return _b4["start"]()+_b6(_b2,_b4)+_b4["finish"]();
-};
-function _b6(_b7,_b8){
-var _b9=typeof _b7,_ba=_b7.valueOf(),_bb=typeof _ba;
-if(_b9!==_bb){
-_b9=_bb;
-_b7=_ba;
-}
-if(_b7===YES||_b7===NO){
-_b9="boolean";
-}else{
-if(_b9==="number"){
-if(FLOOR(_b7)===_b7){
-_b9="integer";
-}else{
-_b9="real";
-}
-}else{
-if(_b9!=="string"){
-if(_b7.slice){
-_b9="array";
-}else{
-_b9="dictionary";
-}
-}
-}
-}
-return _b8[_b9](_b7,_b8);
-};
-var _b5={};
-_b5[CFPropertyList.FormatXML_v1_0]={"start":function(){
-return CFPropertyList.FormatXMLDTD+"<plist version = \"1.0\">";
-},"finish":function(){
-return "</plist>";
-},"string":function(_bc){
-return "<string>"+_bd(_bc)+"</string>";
-},"boolean":function(_be){
-return _be?"<true/>":"<false/>";
-},"integer":function(_bf){
-return "<integer>"+_bf+"</integer>";
-},"real":function(_c0){
-return "<real>"+_c0+"</real>";
-},"array":function(_c1,_c2){
-var _c3=0,_c4=_c1.length,_c5="<array>";
-for(;_c3<_c4;++_c3){
-_c5+=_b6(_c1[_c3],_c2);
-}
-return _c5+"</array>";
-},"dictionary":function(_c6,_c7){
-var _c8=_c6._keys,_8c=0,_c9=_c8.length,_ca="<dict>";
-for(;_8c<_c9;++_8c){
-var key=_c8[_8c];
-_ca+="<key>"+key+"</key>";
-_ca+=_b6(_c6.valueForKey(key),_c7);
-}
-return _ca+"</dict>";
-}};
-var _cb="A",_cc="D",_cd="f",_ce="d",_cf="S",_d0="T",_d1="F",_d2="K",_d3="E";
-_b5[CFPropertyList.Format280North_v1_0]={"start":function(){
-return CFPropertyList.Format280NorthMagicNumber+";1.0;";
-},"finish":function(){
-return "";
-},"string":function(_d4){
-return _cf+";"+_d4.length+";"+_d4;
-},"boolean":function(_d5){
-return (_d5?_d0:_d1)+";";
-},"integer":function(_d6){
-var _d7=""+_d6;
-return _ce+";"+_d7.length+";"+_d7;
-},"real":function(_d8){
-var _d9=""+_d8;
-return _cd+";"+_d9.length+";"+_d9;
-},"array":function(_da,_db){
-var _dc=0,_dd=_da.length,_de=_cb+";";
-for(;_dc<_dd;++_dc){
-_de+=_b6(_da[_dc],_db);
-}
-return _de+_d3+";";
-},"dictionary":function(_df,_e0){
-var _e1=_df._keys,_8c=0,_e2=_e1.length,_e3=_cc+";";
-for(;_8c<_e2;++_8c){
-var key=_e1[_8c];
-_e3+=_d2+";"+key.length+";"+key;
-_e3+=_b6(_df.valueForKey(key),_e0);
-}
-return _e3+_d3+";";
-}};
-var _e4="xml",_e5="#document",_e6="plist",_e7="key",_e8="dict",_e9="array",_ea="string",_eb="true",_ec="false",_ed="real",_ee="integer",_ef="data";
-var _f0=function(_f1,_f2,_f3){
-var _f4=_f1;
-_f4=(_f4.firstChild);
-if(_f4!==NULL&&((_f4.nodeType)===8||(_f4.nodeType)===3)){
-while((_f4=(_f4.nextSibling))&&((_f4.nodeType)===8||(_f4.nodeType)===3)){
-}
-}
-if(_f4){
-return _f4;
-}
-if((String(_f1.nodeName))===_e9||(String(_f1.nodeName))===_e8){
-_f3.pop();
-}else{
-if(_f4===_f2){
-return NULL;
-}
-_f4=_f1;
-while((_f4=(_f4.nextSibling))&&((_f4.nodeType)===8||(_f4.nodeType)===3)){
-}
-if(_f4){
-return _f4;
-}
-}
-_f4=_f1;
-while(_f4){
-var _f5=_f4;
-while((_f5=(_f5.nextSibling))&&((_f5.nodeType)===8||(_f5.nodeType)===3)){
-}
-if(_f5){
-return _f5;
-}
-var _f4=(_f4.parentNode);
-if(_f2&&_f4===_f2){
-return NULL;
-}
-_f3.pop();
-}
-return NULL;
-};
-CFPropertyList.propertyListFromData=function(_f6,_f7){
-return CFPropertyList.propertyListFromString(_f6.rawString(),_f7);
-};
-CFPropertyList.propertyListFromString=function(_f8,_f9){
-if(!_f9){
-_f9=CFPropertyList.sniffedFormatOfString(_f8);
-}
-if(_f9===CFPropertyList.FormatXML_v1_0){
-return CFPropertyList.propertyListFromXML(_f8);
-}
-if(_f9===CFPropertyList.Format280North_v1_0){
-return _fa(_f8);
-}
-return NULL;
-};
-var _cb="A",_cc="D",_cd="f",_ce="d",_cf="S",_d0="T",_d1="F",_d2="K",_d3="E";
-function _fa(_fb){
-var _fc=new _fd(_fb),_fe=NULL,key="",_ff=NULL,_100=NULL,_101=[],_102=NULL;
-while(_fe=_fc.getMarker()){
-if(_fe===_d3){
-_101.pop();
-continue;
-}
-var _103=_101.length;
-if(_103){
-_102=_101[_103-1];
-}
-if(_fe===_d2){
-key=_fc.getString();
-_fe=_fc.getMarker();
-}
-switch(_fe){
-case _cb:
-_ff=[];
-_101.push(_ff);
-break;
-case _cc:
-_ff=new CFMutableDictionary();
-_101.push(_ff);
-break;
-case _cd:
-_ff=parseFloat(_fc.getString());
-break;
-case _ce:
-_ff=parseInt(_fc.getString(),10);
-break;
-case _cf:
-_ff=_fc.getString();
-break;
-case _d0:
-_ff=YES;
-break;
-case _d1:
-_ff=NO;
-break;
-default:
-throw new Error("*** "+_fe+" marker not recognized in Plist.");
-}
-if(!_100){
-_100=_ff;
-}else{
-if(_102){
-if(_102.slice){
-_102.push(_ff);
-}else{
-_102.setValueForKey(key,_ff);
-}
-}
-}
-}
-return _100;
-};
-function _bd(_104){
-return _104.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&apos;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-};
-function _105(_106){
-return _106.replace(/&quot;/g,"\"").replace(/&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");
-};
-function _92(_107){
-if(window.DOMParser){
-return (new window.DOMParser().parseFromString(_107,"text/xml").documentElement);
-}else{
-if(window.ActiveXObject){
-XMLNode=new ActiveXObject("Microsoft.XMLDOM");
-var _108=_107.match(CFPropertyList.DTDRE);
-if(_108){
-_107=_107.substr(_108[0].length);
-}
-XMLNode.loadXML(_107);
-return XMLNode;
-}
-}
-return NULL;
-};
-CFPropertyList.propertyListFromXML=function(_109){
-var _10a=_109;
-if(_109.valueOf&&typeof _109.valueOf()==="string"){
-_10a=_92(_109);
-}
-while(((String(_10a.nodeName))===_e5)||((String(_10a.nodeName))===_e4)){
-_10a=(_10a.firstChild);
-}
-if(_10a!==NULL&&((_10a.nodeType)===8||(_10a.nodeType)===3)){
-while((_10a=(_10a.nextSibling))&&((_10a.nodeType)===8||(_10a.nodeType)===3)){
-}
-}
-if(((_10a.nodeType)===10)){
-while((_10a=(_10a.nextSibling))&&((_10a.nodeType)===8||(_10a.nodeType)===3)){
-}
-}
-if(!((String(_10a.nodeName))===_e6)){
-return NULL;
-}
-var key="",_10b=NULL,_10c=NULL,_10d=_10a,_10e=[],_10f=NULL;
-while(_10a=_f0(_10a,_10d,_10e)){
-var _110=_10e.length;
-if(_110){
-_10f=_10e[_110-1];
-}
-if((String(_10a.nodeName))===_e7){
-key=((String((_10a.firstChild).nodeValue)));
-while((_10a=(_10a.nextSibling))&&((_10a.nodeType)===8||(_10a.nodeType)===3)){
-}
-}
-switch(String((String(_10a.nodeName)))){
-case _e9:
-_10b=[];
-_10e.push(_10b);
-break;
-case _e8:
-_10b=new CFMutableDictionary();
-_10e.push(_10b);
-break;
-case _ed:
-_10b=parseFloat(((String((_10a.firstChild).nodeValue))));
-break;
-case _ee:
-_10b=parseInt(((String((_10a.firstChild).nodeValue))),10);
-break;
-case _ea:
-_10b=_105((_10a.firstChild)?((String((_10a.firstChild).nodeValue))):"");
-break;
-case _eb:
-_10b=YES;
-break;
-case _ec:
-_10b=NO;
-break;
-case _ef:
-_10b=new CFMutableData();
-_10b.bytes=(_10a.firstChild)?CFData.decodeBase64ToArray(((String((_10a.firstChild).nodeValue))),YES):[];
-break;
-default:
-throw new Error("*** "+(String(_10a.nodeName))+" tag not recognized in Plist.");
-}
-if(!_10c){
-_10c=_10b;
-}else{
-if(_10f){
-if(_10f.slice){
-_10f.push(_10b);
-}else{
-_10f.setValueForKey(key,_10b);
-}
-}
-}
-}
-return _10c;
-};
-kCFPropertyListOpenStepFormat=CFPropertyList.FormatOpenStep;
-kCFPropertyListXMLFormat_v1_0=CFPropertyList.FormatXML_v1_0;
-kCFPropertyListBinaryFormat_v1_0=CFPropertyList.FormatBinary_v1_0;
-kCFPropertyList280NorthFormat_v1_0=CFPropertyList.Format280North_v1_0;
-CFPropertyListCreate=function(){
-return new CFPropertyList();
-};
-CFPropertyListCreateFromXMLData=function(data){
-return CFPropertyList.propertyListFromData(data,CFPropertyList.FormatXML_v1_0);
-};
-CFPropertyListCreateXMLData=function(_111){
-return CFPropertyList.dataFromPropertyList(_111,CFPropertyList.FormatXML_v1_0);
-};
-CFPropertyListCreateFrom280NorthData=function(data){
-return CFPropertyList.propertyListFromData(data,CFPropertyList.Format280North_v1_0);
-};
-CFPropertyListCreate280NorthData=function(_112){
-return CFPropertyList.dataFromPropertyList(_112,CFPropertyList.Format280North_v1_0);
-};
-CPPropertyListCreateFromData=function(data,_113){
-return CFPropertyList.propertyListFromData(data,_113);
-};
-CPPropertyListCreateData=function(_114,_115){
-return CFPropertyList.dataFromPropertyList(_114,_115);
-};
-CFDictionary=function(_116){
-this._keys=[];
-this._count=0;
-this._buckets={};
-this._UID=objj_generateObjectUID();
-};
-var _117=Array.prototype.indexOf,_71=Object.prototype.hasOwnProperty;
-CFDictionary.prototype.copy=function(){
-return this;
-};
-CFDictionary.prototype.mutableCopy=function(){
-var _118=new CFMutableDictionary(),keys=this._keys,_119=this._count;
-_118._keys=keys.slice();
-_118._count=_119;
-var _11a=0,_11b=this._buckets,_11c=_118._buckets;
-for(;_11a<_119;++_11a){
-var key=keys[_11a];
-_11c[key]=_11b[key];
-}
-return _118;
-};
-CFDictionary.prototype.containsKey=function(aKey){
-return _71.apply(this._buckets,[aKey]);
-};
-CFDictionary.prototype.containsValue=function(_11d){
-var keys=this._keys,_11e=this._buckets,_8c=0,_11f=keys.length;
-for(;_8c<_11f;++_8c){
-if(_11e[keys]===_11d){
-return YES;
-}
-}
-return NO;
-};
-CFDictionary.prototype.count=function(){
-return this._count;
-};
-CFDictionary.prototype.countOfKey=function(aKey){
-return this.containsKey(aKey)?1:0;
-};
-CFDictionary.prototype.countOfValue=function(_120){
-var keys=this._keys,_121=this._buckets,_8c=0,_122=keys.length,_123=0;
-for(;_8c<_122;++_8c){
-if(_121[keys]===_120){
-return ++_123;
-}
-}
-return _123;
-};
-CFDictionary.prototype.keys=function(){
-return this._keys.slice();
-};
-CFDictionary.prototype.valueForKey=function(aKey){
-var _124=this._buckets;
-if(!_71.apply(_124,[aKey])){
-return nil;
-}
-return _124[aKey];
-};
-CFDictionary.prototype.toString=function(){
-var _125="{\n",keys=this._keys,_8c=0,_126=this._count;
-for(;_8c<_126;++_8c){
-var key=keys[_8c];
-_125+="\t"+key+" = \""+String(this.valueForKey(key)).split("\n").join("\n\t")+"\"\n";
-}
-return _125+"}";
-};
-CFMutableDictionary=function(_127){
-CFDictionary.apply(this,[]);
-};
-CFMutableDictionary.prototype=new CFDictionary();
-CFMutableDictionary.prototype.copy=function(){
-return this.mutableCopy();
-};
-CFMutableDictionary.prototype.addValueForKey=function(aKey,_128){
-if(this.containsKey(aKey)){
-return;
-}
-++this._count;
-this._keys.push(aKey);
-this._buckets[aKey]=_128;
-};
-CFMutableDictionary.prototype.removeValueForKey=function(aKey){
-var _129=-1;
-if(_117){
-_129=_117.call(this._keys,aKey);
-}else{
-var keys=this._keys,_8c=0,_12a=keys.length;
-for(;_8c<_12a;++_8c){
-if(keys[_8c]===aKey){
-_129=_8c;
-break;
-}
-}
-}
-if(_129===-1){
-return;
-}
---this._count;
-this._keys.splice(_129,1);
-delete this._buckets[aKey];
-};
-CFMutableDictionary.prototype.removeAllValues=function(){
-this._count=0;
-this._keys=[];
-this._buckets={};
-};
-CFMutableDictionary.prototype.replaceValueForKey=function(aKey,_12b){
-if(!this.containsKey(aKey)){
-return;
-}
-this._buckets[aKey]=_12b;
-};
-CFMutableDictionary.prototype.setValueForKey=function(aKey,_12c){
-if(_12c===nil||_12c===_44){
-this.removeValueForKey(aKey);
-}else{
-if(this.containsKey(aKey)){
-this.replaceValueForKey(aKey,_12c);
-}else{
-this.addValueForKey(aKey,_12c);
-}
-}
-};
-CFData=function(){
-this._rawString=NULL;
-this._propertyList=NULL;
-this._propertyListFormat=NULL;
-this._JSONObject=NULL;
-this._bytes=NULL;
-this._base64=NULL;
-};
-CFData.prototype.propertyList=function(){
-if(!this._propertyList){
-this._propertyList=CFPropertyList.propertyListFromString(this.rawString());
-}
-return this._propertyList;
-};
-CFData.prototype.JSONObject=function(){
-if(!this._JSONObject){
-try{
-this._JSONObject=JSON.parse(this.rawString());
-}
-catch(anException){
-}
-}
-return this._JSONObject;
-};
-CFData.prototype.rawString=function(){
-if(this._rawString===NULL){
-if(this._propertyList){
-this._rawString=CFPropertyList.stringFromPropertyList(this._propertyList,this._propertyListFormat);
-}else{
-if(this._JSONObject){
-this._rawString=JSON.stringify(this._JSONObject);
-}else{
-throw new Error("Can't convert data to string.");
-}
-}
-}
-return this._rawString;
-};
-CFData.prototype.bytes=function(){
-return this._bytes;
-};
-CFData.prototype.base64=function(){
-return this._base64;
-};
-CFMutableData=function(){
-CFData.call(this);
-};
-CFMutableData.prototype=new CFData();
-function _12d(_12e){
-this._rawString=NULL;
-this._propertyList=NULL;
-this._propertyListFormat=NULL;
-this._JSONObject=NULL;
-this._bytes=NULL;
-this._base64=NULL;
-};
-CFMutableData.prototype.setPropertyList=function(_12f,_130){
-_12d(this);
-this._propertyList=_12f;
-this._propertyListFormat=_130;
-};
-CFMutableData.prototype.setJSONObject=function(_131){
-_12d(this);
-this._JSONObject=_131;
-};
-CFMutableData.prototype.setRawString=function(_132){
-_12d(this);
-this._rawString=_132;
-};
-CFMutableData.prototype.setBytes=function(_133){
-_12d(this);
-this._bytes=_133;
-};
-CFMutableData.prototype.setBase64String=function(_134){
-_12d(this);
-this._base64=_134;
-};
-var _135=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","0","1","2","3","4","5","6","7","8","9","+","/","="],_136=[];
-for(var i=0;i<_135.length;i++){
-_136[_135[i].charCodeAt(0)]=i;
-}
-CFData.decodeBase64ToArray=function(_137,_138){
-if(_138){
-_137=_137.replace(/[^A-Za-z0-9\+\/\=]/g,"");
-}
-var pad=(_137[_137.length-1]=="="?1:0)+(_137[_137.length-2]=="="?1:0),_139=_137.length,_13a=[];
-var i=0;
-while(i<_139){
-var bits=(_136[_137.charCodeAt(i++)]<<18)|(_136[_137.charCodeAt(i++)]<<12)|(_136[_137.charCodeAt(i++)]<<6)|(_136[_137.charCodeAt(i++)]);
-_13a.push((bits&16711680)>>16);
-_13a.push((bits&65280)>>8);
-_13a.push(bits&255);
-}
-if(pad>0){
-return _13a.slice(0,-1*pad);
-}
-return _13a;
-};
-CFData.encodeBase64Array=function(_13b){
-var pad=(3-(_13b.length%3))%3,_13c=_13b.length+pad,_13d=[];
-if(pad>0){
-_13b.push(0);
-}
-if(pad>1){
-_13b.push(0);
-}
-var i=0;
-while(i<_13c){
-var bits=(_13b[i++]<<16)|(_13b[i++]<<8)|(_13b[i++]);
-_13d.push(_135[(bits&16515072)>>18]);
-_13d.push(_135[(bits&258048)>>12]);
-_13d.push(_135[(bits&4032)>>6]);
-_13d.push(_135[bits&63]);
-}
-if(pad>0){
-_13d[_13d.length-1]="=";
-_13b.pop();
-}
-if(pad>1){
-_13d[_13d.length-2]="=";
-_13b.pop();
-}
-return _13d.join("");
-};
-CFData.decodeBase64ToString=function(_13e,_13f){
-return CFData.bytesToString(CFData.decodeBase64ToArray(_13e,_13f));
-};
-CFData.bytesToString=function(_140){
-return String.fromCharCode.apply(NULL,_140);
-};
-CFData.encodeBase64String=function(_141){
-var temp=[];
-for(var i=0;i<_141.length;i++){
-temp.push(_141.charCodeAt(i));
-}
-return CFData.encodeBase64Array(temp);
-};
-var _142,_143,_144=0;
-function _145(){
-if(++_144!==1){
-return;
-}
-_142={};
-_143={};
-};
-function _146(){
-_144=MAX(_144-1,0);
-if(_144!==0){
-return;
-}
-delete _142;
-delete _143;
-};
-var _147=new RegExp("^"+"(?:"+"([^:/?#]+):"+")?"+"(?:"+"(//)"+"("+"(?:"+"("+"([^:@]*)"+":?"+"([^:@]*)"+")?"+"@"+")?"+"([^:/?#]*)"+"(?::(\\d*))?"+")"+")?"+"([^?#]*)"+"(?:\\?([^#]*))?"+"(?:#(.*))?");
-var _148=["url","scheme","authorityRoot","authority","userInfo","user","password","domain","portNumber","path","queryString","fragment"];
-function _149(aURL){
-if(aURL._parts){
-return aURL._parts;
-}
-var _14a=aURL.string(),_14b=_14a.match(/^mhtml:/);
-if(_14b){
-_14a=_14a.substr("mhtml:".length);
-}
-if(_144>0&&_71.call(_143,_14a)){
-aURL._parts=_143[_14a];
-return aURL._parts;
-}
-aURL._parts={};
-var _14c=aURL._parts,_14d=_147.exec(_14a),_8c=_14d.length;
-while(_8c--){
-_14c[_148[_8c]]=_14d[_8c]||NULL;
-}
-_14c.portNumber=parseInt(_14c.portNumber,10);
-if(isNaN(_14c.portNumber)){
-_14c.portNumber=-1;
-}
-_14c.pathComponents=[];
-if(_14c.path){
-var _14e=_14c.path.split("/"),_14f=_14c.pathComponents,_8c=0,_150=_14e.length;
-for(;_8c<_150;++_8c){
-var _151=_14e[_8c];
-if(_151){
-_14f.push(_151);
-}else{
-if(_8c===0){
-_14f.push("/");
-}
-}
-}
-_14c.pathComponents=_14f;
-}
-if(_14b){
-_14c.url="mhtml:"+_14c.url;
-_14c.scheme="mhtml:"+_14c.scheme;
-}
-if(_144>0){
-_143[_14a]=_14c;
-}
-return _14c;
-};
-CFURL=function(aURL,_152){
-aURL=aURL||"";
-if(aURL instanceof CFURL){
-if(!_152){
-return aURL;
-}
-var _153=aURL.baseURL();
-if(_153){
-_152=new CFURL(_153.absoluteURL(),_152);
-}
-aURL=aURL.string();
-}
-if(_144>0){
-var _154=aURL+" "+(_152&&_152.UID()||"");
-if(_71.call(_142,_154)){
-return _142[_154];
-}
-_142[_154]=this;
-}
-if(aURL.match(/^data:/)){
-var _155={},_8c=_148.length;
-while(_8c--){
-_155[_148[_8c]]="";
-}
-_155.url=aURL;
-_155.scheme="data";
-_155.pathComponents=[];
-this._parts=_155;
-this._standardizedURL=this;
-this._absoluteURL=this;
-}
-this._UID=objj_generateObjectUID();
-this._string=aURL;
-this._baseURL=_152;
-};
-CFURL.prototype.UID=function(){
-return this._UID;
-};
-var _156={};
-CFURL.prototype.mappedURL=function(){
-return _156[this.absoluteString()]||this;
-};
-CFURL.setMappedURLForURL=function(_157,_158){
-_156[_157.absoluteString()]=_158;
-};
-CFURL.prototype.schemeAndAuthority=function(){
-var _159="",_15a=this.scheme();
-if(_15a){
-_159+=_15a+":";
-}
-var _15b=this.authority();
-if(_15b){
-_159+="//"+_15b;
-}
-return _159;
-};
-CFURL.prototype.absoluteString=function(){
-if(this._absoluteString===_44){
-this._absoluteString=this.absoluteURL().string();
-}
-return this._absoluteString;
-};
-CFURL.prototype.toString=function(){
-return this.absoluteString();
-};
-function _15c(aURL){
-aURL=aURL.standardizedURL();
-var _15d=aURL.baseURL();
-if(!_15d){
-return aURL;
-}
-var _15e=((aURL)._parts||_149(aURL)),_15f,_160=_15d.absoluteURL(),_161=((_160)._parts||_149(_160));
-if(_15e.scheme||_15e.authority){
-_15f=_15e;
-}else{
-_15f={};
-_15f.scheme=_161.scheme;
-_15f.authority=_161.authority;
-_15f.userInfo=_161.userInfo;
-_15f.user=_161.user;
-_15f.password=_161.password;
-_15f.domain=_161.domain;
-_15f.portNumber=_161.portNumber;
-_15f.queryString=_15e.queryString;
-_15f.fragment=_15e.fragment;
-var _162=_15e.pathComponents;
-if(_162.length&&_162[0]==="/"){
-_15f.path=_15e.path;
-_15f.pathComponents=_162;
-}else{
-var _163=_161.pathComponents,_164=_163.concat(_162);
-if(!_15d.hasDirectoryPath()&&_163.length){
-_164.splice(_163.length-1,1);
-}
-if(_162.length&&(_162[0]===".."||_162[0]===".")){
-_165(_164,YES);
-}
-_15f.pathComponents=_164;
-_15f.path=_166(_164,_162.length<=0||aURL.hasDirectoryPath());
-}
-}
-var _167=_168(_15f),_169=new CFURL(_167);
-_169._parts=_15f;
-_169._standardizedURL=_169;
-_169._standardizedString=_167;
-_169._absoluteURL=_169;
-_169._absoluteString=_167;
-return _169;
-};
-function _166(_16a,_16b){
-var path=_16a.join("/");
-if(path.length&&path.charAt(0)==="/"){
-path=path.substr(1);
-}
-if(_16b){
-path+="/";
-}
-return path;
-};
-function _165(_16c,_16d){
-var _16e=0,_16f=0,_170=_16c.length,_171=_16d?_16c:[],_172=NO;
-for(;_16e<_170;++_16e){
-var _173=_16c[_16e];
-if(_173===""){
-continue;
-}
-if(_173==="."){
-_172=_16f===0;
-continue;
-}
-if(_173!==".."||_16f===0||_171[_16f-1]===".."){
-_171[_16f]=_173;
-_16f++;
-continue;
-}
-if(_16f>0&&_171[_16f-1]!=="/"){
---_16f;
-}
-}
-if(_172&&_16f===0){
-_171[_16f++]=".";
-}
-_171.length=_16f;
-return _171;
-};
-function _168(_174){
-var _175="",_176=_174.scheme;
-if(_176){
-_175+=_176+":";
-}
-var _177=_174.authority;
-if(_177){
-_175+="//"+_177;
-}
-_175+=_174.path;
-var _178=_174.queryString;
-if(_178){
-_175+="?"+_178;
-}
-var _179=_174.fragment;
-if(_179){
-_175+="#"+_179;
-}
-return _175;
-};
-CFURL.prototype.absoluteURL=function(){
-if(this._absoluteURL===_44){
-this._absoluteURL=_15c(this);
-}
-return this._absoluteURL;
-};
-CFURL.prototype.standardizedURL=function(){
-if(this._standardizedURL===_44){
-var _17a=((this)._parts||_149(this)),_17b=_17a.pathComponents,_17c=_165(_17b,NO);
-var _17d=_166(_17c,this.hasDirectoryPath());
-if(_17a.path===_17d){
-this._standardizedURL=this;
-}else{
-var _17e=_17f(_17a);
-_17e.pathComponents=_17c;
-_17e.path=_17d;
-var _180=new CFURL(_168(_17e),this.baseURL());
-_180._parts=_17e;
-_180._standardizedURL=_180;
-this._standardizedURL=_180;
-}
-}
-return this._standardizedURL;
-};
-function _17f(_181){
-var _182={},_183=_148.length;
-while(_183--){
-var _184=_148[_183];
-_182[_184]=_181[_184];
-}
-return _182;
-};
-CFURL.prototype.string=function(){
-return this._string;
-};
-CFURL.prototype.authority=function(){
-var _185=((this)._parts||_149(this)).authority;
-if(_185){
-return _185;
-}
-var _186=this.baseURL();
-return _186&&_186.authority()||"";
-};
-CFURL.prototype.hasDirectoryPath=function(){
-var _187=this._hasDirectoryPath;
-if(_187===_44){
-var path=this.path();
-if(!path){
-return NO;
-}
-if(path.charAt(path.length-1)==="/"){
-return YES;
-}
-var _188=this.lastPathComponent();
-_187=_188==="."||_188==="..";
-this._hasDirectoryPath=_187;
-}
-return _187;
-};
-CFURL.prototype.hostName=function(){
-return this.authority();
-};
-CFURL.prototype.fragment=function(){
-return ((this)._parts||_149(this)).fragment;
-};
-CFURL.prototype.lastPathComponent=function(){
-if(this._lastPathComponent===_44){
-var _189=this.pathComponents(),_18a=_189.length;
-if(!_18a){
-this._lastPathComponent="";
-}else{
-this._lastPathComponent=_189[_18a-1];
-}
-}
-return this._lastPathComponent;
-};
-CFURL.prototype.path=function(){
-return ((this)._parts||_149(this)).path;
-};
-CFURL.prototype.pathComponents=function(){
-return ((this)._parts||_149(this)).pathComponents;
-};
-CFURL.prototype.pathExtension=function(){
-var _18b=this.lastPathComponent();
-if(!_18b){
-return NULL;
-}
-_18b=_18b.replace(/^\.*/,"");
-var _18c=_18b.lastIndexOf(".");
-return _18c<=0?"":_18b.substring(_18c+1);
-};
-CFURL.prototype.queryString=function(){
-return ((this)._parts||_149(this)).queryString;
-};
-CFURL.prototype.scheme=function(){
-var _18d=this._scheme;
-if(_18d===_44){
-_18d=((this)._parts||_149(this)).scheme;
-if(!_18d){
-var _18e=this.baseURL();
-_18d=_18e&&_18e.scheme();
-}
-this._scheme=_18d;
-}
-return _18d;
-};
-CFURL.prototype.user=function(){
-return ((this)._parts||_149(this)).user;
-};
-CFURL.prototype.password=function(){
-return ((this)._parts||_149(this)).password;
-};
-CFURL.prototype.portNumber=function(){
-return ((this)._parts||_149(this)).portNumber;
-};
-CFURL.prototype.domain=function(){
-return ((this)._parts||_149(this)).domain;
-};
-CFURL.prototype.baseURL=function(){
-return this._baseURL;
-};
-CFURL.prototype.asDirectoryPathURL=function(){
-if(this.hasDirectoryPath()){
-return this;
-}
-var _18f=this.lastPathComponent();
-if(_18f!=="/"){
-_18f="./"+_18f;
-}
-return new CFURL(_18f+"/",this);
-};
-function _190(aURL){
-if(!aURL._resourcePropertiesForKeys){
-aURL._resourcePropertiesForKeys=new CFMutableDictionary();
-}
-return aURL._resourcePropertiesForKeys;
-};
-CFURL.prototype.resourcePropertyForKey=function(aKey){
-return _190(this).valueForKey(aKey);
-};
-CFURL.prototype.setResourcePropertyForKey=function(aKey,_191){
-_190(this).setValueForKey(aKey,_191);
-};
-CFURL.prototype.staticResourceData=function(){
-var data=new CFMutableData();
-data.setRawString(_192.resourceAtURL(this).contents());
-return data;
-};
-function _fd(_193){
-this._string=_193;
-var _194=_193.indexOf(";");
-this._magicNumber=_193.substr(0,_194);
-this._location=_193.indexOf(";",++_194);
-this._version=_193.substring(_194,this._location++);
-};
-_fd.prototype.magicNumber=function(){
-return this._magicNumber;
-};
-_fd.prototype.version=function(){
-return this._version;
-};
-_fd.prototype.getMarker=function(){
-var _195=this._string,_196=this._location;
-if(_196>=_195.length){
-return null;
-}
-var next=_195.indexOf(";",_196);
-if(next<0){
-return null;
-}
-var _197=_195.substring(_196,next);
-if(_197==="e"){
-return null;
-}
-this._location=next+1;
-return _197;
-};
-_fd.prototype.getString=function(){
-var _198=this._string,_199=this._location;
-if(_199>=_198.length){
-return null;
-}
-var next=_198.indexOf(";",_199);
-if(next<0){
-return null;
-}
-var size=parseInt(_198.substring(_199,next),10),text=_198.substr(next+1,size);
-this._location=next+1+size;
-return text;
-};
-var _19a=0,_19b=1<<0,_19c=1<<1,_19d=1<<2,_19e=1<<3,_19f=1<<4;
-var _1a0={},_1a1={},_1a2=new Date().getTime(),_1a3=0,_1a4=0;
-CFBundle=function(aURL){
-aURL=_1a5(aURL).asDirectoryPathURL();
-var _1a6=aURL.absoluteString(),_1a7=_1a0[_1a6];
-if(_1a7){
-return _1a7;
-}
-_1a0[_1a6]=this;
-this._bundleURL=aURL;
-this._resourcesDirectoryURL=new CFURL("Resources/",aURL);
-this._staticResource=NULL;
-this._isValid=NO;
-this._loadStatus=_19a;
-this._loadRequests=[];
-this._infoDictionary=new CFDictionary();
-this._eventDispatcher=new _6c(this);
-};
-CFBundle.environments=function(){
-return ["Browser","ObjJ"];
-};
-CFBundle.bundleContainingURL=function(aURL){
-aURL=new CFURL(".",_1a5(aURL));
-var _1a8,_1a9=aURL.absoluteString();
-while(!_1a8||_1a8!==_1a9){
-var _1aa=_1a0[_1a9];
-if(_1aa&&_1aa._isValid){
-return _1aa;
-}
-aURL=new CFURL("..",aURL);
-_1a8=_1a9;
-_1a9=aURL.absoluteString();
-}
-return NULL;
-};
-CFBundle.mainBundle=function(){
-return new CFBundle(_1ab);
-};
-function _1ac(_1ad,_1ae){
-if(_1ae){
-_1a1[_1ad.name]=_1ae;
-}
-};
-CFBundle.bundleForClass=function(_1af){
-return _1a1[_1af.name]||CFBundle.mainBundle();
-};
-CFBundle.prototype.bundleURL=function(){
-return this._bundleURL;
-};
-CFBundle.prototype.resourcesDirectoryURL=function(){
-return this._resourcesDirectoryURL;
-};
-CFBundle.prototype.resourceURL=function(_1b0,_1b1,_1b2){
-if(_1b1){
-_1b0=_1b0+"."+_1b1;
-}
-if(_1b2){
-_1b0=_1b2+"/"+_1b0;
-}
-var _1b3=(new CFURL(_1b0,this.resourcesDirectoryURL())).mappedURL();
-return _1b3.absoluteURL();
-};
-CFBundle.prototype.mostEligibleEnvironmentURL=function(){
-if(this._mostEligibleEnvironmentURL===_44){
-this._mostEligibleEnvironmentURL=new CFURL(this.mostEligibleEnvironment()+".environment/",this.bundleURL());
-}
-return this._mostEligibleEnvironmentURL;
-};
-CFBundle.prototype.executableURL=function(){
-if(this._executableURL===_44){
-var _1b4=this.valueForInfoDictionaryKey("CPBundleExecutable");
-if(!_1b4){
-this._executableURL=NULL;
-}else{
-this._executableURL=new CFURL(_1b4,this.mostEligibleEnvironmentURL());
-}
-}
-return this._executableURL;
-};
-CFBundle.prototype.infoDictionary=function(){
-return this._infoDictionary;
-};
-CFBundle.prototype.valueForInfoDictionaryKey=function(aKey){
-return this._infoDictionary.valueForKey(aKey);
-};
-CFBundle.prototype.hasSpritedImages=function(){
-var _1b5=this._infoDictionary.valueForKey("CPBundleEnvironmentsWithImageSprites")||[],_8c=_1b5.length,_1b6=this.mostEligibleEnvironment();
-while(_8c--){
-if(_1b5[_8c]===_1b6){
-return YES;
-}
-}
-return NO;
-};
-CFBundle.prototype.environments=function(){
-return this._infoDictionary.valueForKey("CPBundleEnvironments")||["ObjJ"];
-};
-CFBundle.prototype.mostEligibleEnvironment=function(_1b7){
-_1b7=_1b7||this.environments();
-var _1b8=CFBundle.environments(),_8c=0,_1b9=_1b8.length,_1ba=_1b7.length;
-for(;_8c<_1b9;++_8c){
-var _1bb=0,_1bc=_1b8[_8c];
-for(;_1bb<_1ba;++_1bb){
-if(_1bc===_1b7[_1bb]){
-return _1bc;
-}
-}
-}
-return NULL;
-};
-CFBundle.prototype.isLoading=function(){
-return this._loadStatus&_19b;
-};
-CFBundle.prototype.load=function(_1bd){
-if(this._loadStatus!==_19a){
-return;
-}
-this._loadStatus=_19b|_19c;
-var self=this,_1be=this.bundleURL(),_1bf=new CFURL("..",_1be);
-if(_1bf.absoluteString()===_1be.absoluteString()){
-_1bf=_1bf.schemeAndAuthority();
-}
-_192.resolveResourceAtURL(_1bf,YES,function(_1c0){
-var _1c1=_1be.absoluteURL().lastPathComponent();
-self._staticResource=_1c0._children[_1c1]||new _192(_1be,_1c0,YES,NO);
-function _1c2(_1c3){
-self._loadStatus&=~_19c;
-var _1c4=_1c3.request.responsePropertyList();
-self._isValid=!!_1c4||CFBundle.mainBundle()===self;
-if(_1c4){
-self._infoDictionary=_1c4;
-}
-if(!self._infoDictionary){
-_1c6(self,new Error("Could not load bundle at \""+path+"\""));
-return;
-}
-if(self===CFBundle.mainBundle()&&self.valueForInfoDictionaryKey("CPApplicationSize")){
-_1a4=self.valueForInfoDictionaryKey("CPApplicationSize").valueForKey("executable")||0;
-}
-_1ca(self,_1bd);
-};
-function _1c5(){
-self._isValid=CFBundle.mainBundle()===self;
-self._loadStatus=_19a;
-_1c6(self,new Error("Could not load bundle at \""+self.bundleURL()+"\""));
-};
-new _a8(new CFURL("Info.plist",self.bundleURL()),_1c2,_1c5);
+class_getMethodImplementation = function( aClass, aSelector)
+{
+    if (!((((aClass.info & (CLS_META))) ? aClass : aClass.isa).info & (CLS_INITIALIZED))) _class_initialize(aClass); var method = aClass.method_dtable[aSelector]; if (!method) method = _objj_forward; var implementation = method.method_imp;;
+    return implementation;
+}
+class_getMethodImplementation.displayName = "class_getMethodImplementation";
+var REGISTERED_CLASSES = { };
+objj_allocateClassPair = function( superclass, aName)
+{
+    var classObject = new objj_class(),
+        metaClassObject = new objj_class(),
+        rootClassObject = classObject;
+    if (superclass)
+    {
+        rootClassObject = superclass;
+        while (rootClassObject.superclass)
+            rootClassObject = rootClassObject.superclass;
+        classObject.allocator.prototype = new superclass.allocator;
+        classObject.method_store.prototype = new superclass.method_store;
+        classObject.method_dtable = classObject.method_store.prototype;
+        metaClassObject.method_store.prototype = new superclass.isa.method_store;
+        metaClassObject.method_dtable = metaClassObject.method_store.prototype;
+        classObject.super_class = superclass;
+        metaClassObject.super_class = superclass.isa;
+    }
+    else
+        classObject.allocator.prototype = new objj_object();
+    classObject.isa = metaClassObject;
+    classObject.name = aName;
+    classObject.info = CLS_CLASS;
+    classObject._UID = objj_generateObjectUID();
+    metaClassObject.isa = rootClassObject.isa;
+    metaClassObject.name = aName;
+    metaClassObject.info = CLS_META;
+    metaClassObject._UID = objj_generateObjectUID();
+    return classObject;
+}
+objj_allocateClassPair.displayName = "objj_allocateClassPair";
+var CONTEXT_BUNDLE = nil;
+objj_registerClassPair = function( aClass)
+{
+    global[aClass.name] = aClass;
+    REGISTERED_CLASSES[aClass.name] = aClass;
+    addClassToBundle(aClass, CONTEXT_BUNDLE);
+}
+objj_registerClassPair.displayName = "objj_registerClassPair";
+class_createInstance = function( aClass)
+{
+    if (!aClass)
+        objj_exception_throw(new objj_exception(OBJJNilClassException, "*** Attempting to create object with Nil class."));
+    var object = new aClass.allocator();
+    object.isa = aClass;
+    object._UID = objj_generateObjectUID();
+    return object;
+}
+class_createInstance.displayName = "class_createInstance";
+var prototype_bug = function() { }
+prototype_bug.prototype.member = false;
+with (new prototype_bug())
+    member = true;
+if (new prototype_bug().member)
+{
+var fast_class_createInstance = class_createInstance;
+class_createInstance = function( aClass)
+{
+    var object = fast_class_createInstance(aClass);
+    if (object)
+    {
+        var theClass = object.isa,
+            actualClass = theClass;
+        while (theClass)
+        {
+            var ivars = theClass.ivars;
+                count = ivars.length;
+            while (count--)
+                object[ivars[count].name] = NULL;
+            theClass = theClass.super_class;
+        }
+        object.isa = actualClass;
+    }
+    return object;
+}
+}
+object_getClassName = function( anObject)
+{
+    if (!anObject)
+        return "";
+    var theClass = anObject.isa;
+    return theClass ? class_getName(theClass) : "";
+}
+object_getClassName.displayName = "object_getClassName";
+objj_lookUpClass = function( aName)
+{
+    var theClass = REGISTERED_CLASSES[aName];
+    return theClass ? theClass : Nil;
+}
+objj_lookUpClass.displayName = "objj_lookUpClass";
+objj_getClass = function( aName)
+{
+    var theClass = REGISTERED_CLASSES[aName];
+    if (!theClass)
+    {
+    }
+    return theClass ? theClass : Nil;
+}
+objj_getClass.displayName = "objj_getClass";
+objj_getMetaClass = function( aName)
+{
+    var theClass = objj_getClass(aName);
+    return (((theClass.info & (CLS_META))) ? theClass : theClass.isa);
+}
+objj_getMetaClass.displayName = "objj_getMetaClass";
+ivar_getName = function(anIvar)
+{
+    return anIvar.name;
+}
+ivar_getName.displayName = "ivar_getName";
+ivar_getTypeEncoding = function(anIvar)
+{
+    return anIvar.type;
+}
+ivar_getTypeEncoding.displayName = "ivar_getTypeEncoding";
+objj_msgSend = function( aReceiver, aSelector)
+{
+    if (aReceiver == nil)
+        return nil;
+    var isa = aReceiver.isa;
+    if (!((((isa.info & (CLS_META))) ? isa : isa.isa).info & (CLS_INITIALIZED))) _class_initialize(isa); var method = isa.method_dtable[aSelector]; if (!method) method = _objj_forward; var implementation = method.method_imp;;
+    switch(arguments.length)
+    {
+        case 2: return implementation(aReceiver, aSelector);
+        case 3: return implementation(aReceiver, aSelector, arguments[2]);
+        case 4: return implementation(aReceiver, aSelector, arguments[2], arguments[3]);
+    }
+    return implementation.apply(aReceiver, arguments);
+}
+objj_msgSend.displayName = "objj_msgSend";
+objj_msgSendSuper = function( aSuper, aSelector)
+{
+    var super_class = aSuper.super_class;
+    arguments[0] = aSuper.receiver;
+    if (!((((super_class.info & (CLS_META))) ? super_class : super_class.isa).info & (CLS_INITIALIZED))) _class_initialize(super_class); var method = super_class.method_dtable[aSelector]; if (!method) method = _objj_forward; var implementation = method.method_imp;;
+    return implementation.apply(aSuper.receiver, arguments);
+}
+objj_msgSendSuper.displayName = "objj_msgSendSuper";
+method_getName = function( aMethod)
+{
+    return aMethod.name;
+}
+method_getName.displayName = "method_getName";
+method_getImplementation = function( aMethod)
+{
+    return aMethod.method_imp;
+}
+method_getImplementation.displayName = "method_getImplementation";
+method_setImplementation = function( aMethod, anImplementation)
+{
+    var oldImplementation = aMethod.method_imp;
+    aMethod.method_imp = anImplementation;
+    return oldImplementation;
+}
+method_setImplementation.displayName = "method_setImplementation";
+method_exchangeImplementations = function( lhs, rhs)
+{
+    var lhs_imp = method_getImplementation(lhs),
+        rhs_imp = method_getImplementation(rhs);
+    method_setImplementation(lhs, rhs_imp);
+    method_setImplementation(rhs, lhs_imp);
+}
+method_exchangeImplementations.displayName = "method_exchangeImplementations";
+sel_getName = function(aSelector)
+{
+    return aSelector ? aSelector : "<null selector>";
+}
+sel_getName.displayName = "sel_getName";
+sel_getUid = function( aName)
+{
+    return aName;
+}
+sel_getUid.displayName = "sel_getUid";
+sel_isEqual = function( lhs, rhs)
+{
+    return lhs === rhs;
+}
+sel_isEqual.displayName = "sel_isEqual";
+sel_registerName = function( aName)
+{
+    return aName;
+}
+sel_registerName.displayName = "sel_registerName";
+objj_eval = function( aString)
+{
+    var url = exports.pageURL;
+    var asyncLoaderSaved = exports.asyncLoader;
+    exports.asyncLoader = NO;
+    var executable = exports.preprocess(aString, url, 0);
+    if (!executable.hasLoadedFileDependencies())
+        executable.loadFileDependencies();
+    global._objj_eval_scope = {};
+    global._objj_eval_scope.objj_executeFile = Executable.fileExecuterForURL(url);
+    global._objj_eval_scope.objj_importFile = Executable.fileImporterForURL(url);
+    var code = "with(_objj_eval_scope){" + executable._code + "\n//*/\n}";
+    var result;
+        result = eval(code);
+    exports.asyncLoader = asyncLoaderSaved;
+    return result;
+}
+exports.objj_eval = objj_eval;
+CPLogRegister(CPLogDefault);
+function objj_debug_object_format(aReceiver)
+{
+    return (aReceiver && aReceiver.isa) ? exports.sprintf("<%s %#08x>", (((aReceiver.info & (CLS_META))) ? aReceiver : aReceiver.isa).name, aReceiver._UID) : String(aReceiver);
+}
+function objj_debug_message_format(aReceiver, aSelector)
+{
+    return exports.sprintf("[%s %s]", objj_debug_object_format(aReceiver), aSelector);
+}
+var objj_msgSend_original = objj_msgSend,
+    objj_msgSendSuper_original = objj_msgSendSuper;
+objj_msgSend_reset = function()
+{
+    objj_msgSend = objj_msgSend_original;
+    objj_msgSendSuper = objj_msgSendSuper_original;
+}
+objj_msgSend_decorate = function()
+{
+    var index = 0,
+        count = arguments.length;
+    for (; index < count; ++index)
+    {
+        objj_msgSend = arguments[index](objj_msgSend);
+        objj_msgSendSuper = arguments[index](objj_msgSendSuper);
+    }
+}
+objj_msgSend_set_decorators = function()
+{
+    objj_msgSend_reset();
+    objj_msgSend_decorate.apply(NULL, arguments);
+}
+var objj_backtrace = [];
+objj_backtrace_print = function( aStream)
+{
+    var index = 0,
+        count = objj_backtrace.length;
+    for (; index < count; ++index)
+    {
+        var frame = objj_backtrace[index];
+        aStream(objj_debug_message_format(frame.receiver, frame.selector));
+    }
+}
+objj_backtrace_decorator = function(msgSend)
+{
+    return function(aReceiverOrSuper, aSelector)
+    {
+        var aReceiver = aReceiverOrSuper && (aReceiverOrSuper.receiver || aReceiverOrSuper);
+        objj_backtrace.push({ receiver: aReceiver, selector : aSelector });
+        try
+        {
+            return msgSend.apply(NULL, arguments);
+        }
+        catch (anException)
+        {
+            CPLog.warn("Exception " + anException + " in " + objj_debug_message_format(aReceiver, aSelector));
+            objj_backtrace_print(CPLog.warn);
+        }
+        finally
+        {
+            objj_backtrace.pop();
+        }
+    }
+}
+var objj_typechecks_reported = {},
+    objj_typecheck_prints_backtrace = NO;
+objj_typecheck_decorator = function(msgSend)
+{
+    return function(aReceiverOrSuper, aSelector)
+    {
+        var aReceiver = aReceiverOrSuper && (aReceiverOrSuper.receiver || aReceiverOrSuper);
+        if (!aReceiver)
+            return msgSend.apply(NULL, arguments);
+        var types = aReceiver.isa.method_dtable[aSelector].types;
+        for (var i = 2; i < arguments.length; i++)
+        {
+            try
+            {
+                objj_debug_typecheck(types[i-1], arguments[i]);
+            }
+            catch (e)
+            {
+                var key = [(((aReceiver.info & (CLS_META))) ? aReceiver : aReceiver.isa).name, aSelector, i, e].join(";");
+                if (!objj_typechecks_reported[key]) {
+                    objj_typechecks_reported[key] = YES;
+                    CPLog.warn("Type check failed on argument " + (i-2) + " of " + objj_debug_message_format(aReceiver, aSelector) + ": " + e);
+                    if (objj_typecheck_prints_backtrace)
+                        objj_backtrace_print(CPLog.warn);
+                }
+            }
+        }
+        var result = msgSend.apply(NULL, arguments);
+        try
+        {
+            objj_debug_typecheck(types[0], result);
+        }
+        catch (e)
+        {
+            var key = [(((aReceiver.info & (CLS_META))) ? aReceiver : aReceiver.isa).name, aSelector, "ret", e].join(";");
+            if (!objj_typechecks_reported[key]) {
+                objj_typechecks_reported[key] = YES;
+                CPLog.warn("Type check failed on return val of " + objj_debug_message_format(aReceiver, aSelector) + ": " + e);
+                if (objj_typecheck_prints_backtrace)
+                    objj_backtrace_print(CPLog.warn);
+            }
+        }
+        return result;
+    }
+}
+objj_debug_typecheck = function(expectedType, object)
+{
+    var objjClass;
+    if (!expectedType)
+    {
+        return;
+    }
+    else if (expectedType === "id")
+    {
+        if (object !== undefined)
+            return;
+    }
+    else if (expectedType === "void")
+    {
+        if (object === undefined)
+            return;
+    }
+    else if (objjClass = objj_getClass(expectedType))
+    {
+        if (object === nil)
+        {
+            return;
+        }
+        else if (object !== undefined && object.isa)
+        {
+            var theClass = object.isa;
+            for (; theClass; theClass = theClass.super_class)
+                if (theClass === objjClass)
+                    return;
+        }
+    }
+    else
+    {
+        return;
+    }
+    var actualType;
+    if (object === NULL)
+        actualType = "null";
+    else if (object === undefined)
+        actualType = "void";
+    else if (object.isa)
+        actualType = (((object.info & (CLS_META))) ? object : object.isa).name;
+    else
+        actualType = typeof object;
+    throw ("expected=" + expectedType + ", actual=" + actualType);
+}
+enableCFURLCaching();
+var pageURL = new CFURL(window.location.href),
+    DOMBaseElements = document.getElementsByTagName("base"),
+    DOMBaseElementsCount = DOMBaseElements.length;
+if (DOMBaseElementsCount > 0)
+{
+    var DOMBaseElement = DOMBaseElements[DOMBaseElementsCount - 1],
+        DOMBaseElementHref = DOMBaseElement && DOMBaseElement.getAttribute("href");
+    if (DOMBaseElementHref)
+        pageURL = new CFURL(DOMBaseElementHref, pageURL);
+}
+var mainFileURL = new CFURL(window.OBJJ_MAIN_FILE || "main.j"),
+    mainBundleURL = new CFURL(".", new CFURL(mainFileURL, pageURL)).absoluteURL(),
+    assumedResolvedURL = new CFURL("..", mainBundleURL).absoluteURL();
+if (mainBundleURL === assumedResolvedURL)
+    assumedResolvedURL = new CFURL(assumedResolvedURL.schemeAndAuthority());
+StaticResource.resourceAtURL(assumedResolvedURL, YES);
+exports.pageURL = pageURL;
+exports.bootstrap = function()
+{
+    resolveMainBundleURL();
+}
+function resolveMainBundleURL()
+{
+    StaticResource.resolveResourceAtURL(mainBundleURL, YES, function( aResource)
+    {
+        var includeURLs = StaticResource.includeURLs(),
+            index = 0,
+            count = includeURLs.length;
+        for (; index < count; ++index)
+            aResource.resourceAtURL(includeURLs[index], YES);
+        Executable.fileImporterForURL(mainBundleURL)(mainFileURL.lastPathComponent(), YES, function()
+        {
+            disableCFURLCaching();
+            afterDocumentLoad(function()
+            {
+                var hashString = window.location.hash.substring(1),
+                    args = [];
+                if (hashString.length)
+                {
+                    args = hashString.split("/");
+                    for (var i = 0, count = args.length; i < count; i++)
+                        args[i] = decodeURIComponent(args[i]);
+                }
+                var namedArgsArray = window.location.search.substring(1).split("&"),
+                    namedArgs = new CFMutableDictionary();
+                for (var i = 0, count = namedArgsArray.length; i < count; i++)
+                {
+                    var thisArg = namedArgsArray[i].split("=");
+                    if (!thisArg[0])
+                        continue;
+                    if (thisArg[1] == null)
+                        thisArg[1] = true;
+                    namedArgs.setValueForKey(decodeURIComponent(thisArg[0]), decodeURIComponent(thisArg[1]));
+                }
+                main(args, namedArgs);
+            });
+        });
+    });
+}
+var documentLoaded = NO;
+function afterDocumentLoad( aFunction)
+{
+    if (documentLoaded)
+        return aFunction();
+    if (window.addEventListener)
+        window.addEventListener("load", aFunction, NO);
+    else if (window.attachEvent)
+        window.attachEvent("onload", aFunction);
+}
+afterDocumentLoad(function()
+{
+    documentLoaded = YES;
 });
-};
-function _1c6(_1c7,_1c8){
-_1c9(_1c7._staticResource);
-_1c7._eventDispatcher.dispatchEvent({type:"error",error:_1c8,bundle:_1c7});
-};
-function _1ca(_1cb,_1cc){
-if(!_1cb.mostEligibleEnvironment()){
-return _1cd();
-}
-_1ce(_1cb,_1cf,_1cd);
-_1d0(_1cb,_1cf,_1cd);
-if(_1cb._loadStatus===_19b){
-return _1cf();
-}
-function _1cd(_1d1){
-var _1d2=_1cb._loadRequests,_1d3=_1d2.length;
-while(_1d3--){
-_1d2[_1d3].abort();
-}
-this._loadRequests=[];
-_1cb._loadStatus=_19a;
-_1c6(_1cb,_1d1||new Error("Could not recognize executable code format in Bundle "+_1cb));
-};
-function _1cf(){
-if((typeof CPApp==="undefined"||!CPApp||!CPApp._finishedLaunching)&&typeof OBJJ_PROGRESS_CALLBACK==="function"&&_1a4){
-OBJJ_PROGRESS_CALLBACK(MAX(MIN(1,_1a3/_1a4),0),_1a4,_1cb.path());
-}
-if(_1cb._loadStatus===_19b){
-_1cb._loadStatus=_19f;
-}else{
-return;
-}
-_1c9(_1cb._staticResource);
-function _1d4(){
-_1cb._eventDispatcher.dispatchEvent({type:"load",bundle:_1cb});
-};
-if(_1cc){
-_1d5(_1cb,_1d4);
-}else{
-_1d4();
-}
-};
-};
-function _1ce(_1d6,_1d7,_1d8){
-var _1d9=_1d6.executableURL();
-if(!_1d9){
-return;
-}
-_1d6._loadStatus|=_19d;
-new _a8(_1d9,function(_1da){
-try{
-_1a3+=_1da.request.responseText().length;
-_1db(_1d6,_1da.request.responseText(),_1d9);
-_1d6._loadStatus&=~_19d;
-_1d7();
-}
-catch(anException){
-_1d8(anException);
-}
-},_1d8);
-};
-function _1dc(_1dd){
-return "mhtml:"+new CFURL("MHTMLTest.txt",_1dd.mostEligibleEnvironmentURL());
-};
-function _1de(_1df){
-if(_1e0===_1e1){
-return new CFURL("dataURLs.txt",_1df.mostEligibleEnvironmentURL());
-}
-if(_1e0===_1e2||_1e0===_1e3){
-return new CFURL("MHTMLPaths.txt",_1df.mostEligibleEnvironmentURL());
-}
-return NULL;
-};
-function _1d0(_1e4,_1e5,_1e6){
-if(!_1e4.hasSpritedImages()){
-return;
-}
-_1e4._loadStatus|=_19e;
-if(!_1e7()){
-return _1e8(_1dc(_1e4),function(){
-_1d0(_1e4,_1e5,_1e6);
-});
-}
-var _1e9=_1de(_1e4);
-if(!_1e9){
-_1e4._loadStatus&=~_19e;
-return _1e5();
-}
-new _a8(_1e9,function(_1ea){
-try{
-_1a3+=_1ea.request.responseText().length;
-_1db(_1e4,_1ea.request.responseText(),_1e9);
-_1e4._loadStatus&=~_19e;
-}
-catch(anException){
-_1e6(anException);
-}
-_1e5();
-},_1e6);
-};
-var _1eb=[],_1e0=-1,_1ec=0,_1e1=1,_1e2=2,_1e3=3;
-function _1e7(){
-return _1e0!==-1;
-};
-function _1e8(_1ed,_1ee){
-if(_1e7()){
-return;
-}
-_1eb.push(_1ee);
-if(_1eb.length>1){
-return;
-}
-_1eb.push(function(){
-var size=0,_1ef=CFBundle.mainBundle().valueForInfoDictionaryKey("CPApplicationSize");
-if(!_1ef){
-return;
-}
-switch(_1e0){
-case _1e1:
-size=_1ef.valueForKey("data");
-break;
-case _1e2:
-case _1e3:
-size=_1ef.valueForKey("mhtml");
-break;
-}
-_1a4+=size;
-});
-_1f0([_1e1,"data:image/gif;base64,R0lGODlhAQABAIAAAMc9BQAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",_1e2,_1ed+"!test",_1e3,_1ed+"?"+_1a2+"!test"]);
-};
-function _1f1(){
-var _1f2=_1eb.length;
-while(_1f2--){
-_1eb[_1f2]();
-}
-};
-function _1f0(_1f3){
-if(_1f3.length<2){
-_1e0=_1ec;
-_1f1();
-return;
-}
-var _1f4=new Image();
-_1f4.onload=function(){
-if(_1f4.width===1&&_1f4.height===1){
-_1e0=_1f3[0];
-_1f1();
-}else{
-_1f4.onerror();
-}
-};
-_1f4.onerror=function(){
-_1f0(_1f3.slice(2));
-};
-_1f4.src=_1f3[1];
-};
-function _1d5(_1f5,_1f6){
-var _1f7=[_1f5._staticResource];
-function _1f8(_1f9){
-for(;_1f9<_1f7.length;++_1f9){
-var _1fa=_1f7[_1f9];
-if(_1fa.isNotFound()){
-continue;
-}
-if(_1fa.isFile()){
-var _1fb=new _313(_1fa.URL());
-if(_1fb.hasLoadedFileDependencies()){
-_1fb.execute();
-}else{
-_1fb.loadFileDependencies(function(){
-_1f8(_1f9);
-});
-return;
-}
-}else{
-if(_1fa.URL().absoluteString()===_1f5.resourcesDirectoryURL().absoluteString()){
-continue;
-}
-var _1fc=_1fa.children();
-for(var name in _1fc){
-if(_71.call(_1fc,name)){
-_1f7.push(_1fc[name]);
-}
-}
-}
-}
-_1f6();
-};
-_1f8(0);
-};
-var _1fd="@STATIC",_1fe="p",_1ff="u",_200="c",_201="t",_202="I",_203="i";
-function _1db(_204,_205,_206){
-var _207=new _fd(_205);
-if(_207.magicNumber()!==_1fd){
-throw new Error("Could not read static file: "+_206);
-}
-if(_207.version()!=="1.0"){
-throw new Error("Could not read static file: "+_206);
-}
-var _208,_209=_204.bundleURL(),file=NULL;
-while(_208=_207.getMarker()){
-var text=_207.getString();
-if(_208===_1fe){
-var _20a=new CFURL(text,_209),_20b=_192.resourceAtURL(new CFURL(".",_20a),YES);
-file=new _192(_20a,_20b,NO,YES);
-}else{
-if(_208===_1ff){
-var URL=new CFURL(text,_209),_20c=_207.getString();
-if(_20c.indexOf("mhtml:")===0){
-_20c="mhtml:"+new CFURL(_20c.substr("mhtml:".length),_209);
-if(_1e0===_1e3){
-var _20d=URLString.indexOf("!"),_20e=URLString.substring(0,_20d),_20f=URLString.substring(_20d);
-_20c=_20e+"?"+_1a2+_20f;
-}
-}
-CFURL.setMappedURLForURL(URL,new CFURL(_20c));
-var _20b=_192.resourceAtURL(new CFURL(".",URL),YES);
-new _192(URL,_20b,NO,YES);
-}else{
-if(_208===_201){
-file.write(text);
-}
-}
-}
-}
-};
-CFBundle.prototype.addEventListener=function(_210,_211){
-this._eventDispatcher.addEventListener(_210,_211);
-};
-CFBundle.prototype.removeEventListener=function(_212,_213){
-this._eventDispatcher.removeEventListener(_212,_213);
-};
-CFBundle.prototype.onerror=function(_214){
-throw _214.error;
-};
-CFBundle.prototype.bundlePath=function(){
-return this._bundleURL.absoluteURL().path();
-};
-CFBundle.prototype.path=function(){
-CPLog.warn("CFBundle.prototype.path is deprecated, use CFBundle.prototype.bundlePath instead.");
-return this.bundlePath.apply(this,arguments);
-};
-CFBundle.prototype.pathForResource=function(_215){
-return this.resourceURL(_215).absoluteString();
-};
-var _216={};
-function _192(aURL,_217,_218,_219){
-this._parent=_217;
-this._eventDispatcher=new _6c(this);
-var name=aURL.absoluteURL().lastPathComponent()||aURL.schemeAndAuthority();
-this._name=name;
-this._URL=aURL;
-this._isResolved=!!_219;
-if(_218){
-this._URL=this._URL.asDirectoryPathURL();
-}
-if(!_217){
-_216[name]=this;
-}
-this._isDirectory=!!_218;
-this._isNotFound=NO;
-if(_217){
-_217._children[name]=this;
-}
-if(_218){
-this._children={};
-}else{
-this._contents="";
-}
-};
-_192.rootResources=function(){
-return _216;
-};
-_2.StaticResource=_192;
-function _1c9(_21a){
-_21a._isResolved=YES;
-_21a._eventDispatcher.dispatchEvent({type:"resolve",staticResource:_21a});
-};
-_192.prototype.resolve=function(){
-if(this.isDirectory()){
-var _21b=new CFBundle(this.URL());
-_21b.onerror=function(){
-};
-_21b.load(NO);
-}else{
-var self=this;
-function _21c(_21d){
-self._contents=_21d.request.responseText();
-_1c9(self);
-};
-function _21e(){
-self._isNotFound=YES;
-_1c9(self);
-};
-new _a8(this.URL(),_21c,_21e);
-}
-};
-_192.prototype.name=function(){
-return this._name;
-};
-_192.prototype.URL=function(){
-return this._URL;
-};
-_192.prototype.contents=function(){
-return this._contents;
-};
-_192.prototype.children=function(){
-return this._children;
-};
-_192.prototype.parent=function(){
-return this._parent;
-};
-_192.prototype.isResolved=function(){
-return this._isResolved;
-};
-_192.prototype.write=function(_21f){
-this._contents+=_21f;
-};
-function _220(_221){
-var _222=_221.schemeAndAuthority(),_223=_216[_222];
-if(!_223){
-_223=new _192(new CFURL(_222),NULL,YES,YES);
-}
-return _223;
-};
-_192.resourceAtURL=function(aURL,_224){
-aURL=_1a5(aURL).absoluteURL();
-var _225=_220(aURL),_226=aURL.pathComponents(),_8c=0,_227=_226.length;
-for(;_8c<_227;++_8c){
-var name=_226[_8c];
-if(_71.call(_225._children,name)){
-_225=_225._children[name];
-}else{
-if(_224){
-if(name!=="/"){
-name="./"+name;
-}
-_225=new _192(new CFURL(name,_225.URL()),_225,YES,YES);
-}else{
-throw new Error("Static Resource at "+aURL+" is not resolved (\""+name+"\")");
-}
-}
-}
-return _225;
-};
-_192.prototype.resourceAtURL=function(aURL,_228){
-return _192.resourceAtURL(new CFURL(aURL,this.URL()),_228);
-};
-_192.resolveResourceAtURL=function(aURL,_229,_22a){
-aURL=_1a5(aURL).absoluteURL();
-_22b(_220(aURL),_229,aURL.pathComponents(),0,_22a);
-};
-_192.prototype.resolveResourceAtURL=function(aURL,_22c,_22d){
-_192.resolveResourceAtURL(new CFURL(aURL,this.URL()).absoluteURL(),_22c,_22d);
-};
-function _22b(_22e,_22f,_230,_231,_232){
-var _233=_230.length;
-for(;_231<_233;++_231){
-var name=_230[_231],_234=_71.call(_22e._children,name)&&_22e._children[name];
-if(!_234){
-_234=new _192(new CFURL(name,_22e.URL()),_22e,_231+1<_233||_22f,NO);
-_234.resolve();
-}
-if(!_234.isResolved()){
-return _234.addEventListener("resolve",function(){
-_22b(_22e,_22f,_230,_231,_232);
-});
-}
-if(_234.isNotFound()){
-return _232(null,new Error("File not found: "+_230.join("/")));
-}
-if((_231+1<_233)&&_234.isFile()){
-return _232(null,new Error("File is not a directory: "+_230.join("/")));
-}
-_22e=_234;
-}
-_232(_22e);
-};
-function _235(aURL,_236,_237){
-var _238=_192.includeURLs(),_239=new CFURL(aURL,_238[_236]).absoluteURL();
-_192.resolveResourceAtURL(_239,NO,function(_23a){
-if(!_23a){
-if(_236+1<_238.length){
-_235(aURL,_236+1,_237);
-}else{
-_237(NULL);
-}
-return;
-}
-_237(_23a);
-});
-};
-_192.resolveResourceAtURLSearchingIncludeURLs=function(aURL,_23b){
-_235(aURL,0,_23b);
-};
-_192.prototype.addEventListener=function(_23c,_23d){
-this._eventDispatcher.addEventListener(_23c,_23d);
-};
-_192.prototype.removeEventListener=function(_23e,_23f){
-this._eventDispatcher.removeEventListener(_23e,_23f);
-};
-_192.prototype.isNotFound=function(){
-return this._isNotFound;
-};
-_192.prototype.isFile=function(){
-return !this._isDirectory;
-};
-_192.prototype.isDirectory=function(){
-return this._isDirectory;
-};
-_192.prototype.toString=function(_240){
-if(this.isNotFound()){
-return "<file not found: "+this.name()+">";
-}
-var _241=this.name();
-if(this.isDirectory()){
-var _242=this._children;
-for(var name in _242){
-if(_242.hasOwnProperty(name)){
-var _243=_242[name];
-if(_240||!_243.isNotFound()){
-_241+="\n\t"+_242[name].toString(_240).split("\n").join("\n\t");
-}
-}
-}
-}
-return _241;
-};
-var _244=NULL;
-_192.includeURLs=function(){
-if(_245){
-return _245;
-}
-var _245=[];
-if(!_1.OBJJ_INCLUDE_PATHS&&!_1.OBJJ_INCLUDE_URLS){
-_245=["Frameworks","Frameworks/Debug"];
-}else{
-_245=(_1.OBJJ_INCLUDE_PATHS||[]).concat(_1.OBJJ_INCLUDE_URLS||[]);
-}
-var _246=_245.length;
-while(_246--){
-_245[_246]=new CFURL(_245[_246]).asDirectoryPathURL();
-}
-return _245;
-};
-var _247="accessors",_248="class",_249="end",_24a="function",_24b="implementation",_24c="import",_24d="each",_24e="outlet",_24f="action",_250="new",_251="selector",_252="super",_253="var",_254="in",_255="pragma",_256="mark",_257="=",_258="+",_259="-",_25a=":",_25b=",",_25c=".",_25d="*",_25e=";",_25f="<",_260="{",_261="}",_262=">",_263="[",_264="\"",_265="@",_266="#",_267="]",_268="?",_269="(",_26a=")",_26b=/^(?:(?:\s+$)|(?:\/(?:\/|\*)))/,_26c=/^[+-]?\d+(([.]\d+)*([eE][+-]?\d+))?$/,_26d=/^[a-zA-Z_$](\w|$)*$/;
-function _26e(_26f){
-this._index=-1;
-this._tokens=(_26f+"\n").match(/\/\/.*(\r|\n)?|\/\*(?:.|\n|\r)*?\*\/|\w+\b|[+-]?\d+(([.]\d+)*([eE][+-]?\d+))?|"[^"\\]*(\\[\s\S][^"\\]*)*"|'[^'\\]*(\\[\s\S][^'\\]*)*'|\s+|./g);
-this._context=[];
-return this;
-};
-_26e.prototype.push=function(){
-this._context.push(this._index);
-};
-_26e.prototype.pop=function(){
-this._index=this._context.pop();
-};
-_26e.prototype.peak=function(_270){
-if(_270){
-this.push();
-var _271=this.skip_whitespace();
-this.pop();
-return _271;
-}
-return this._tokens[this._index+1];
-};
-_26e.prototype.next=function(){
-return this._tokens[++this._index];
-};
-_26e.prototype.previous=function(){
-return this._tokens[--this._index];
-};
-_26e.prototype.last=function(){
-if(this._index<0){
-return NULL;
-}
-return this._tokens[this._index-1];
-};
-_26e.prototype.skip_whitespace=function(_272){
-var _273;
-if(_272){
-while((_273=this.previous())&&_26b.test(_273)){
-}
-}else{
-while((_273=this.next())&&_26b.test(_273)){
-}
-}
-return _273;
-};
-_2.Lexer=_26e;
-function _274(){
-this.atoms=[];
-};
-_274.prototype.toString=function(){
-return this.atoms.join("");
-};
-_2.preprocess=function(_275,aURL,_276){
-return new _277(_275,aURL,_276).executable();
-};
-_2.eval=function(_278){
-return eval(_2.preprocess(_278).code());
-};
-var _277=function(_279,aURL,_27a){
-this._URL=new CFURL(aURL);
-_279=_279.replace(/^#[^\n]+\n/,"\n");
-this._currentSelector="";
-this._currentClass="";
-this._currentSuperClass="";
-this._currentSuperMetaClass="";
-this._buffer=new _274();
-this._preprocessed=NULL;
-this._dependencies=[];
-this._tokens=new _26e(_279);
-this._flags=_27a;
-this._classMethod=false;
-this._executable=NULL;
-this._classLookupTable={};
-this._classVars={};
-var _27b=new objj_class();
-for(var i in _27b){
-this._classVars[i]=1;
-}
-this.preprocess(this._tokens,this._buffer);
-};
-_277.prototype.setClassInfo=function(_27c,_27d,_27e){
-this._classLookupTable[_27c]={superClassName:_27d,ivars:_27e};
-};
-_277.prototype.getClassInfo=function(_27f){
-return this._classLookupTable[_27f];
-};
-_277.prototype.allIvarNamesForClassName=function(_280){
-var _281={},_282=this.getClassInfo(_280);
-while(_282){
-for(var i in _282.ivars){
-_281[i]=1;
-}
-_282=this.getClassInfo(_282.superClassName);
-}
-return _281;
-};
-_2.Preprocessor=_277;
-_277.Flags={};
-_277.Flags.IncludeDebugSymbols=1<<0;
-_277.Flags.IncludeTypeSignatures=1<<1;
-_277.prototype.executable=function(){
-if(!this._executable){
-this._executable=new _283(this._buffer.toString(),this._dependencies,this._URL);
-}
-return this._executable;
-};
-_277.prototype.accessors=function(_284){
-var _285=_284.skip_whitespace(),_286={};
-if(_285!=_269){
-_284.previous();
-return _286;
-}
-while((_285=_284.skip_whitespace())!=_26a){
-var name=_285,_287=true;
-if(!/^\w+$/.test(name)){
-throw new SyntaxError(this.error_message("*** @property attribute name not valid."));
-}
-if((_285=_284.skip_whitespace())==_257){
-_287=_284.skip_whitespace();
-if(!/^\w+$/.test(_287)){
-throw new SyntaxError(this.error_message("*** @property attribute value not valid."));
-}
-if(name=="setter"){
-if((_285=_284.next())!=_25a){
-throw new SyntaxError(this.error_message("*** @property setter attribute requires argument with \":\" at end of selector name."));
-}
-_287+=":";
-}
-_285=_284.skip_whitespace();
-}
-_286[name]=_287;
-if(_285==_26a){
-break;
-}
-if(_285!=_25b){
-throw new SyntaxError(this.error_message("*** Expected ',' or ')' in @property attribute list."));
-}
-}
-return _286;
-};
-_277.prototype.brackets=function(_288,_289){
-var _28a=[];
-while(this.preprocess(_288,NULL,NULL,NULL,_28a[_28a.length]=[])){
-}
-if(_28a[0].length===1){
-_289.atoms[_289.atoms.length]="[";
-_289.atoms[_289.atoms.length]=_28a[0][0];
-_289.atoms[_289.atoms.length]="]";
-}else{
-var _28b=new _274();
-if(_28a[0][0].atoms[0]==_252){
-_289.atoms[_289.atoms.length]="objj_msgSendSuper(";
-_289.atoms[_289.atoms.length]="{ receiver:self, super_class:"+(this._classMethod?this._currentSuperMetaClass:this._currentSuperClass)+" }";
-}else{
-_289.atoms[_289.atoms.length]="objj_msgSend(";
-_289.atoms[_289.atoms.length]=_28a[0][0];
-}
-_28b.atoms[_28b.atoms.length]=_28a[0][1];
-var _28c=1,_28d=_28a.length,_28e=new _274();
-for(;_28c<_28d;++_28c){
-var pair=_28a[_28c];
-_28b.atoms[_28b.atoms.length]=pair[1];
-_28e.atoms[_28e.atoms.length]=", "+pair[0];
-}
-_289.atoms[_289.atoms.length]=", \"";
-_289.atoms[_289.atoms.length]=_28b;
-_289.atoms[_289.atoms.length]="\"";
-_289.atoms[_289.atoms.length]=_28e;
-_289.atoms[_289.atoms.length]=")";
-}
-};
-_277.prototype.directive=function(_28f,_290,_291){
-var _292=_290?_290:new _274(),_293=_28f.next();
-if(_293.charAt(0)==_264){
-_292.atoms[_292.atoms.length]=_293;
-}else{
-if(_293===_248){
-_28f.skip_whitespace();
-return;
-}else{
-if(_293===_24b){
-this.implementation(_28f,_292);
-}else{
-if(_293===_24c){
-this._import(_28f);
-}else{
-if(_293===_251){
-this.selector(_28f,_292);
-}
-}
-}
-}
-}
-if(!_290){
-return _292;
-}
-};
-_277.prototype.hash=function(_294,_295){
-var _296=_295?_295:new _274(),_297=_294.next();
-if(_297===_255){
-_297=_294.skip_whitespace();
-if(_297===_256){
-while((_297=_294.next()).indexOf("\n")<0){
-}
-}
-}else{
-throw new SyntaxError(this.error_message("*** Expected \"pragma\" to follow # but instead saw \""+_297+"\"."));
-}
-};
-_277.prototype.implementation=function(_298,_299){
-var _29a=_299,_29b="",_29c=NO,_29d=_298.skip_whitespace(),_29e="Nil",_29f=new _274(),_2a0=new _274();
-if(!(/^\w/).test(_29d)){
-throw new Error(this.error_message("*** Expected class name, found \""+_29d+"\"."));
-}
-this._currentSuperClass="objj_getClass(\""+_29d+"\").super_class";
-this._currentSuperMetaClass="objj_getMetaClass(\""+_29d+"\").super_class";
-this._currentClass=_29d;
-this._currentSelector="";
-if((_29b=_298.skip_whitespace())==_269){
-_29b=_298.skip_whitespace();
-if(_29b==_26a){
-throw new SyntaxError(this.error_message("*** Can't Have Empty Category Name for class \""+_29d+"\"."));
-}
-if(_298.skip_whitespace()!=_26a){
-throw new SyntaxError(this.error_message("*** Improper Category Definition for class \""+_29d+"\"."));
-}
-_29a.atoms[_29a.atoms.length]="{\nvar the_class = objj_getClass(\""+_29d+"\")\n";
-_29a.atoms[_29a.atoms.length]="if(!the_class) throw new SyntaxError(\"*** Could not find definition for class \\\""+_29d+"\\\"\");\n";
-_29a.atoms[_29a.atoms.length]="var meta_class = the_class.isa;";
-}else{
-if(_29b==_25a){
-_29b=_298.skip_whitespace();
-if(!_26d.test(_29b)){
-throw new SyntaxError(this.error_message("*** Expected class name, found \""+_29b+"\"."));
-}
-_29e=_29b;
-_29b=_298.skip_whitespace();
-}
-_29a.atoms[_29a.atoms.length]="{var the_class = objj_allocateClassPair("+_29e+", \""+_29d+"\"),\nmeta_class = the_class.isa;";
-if(_29b==_260){
-var _2a1={},_2a2=0,_2a3=[],_2a4,_2a5={};
-while((_29b=_298.skip_whitespace())&&_29b!=_261){
-if(_29b===_265){
-_29b=_298.next();
-if(_29b===_247){
-_2a4=this.accessors(_298);
-}else{
-if(_29b!==_24e){
-throw new SyntaxError(this.error_message("*** Unexpected '@' token in ivar declaration ('@"+_29b+"')."));
-}
-}
-}else{
-if(_29b==_25e){
-if(_2a2++===0){
-_29a.atoms[_29a.atoms.length]="class_addIvars(the_class, [";
-}else{
-_29a.atoms[_29a.atoms.length]=", ";
-}
-var name=_2a3[_2a3.length-1];
-_29a.atoms[_29a.atoms.length]="new objj_ivar(\""+name+"\")";
-_2a1[name]=1;
-_2a3=[];
-if(_2a4){
-_2a5[name]=_2a4;
-_2a4=NULL;
-}
-}else{
-_2a3.push(_29b);
-}
-}
-}
-if(_2a3.length){
-throw new SyntaxError(this.error_message("*** Expected ';' in ivar declaration, found '}'."));
-}
-if(_2a2){
-_29a.atoms[_29a.atoms.length]="]);\n";
-}
-if(!_29b){
-throw new SyntaxError(this.error_message("*** Expected '}'"));
-}
-this.setClassInfo(_29d,_29e==="Nil"?null:_29e,_2a1);
-var _2a1=this.allIvarNamesForClassName(_29d);
-for(ivar_name in _2a5){
-var _2a6=_2a5[ivar_name],_2a7=_2a6["property"]||ivar_name;
-var _2a8=_2a6["getter"]||_2a7,_2a9="(id)"+_2a8+"\n{\nreturn "+ivar_name+";\n}";
-if(_29f.atoms.length!==0){
-_29f.atoms[_29f.atoms.length]=",\n";
-}
-_29f.atoms[_29f.atoms.length]=this.method(new _26e(_2a9),_2a1);
-if(_2a6["readonly"]){
-continue;
-}
-var _2aa=_2a6["setter"];
-if(!_2aa){
-var _2ab=_2a7.charAt(0)=="_"?1:0;
-_2aa=(_2ab?"_":"")+"set"+_2a7.substr(_2ab,1).toUpperCase()+_2a7.substring(_2ab+1)+":";
-}
-var _2ac="(void)"+_2aa+"(id)newValue\n{\n";
-if(_2a6["copy"]){
-_2ac+="if ("+ivar_name+" !== newValue)\n"+ivar_name+" = [newValue copy];\n}";
-}else{
-_2ac+=ivar_name+" = newValue;\n}";
-}
-if(_29f.atoms.length!==0){
-_29f.atoms[_29f.atoms.length]=",\n";
-}
-_29f.atoms[_29f.atoms.length]=this.method(new _26e(_2ac),_2a1);
-}
-}else{
-_298.previous();
-}
-_29a.atoms[_29a.atoms.length]="objj_registerClassPair(the_class);\n";
-}
-if(!_2a1){
-var _2a1=this.allIvarNamesForClassName(_29d);
-}
-while((_29b=_298.skip_whitespace())){
-if(_29b==_258){
-this._classMethod=true;
-if(_2a0.atoms.length!==0){
-_2a0.atoms[_2a0.atoms.length]=", ";
-}
-_2a0.atoms[_2a0.atoms.length]=this.method(_298,this._classVars);
-}else{
-if(_29b==_259){
-this._classMethod=false;
-if(_29f.atoms.length!==0){
-_29f.atoms[_29f.atoms.length]=", ";
-}
-_29f.atoms[_29f.atoms.length]=this.method(_298,_2a1);
-}else{
-if(_29b==_266){
-this.hash(_298,_29a);
-}else{
-if(_29b==_265){
-if((_29b=_298.next())==_249){
-break;
-}else{
-throw new SyntaxError(this.error_message("*** Expected \"@end\", found \"@"+_29b+"\"."));
-}
-}
-}
-}
-}
-}
-if(_29f.atoms.length!==0){
-_29a.atoms[_29a.atoms.length]="class_addMethods(the_class, [";
-_29a.atoms[_29a.atoms.length]=_29f;
-_29a.atoms[_29a.atoms.length]="]);\n";
-}
-if(_2a0.atoms.length!==0){
-_29a.atoms[_29a.atoms.length]="class_addMethods(meta_class, [";
-_29a.atoms[_29a.atoms.length]=_2a0;
-_29a.atoms[_29a.atoms.length]="]);\n";
-}
-_29a.atoms[_29a.atoms.length]="}";
-this._currentClass="";
-};
-_277.prototype._import=function(_2ad){
-var _2ae="",_2af=_2ad.skip_whitespace(),_2b0=(_2af!==_25f);
-if(_2af===_25f){
-while((_2af=_2ad.next())&&_2af!==_262){
-_2ae+=_2af;
-}
-if(!_2af){
-throw new SyntaxError(this.error_message("*** Unterminated import statement."));
-}
-}else{
-if(_2af.charAt(0)===_264){
-_2ae=_2af.substr(1,_2af.length-2);
-}else{
-throw new SyntaxError(this.error_message("*** Expecting '<' or '\"', found \""+_2af+"\"."));
-}
-}
-this._buffer.atoms[this._buffer.atoms.length]="objj_executeFile(\"";
-this._buffer.atoms[this._buffer.atoms.length]=_2ae;
-this._buffer.atoms[this._buffer.atoms.length]=_2b0?"\", YES);":"\", NO);";
-this._dependencies.push(new _2b1(new CFURL(_2ae),_2b0));
-};
-_277.prototype.method=function(_2b2,_2b3){
-var _2b4=new _274(),_2b5,_2b6="",_2b7=[],_2b8=[null];
-_2b3=_2b3||{};
-while((_2b5=_2b2.skip_whitespace())&&_2b5!==_260&&_2b5!==_25e){
-if(_2b5==_25a){
-var type="";
-_2b6+=_2b5;
-_2b5=_2b2.skip_whitespace();
-if(_2b5==_269){
-while((_2b5=_2b2.skip_whitespace())&&_2b5!=_26a){
-type+=_2b5;
-}
-_2b5=_2b2.skip_whitespace();
-}
-_2b8[_2b7.length+1]=type||null;
-_2b7[_2b7.length]=_2b5;
-if(_2b5 in _2b3){
-throw new SyntaxError(this.error_message("*** Method ( "+_2b6+" ) uses a parameter name that is already in use ( "+_2b5+" )"));
-}
-}else{
-if(_2b5==_269){
-var type="";
-while((_2b5=_2b2.skip_whitespace())&&_2b5!=_26a){
-type+=_2b5;
-}
-_2b8[0]=type||null;
-}else{
-if(_2b5==_25b){
-if((_2b5=_2b2.skip_whitespace())!=_25c||_2b2.next()!=_25c||_2b2.next()!=_25c){
-throw new SyntaxError(this.error_message("*** Argument list expected after ','."));
-}
-}else{
-_2b6+=_2b5;
-}
-}
-}
-}
-if(_2b5===_25e){
-_2b5=_2b2.skip_whitespace();
-if(_2b5!==_260){
-throw new SyntaxError(this.error_message("Invalid semi-colon in method declaration. "+"Semi-colons are allowed only to terminate the method signature, before the open brace."));
-}
-}
-var _2b9=0,_2ba=_2b7.length;
-_2b4.atoms[_2b4.atoms.length]="new objj_method(sel_getUid(\"";
-_2b4.atoms[_2b4.atoms.length]=_2b6;
-_2b4.atoms[_2b4.atoms.length]="\"), function";
-this._currentSelector=_2b6;
-if(this._flags&_277.Flags.IncludeDebugSymbols){
-_2b4.atoms[_2b4.atoms.length]=" $"+this._currentClass+"__"+_2b6.replace(/:/g,"_");
-}
-_2b4.atoms[_2b4.atoms.length]="(self, _cmd";
-for(;_2b9<_2ba;++_2b9){
-_2b4.atoms[_2b4.atoms.length]=", ";
-_2b4.atoms[_2b4.atoms.length]=_2b7[_2b9];
-}
-_2b4.atoms[_2b4.atoms.length]=")\n{ with(self)\n{";
-_2b4.atoms[_2b4.atoms.length]=this.preprocess(_2b2,NULL,_261,_260);
-_2b4.atoms[_2b4.atoms.length]="}\n}";
-if(this._flags&_277.Flags.IncludeDebugSymbols){
-_2b4.atoms[_2b4.atoms.length]=","+JSON.stringify(_2b8);
-}
-_2b4.atoms[_2b4.atoms.length]=")";
-this._currentSelector="";
-return _2b4;
-};
-_277.prototype.preprocess=function(_2bb,_2bc,_2bd,_2be,_2bf){
-var _2c0=_2bc?_2bc:new _274(),_2c1=0,_2c2="";
-if(_2bf){
-_2bf[0]=_2c0;
-var _2c3=false,_2c4=[0,0,0];
-}
-while((_2c2=_2bb.next())&&((_2c2!==_2bd)||_2c1)){
-if(_2bf){
-if(_2c2===_268){
-++_2c4[2];
-}else{
-if(_2c2===_260){
-++_2c4[0];
-}else{
-if(_2c2===_261){
---_2c4[0];
-}else{
-if(_2c2===_269){
-++_2c4[1];
-}else{
-if(_2c2===_26a){
---_2c4[1];
-}else{
-if((_2c2===_25a&&_2c4[2]--===0||(_2c3=(_2c2===_267)))&&_2c4[0]===0&&_2c4[1]===0){
-_2bb.push();
-var _2c5=_2c3?_2bb.skip_whitespace(true):_2bb.previous(),_2c6=_26b.test(_2c5);
-if(_2c6||_26d.test(_2c5)&&_26b.test(_2bb.previous())){
-_2bb.push();
-var last=_2bb.skip_whitespace(true),_2c7=true,_2c8=false;
-if(last==="+"||last==="-"){
-if(_2bb.previous()!==last){
-_2c7=false;
-}else{
-last=_2bb.skip_whitespace(true);
-_2c8=true;
-}
-}
-_2bb.pop();
-_2bb.pop();
-if(_2c7&&((!_2c8&&(last===_261))||last===_26a||last===_267||last===_25c||_26c.test(last)||last.charAt(last.length-1)==="\""||last.charAt(last.length-1)==="'"||_26d.test(last)&&!/^(new|return|case|var)$/.test(last))){
-if(_2c6){
-_2bf[1]=":";
-}else{
-_2bf[1]=_2c5;
-if(!_2c3){
-_2bf[1]+=":";
-}
-var _2c1=_2c0.atoms.length;
-while(_2c0.atoms[_2c1--]!==_2c5){
-}
-_2c0.atoms.length=_2c1;
-}
-return !_2c3;
-}
-if(_2c3){
-return NO;
-}
-}
-_2bb.pop();
-if(_2c3){
-return NO;
-}
-}
-}
-}
-}
-}
-}
-_2c4[2]=MAX(_2c4[2],0);
-}
-if(_2be){
-if(_2c2===_2be){
-++_2c1;
-}else{
-if(_2c2===_2bd){
---_2c1;
-}
-}
-}
-if(_2c2===_24a){
-var _2c9="";
-while((_2c2=_2bb.next())&&_2c2!==_269&&!(/^\w/).test(_2c2)){
-_2c9+=_2c2;
-}
-if(_2c2===_269){
-if(_2be===_269){
-++_2c1;
-}
-_2c0.atoms[_2c0.atoms.length]="function"+_2c9+"(";
-if(_2bf){
-++_2c4[1];
-}
-}else{
-_2c0.atoms[_2c0.atoms.length]=_2c2+"= function";
-}
-}else{
-if(_2c2==_265){
-this.directive(_2bb,_2c0);
-}else{
-if(_2c2==_266){
-this.hash(_2bb,_2c0);
-}else{
-if(_2c2==_263){
-this.brackets(_2bb,_2c0);
-}else{
-_2c0.atoms[_2c0.atoms.length]=_2c2;
-}
-}
-}
-}
-}
-if(_2bf){
-throw new SyntaxError(this.error_message("*** Expected ']' - Unterminated message send or array."));
-}
-if(!_2bc){
-return _2c0;
-}
-};
-_277.prototype.selector=function(_2ca,_2cb){
-var _2cc=_2cb?_2cb:new _274();
-_2cc.atoms[_2cc.atoms.length]="sel_getUid(\"";
-if(_2ca.skip_whitespace()!=_269){
-throw new SyntaxError(this.error_message("*** Expected '('"));
-}
-var _2cd=_2ca.skip_whitespace();
-if(_2cd==_26a){
-throw new SyntaxError(this.error_message("*** Unexpected ')', can't have empty @selector()"));
-}
-_2cb.atoms[_2cb.atoms.length]=_2cd;
-var _2ce,_2cf=true;
-while((_2ce=_2ca.next())&&_2ce!=_26a){
-if(_2cf&&/^\d+$/.test(_2ce)||!(/^(\w|$|\:)/.test(_2ce))){
-if(!(/\S/).test(_2ce)){
-if(_2ca.skip_whitespace()==_26a){
-break;
-}else{
-throw new SyntaxError(this.error_message("*** Unexpected whitespace in @selector()."));
-}
-}else{
-throw new SyntaxError(this.error_message("*** Illegal character '"+_2ce+"' in @selector()."));
-}
-}
-_2cc.atoms[_2cc.atoms.length]=_2ce;
-_2cf=(_2ce==_25a);
-}
-_2cc.atoms[_2cc.atoms.length]="\")";
-if(!_2cb){
-return _2cc;
-}
-};
-_277.prototype.error_message=function(_2d0){
-return _2d0+" <Context File: "+this._URL+(this._currentClass?" Class: "+this._currentClass:"")+(this._currentSelector?" Method: "+this._currentSelector:"")+">";
-};
-function _2b1(aURL,_2d1){
-this._URL=aURL;
-this._isLocal=_2d1;
-};
-_2.FileDependency=_2b1;
-_2b1.prototype.URL=function(){
-return this._URL;
-};
-_2b1.prototype.isLocal=function(){
-return this._isLocal;
-};
-_2b1.prototype.toMarkedString=function(){
-var _2d2=this.URL().absoluteString();
-return (this.isLocal()?_203:_202)+";"+_2d2.length+";"+_2d2;
-};
-_2b1.prototype.toString=function(){
-return (this.isLocal()?"LOCAL: ":"STD: ")+this.URL();
-};
-var _2d3=0,_2d4=1,_2d5=2,_2d6=0;
-function _283(_2d7,_2d8,aURL,_2d9){
-if(arguments.length===0){
-return this;
-}
-this._code=_2d7;
-this._function=_2d9||NULL;
-this._URL=_1a5(aURL||new CFURL("(Anonymous"+(_2d6++)+")"));
-this._fileDependencies=_2d8;
-if(_2d8.length){
-this._fileDependencyStatus=_2d3;
-this._fileDependencyCallbacks=[];
-}else{
-this._fileDependencyStatus=_2d5;
-}
-if(this._function){
-return;
-}
-this.setCode(_2d7);
-};
-_2.Executable=_283;
-_283.prototype.path=function(){
-return this.URL().path();
-};
-_283.prototype.URL=function(){
-return this._URL;
-};
-_283.prototype.functionParameters=function(){
-var _2da=["global","objj_executeFile","objj_importFile"];
-return _2da;
-};
-_283.prototype.functionArguments=function(){
-var _2db=[_1,this.fileExecuter(),this.fileImporter()];
-return _2db;
-};
-_283.prototype.execute=function(){
-var _2dc=_2dd;
-_2dd=CFBundle.bundleContainingURL(this.URL());
-var _2de=this._function.apply(_1,this.functionArguments());
-_2dd=_2dc;
-return _2de;
-};
-_283.prototype.code=function(){
-return this._code;
-};
-_283.prototype.setCode=function(code){
-this._code=code;
-var _2df=this.functionParameters().join(",");
-this._function=new Function(_2df,code);
-};
-_283.prototype.fileDependencies=function(){
-return this._fileDependencies;
-};
-_283.prototype.hasLoadedFileDependencies=function(){
-return this._fileDependencyStatus===_2d5;
-};
-var _2e0=0,_2e1=[],_2e2={};
-_283.prototype.loadFileDependencies=function(_2e3){
-var _2e4=this._fileDependencyStatus;
-if(_2e3){
-if(_2e4===_2d5){
-return _2e3();
-}
-this._fileDependencyCallbacks.push(_2e3);
-}
-if(_2e4===_2d3){
-if(_2e0){
-throw "Can't load";
-}
-_2e5(this);
-}
-};
-function _2e5(_2e6){
-_2e1.push(_2e6);
-_2e6._fileDependencyStatus=_2d4;
-var _2e7=_2e6.fileDependencies(),_8c=0,_2e8=_2e7.length,_2e9=_2e6.referenceURL(),_2ea=_2e9.absoluteString(),_2eb=_2e6.fileExecutableSearcher();
-_2e0+=_2e8;
-for(;_8c<_2e8;++_8c){
-var _2ec=_2e7[_8c],_2ed=_2ec.isLocal(),URL=_2ec.URL(),_2ee=(_2ed&&(_2ea+" ")||"")+URL;
-if(_2e2[_2ee]){
-if(--_2e0===0){
-_2ef();
-}
-continue;
-}
-_2e2[_2ee]=YES;
-_2eb(URL,_2ed,_2f0);
-}
-};
-function _2f0(_2f1){
---_2e0;
-if(_2f1._fileDependencyStatus===_2d3){
-_2e5(_2f1);
-}else{
-if(_2e0===0){
-_2ef();
-}
-}
-};
-function _2ef(){
-var _2f2=_2e1,_8c=0,_2f3=_2f2.length;
-_2e1=[];
-for(;_8c<_2f3;++_8c){
-_2f2[_8c]._fileDependencyStatus=_2d5;
-}
-for(_8c=0;_8c<_2f3;++_8c){
-var _2f4=_2f2[_8c],_2f5=_2f4._fileDependencyCallbacks,_2f6=0,_2f7=_2f5.length;
-for(;_2f6<_2f7;++_2f6){
-_2f5[_2f6]();
-}
-_2f4._fileDependencyCallbacks=[];
-}
-};
-_283.prototype.referenceURL=function(){
-if(this._referenceURL===_44){
-this._referenceURL=new CFURL(".",this.URL());
-}
-return this._referenceURL;
-};
-_283.prototype.fileImporter=function(){
-return _283.fileImporterForURL(this.referenceURL());
-};
-_283.prototype.fileExecuter=function(){
-return _283.fileExecuterForURL(this.referenceURL());
-};
-_283.prototype.fileExecutableSearcher=function(){
-return _283.fileExecutableSearcherForURL(this.referenceURL());
-};
-var _2f8={};
-_283.fileExecuterForURL=function(aURL){
-var _2f9=_1a5(aURL),_2fa=_2f9.absoluteString(),_2fb=_2f8[_2fa];
-if(!_2fb){
-_2fb=function(aURL,_2fc,_2fd){
-_283.fileExecutableSearcherForURL(_2f9)(aURL,_2fc,function(_2fe){
-if(!_2fe.hasLoadedFileDependencies()){
-throw "No executable loaded for file at URL "+aURL;
-}
-_2fe.execute(_2fd);
-});
-};
-_2f8[_2fa]=_2fb;
-}
-return _2fb;
-};
-var _2ff={};
-_283.fileImporterForURL=function(aURL){
-var _300=_1a5(aURL),_301=_300.absoluteString(),_302=_2ff[_301];
-if(!_302){
-_302=function(aURL,_303,_304){
-_145();
-_283.fileExecutableSearcherForURL(_300)(aURL,_303,function(_305){
-_305.loadFileDependencies(function(){
-_305.execute();
-_146();
-if(_304){
-_304();
-}
-});
-});
-};
-_2ff[_301]=_302;
-}
-return _302;
-};
-var _306={},_307={};
-_283.fileExecutableSearcherForURL=function(_308){
-var _309=_308.absoluteString(),_30a=_306[_309],_30b={};
-if(!_30a){
-_30a=function(aURL,_30c,_30d){
-var _30e=(_30c&&_308||"")+aURL,_30f=_307[_30e];
-if(_30f){
-return _310(_30f);
-}
-var _311=(aURL instanceof CFURL)&&aURL.scheme();
-if(_30c||_311){
-if(!_311){
-aURL=new CFURL(aURL,_308);
-}
-_192.resolveResourceAtURL(aURL,NO,_310);
-}else{
-_192.resolveResourceAtURLSearchingIncludeURLs(aURL,_310);
-}
-function _310(_312){
-if(!_312){
-throw new Error("Could not load file at "+aURL);
-}
-_307[_30e]=_312;
-_30d(new _313(_312.URL()));
-};
-};
-_306[_309]=_30a;
-}
-return _30a;
-};
-var _314={};
-function _313(aURL){
-aURL=_1a5(aURL);
-var _315=aURL.absoluteString(),_316=_314[_315];
-if(_316){
-return _316;
-}
-_314[_315]=this;
-var _317=_192.resourceAtURL(aURL).contents(),_318=NULL,_319=aURL.pathExtension();
-if(_317.match(/^@STATIC;/)){
-_318=_31a(_317,aURL);
-}else{
-if(_319==="j"||!_319){
-_318=_2.preprocess(_317,aURL,_277.Flags.IncludeDebugSymbols);
-}else{
-_318=new _283(_317,[],aURL);
-}
-}
-_283.apply(this,[_318.code(),_318.fileDependencies(),aURL,_318._function]);
-this._hasExecuted=NO;
-};
-_2.FileExecutable=_313;
-_313.prototype=new _283();
-_313.prototype.execute=function(_31b){
-if(this._hasExecuted&&!_31b){
-return;
-}
-this._hasExecuted=YES;
-_283.prototype.execute.call(this);
-};
-_313.prototype.hasExecuted=function(){
-return this._hasExecuted;
-};
-function _31a(_31c,aURL){
-var _31d=new _fd(_31c);
-var _31e=NULL,code="",_31f=[];
-while(_31e=_31d.getMarker()){
-var text=_31d.getString();
-if(_31e===_201){
-code+=text;
-}else{
-if(_31e===_202){
-_31f.push(new _2b1(new CFURL(text),NO));
-}else{
-if(_31e===_203){
-_31f.push(new _2b1(new CFURL(text),YES));
-}
-}
-}
-}
-var fn=_313._lookupCachedFunction(aURL);
-if(fn){
-return new _283(code,_31f,aURL,fn);
-}
-return new _283(code,_31f,aURL);
-};
-var _320={};
-_313._cacheFunction=function(aURL,fn){
-aURL=typeof aURL==="string"?aURL:aURL.absoluteString();
-_320[aURL]=fn;
-};
-_313._lookupCachedFunction=function(aURL){
-aURL=typeof aURL==="string"?aURL:aURL.absoluteString();
-return _320[aURL];
-};
-var _321=1,_322=2,_323=4,_324=8;
-objj_ivar=function(_325,_326){
-this.name=_325;
-this.type=_326;
-};
-objj_method=function(_327,_328,_329){
-this.name=_327;
-this.method_imp=_328;
-this.types=_329;
-};
-objj_class=function(){
-this.isa=NULL;
-this.super_class=NULL;
-this.sub_classes=[];
-this.name=NULL;
-this.info=0;
-this.ivars=[];
-this.method_list=[];
-this.method_hash={};
-this.method_store=function(){
-};
-this.method_dtable=this.method_store.prototype;
-this.allocator=function(){
-};
-this._UID=-1;
-};
-objj_object=function(){
-this.isa=NULL;
-this._UID=-1;
-};
-class_getName=function(_32a){
-if(_32a==Nil){
-return "";
-}
-return _32a.name;
-};
-class_isMetaClass=function(_32b){
-if(!_32b){
-return NO;
-}
-return ((_32b.info&(_322)));
-};
-class_getSuperclass=function(_32c){
-if(_32c==Nil){
-return Nil;
-}
-return _32c.super_class;
-};
-class_setSuperclass=function(_32d,_32e){
-_32d.super_class=_32e;
-_32d.isa.super_class=_32e.isa;
-};
-class_addIvar=function(_32f,_330,_331){
-var _332=_32f.allocator.prototype;
-if(typeof _332[_330]!="undefined"){
-return NO;
-}
-_32f.ivars.push(new objj_ivar(_330,_331));
-_332[_330]=NULL;
-return YES;
-};
-class_addIvars=function(_333,_334){
-var _335=0,_336=_334.length,_337=_333.allocator.prototype;
-for(;_335<_336;++_335){
-var ivar=_334[_335],name=ivar.name;
-if(typeof _337[name]==="undefined"){
-_333.ivars.push(ivar);
-_337[name]=NULL;
-}
-}
-};
-class_copyIvarList=function(_338){
-return _338.ivars.slice(0);
-};
-class_addMethod=function(_339,_33a,_33b,_33c){
-if(_339.method_hash[_33a]){
-return NO;
-}
-var _33d=new objj_method(_33a,_33b,_33c);
-_339.method_list.push(_33d);
-_339.method_dtable[_33a]=_33d;
-if(!((_339.info&(_322)))&&(((_339.info&(_322)))?_339:_339.isa).isa===(((_339.info&(_322)))?_339:_339.isa)){
-class_addMethod((((_339.info&(_322)))?_339:_339.isa),_33a,_33b,_33c);
-}
-return YES;
-};
-class_addMethods=function(_33e,_33f){
-var _340=0,_341=_33f.length,_342=_33e.method_list,_343=_33e.method_dtable;
-for(;_340<_341;++_340){
-var _344=_33f[_340];
-if(_33e.method_hash[_344.name]){
-continue;
-}
-_342.push(_344);
-_343[_344.name]=_344;
-}
-if(!((_33e.info&(_322)))&&(((_33e.info&(_322)))?_33e:_33e.isa).isa===(((_33e.info&(_322)))?_33e:_33e.isa)){
-class_addMethods((((_33e.info&(_322)))?_33e:_33e.isa),_33f);
-}
-};
-class_getInstanceMethod=function(_345,_346){
-if(!_345||!_346){
-return NULL;
-}
-var _347=_345.method_dtable[_346];
-return _347?_347:NULL;
-};
-class_getClassMethod=function(_348,_349){
-if(!_348||!_349){
-return NULL;
-}
-var _34a=(((_348.info&(_322)))?_348:_348.isa).method_dtable[_349];
-return _34a?_34a:NULL;
-};
-class_copyMethodList=function(_34b){
-return _34b.method_list.slice(0);
-};
-class_replaceMethod=function(_34c,_34d,_34e){
-if(!_34c||!_34d){
-return NULL;
-}
-var _34f=_34c.method_dtable[_34d],_350=NULL;
-if(_34f){
-_350=_34f.method_imp;
-}
-_34f.method_imp=_34e;
-return _350;
-};
-var _351=function(_352){
-var meta=(((_352.info&(_322)))?_352:_352.isa);
-if((_352.info&(_322))){
-_352=objj_getClass(_352.name);
-}
-if(_352.super_class&&!((((_352.super_class.info&(_322)))?_352.super_class:_352.super_class.isa).info&(_323))){
-_351(_352.super_class);
-}
-if(!(meta.info&(_323))&&!(meta.info&(_324))){
-meta.info=(meta.info|(_324))&~(0);
-objj_msgSend(_352,"initialize");
-meta.info=(meta.info|(_323))&~(_324);
-}
-};
-var _353=new objj_method("forward",function(self,_354){
-return objj_msgSend(self,"forward::",_354,arguments);
-});
-class_getMethodImplementation=function(_355,_356){
-if(!((((_355.info&(_322)))?_355:_355.isa).info&(_323))){
-_351(_355);
-}
-var _357=_355.method_dtable[_356];
-if(!_357){
-_357=_353;
-}
-var _358=_357.method_imp;
-return _358;
-};
-var _359={};
-objj_allocateClassPair=function(_35a,_35b){
-var _35c=new objj_class(),_35d=new objj_class(),_35e=_35c;
-if(_35a){
-_35e=_35a;
-while(_35e.superclass){
-_35e=_35e.superclass;
-}
-_35c.allocator.prototype=new _35a.allocator;
-_35c.method_store.prototype=new _35a.method_store;
-_35c.method_dtable=_35c.method_store.prototype;
-_35d.method_store.prototype=new _35a.isa.method_store;
-_35d.method_dtable=_35d.method_store.prototype;
-_35c.super_class=_35a;
-_35d.super_class=_35a.isa;
-}else{
-_35c.allocator.prototype=new objj_object();
-}
-_35c.isa=_35d;
-_35c.name=_35b;
-_35c.info=_321;
-_35c._UID=objj_generateObjectUID();
-_35d.isa=_35e.isa;
-_35d.name=_35b;
-_35d.info=_322;
-_35d._UID=objj_generateObjectUID();
-return _35c;
-};
-var _2dd=nil;
-objj_registerClassPair=function(_35f){
-_1[_35f.name]=_35f;
-_359[_35f.name]=_35f;
-_1ac(_35f,_2dd);
-};
-class_createInstance=function(_360){
-if(!_360){
-objj_exception_throw(new objj_exception(OBJJNilClassException,"*** Attempting to create object with Nil class."));
-}
-var _361=new _360.allocator();
-_361.isa=_360;
-_361._UID=objj_generateObjectUID();
-return _361;
-};
-var _362=function(){
-};
-_362.prototype.member=false;
-with(new _362()){
-member=true;
-}
-if(new _362().member){
-var _363=class_createInstance;
-class_createInstance=function(_364){
-var _365=_363(_364);
-if(_365){
-var _366=_365.isa,_367=_366;
-while(_366){
-var _368=_366.ivars;
-count=_368.length;
-while(count--){
-_365[_368[count].name]=NULL;
-}
-_366=_366.super_class;
-}
-_365.isa=_367;
-}
-return _365;
-};
-}
-object_getClassName=function(_369){
-if(!_369){
-return "";
-}
-var _36a=_369.isa;
-return _36a?class_getName(_36a):"";
-};
-objj_lookUpClass=function(_36b){
-var _36c=_359[_36b];
-return _36c?_36c:Nil;
-};
-objj_getClass=function(_36d){
-var _36e=_359[_36d];
-if(!_36e){
-}
-return _36e?_36e:Nil;
-};
-objj_getMetaClass=function(_36f){
-var _370=objj_getClass(_36f);
-return (((_370.info&(_322)))?_370:_370.isa);
-};
-ivar_getName=function(_371){
-return _371.name;
-};
-ivar_getTypeEncoding=function(_372){
-return _372.type;
-};
-objj_msgSend=function(_373,_374){
-if(_373==nil){
-return nil;
-}
-var isa=_373.isa;
-if(!((((isa.info&(_322)))?isa:isa.isa).info&(_323))){
-_351(isa);
-}
-var _375=isa.method_dtable[_374];
-if(!_375){
-_375=_353;
-}
-var _376=_375.method_imp;
-switch(arguments.length){
-case 2:
-return _376(_373,_374);
-case 3:
-return _376(_373,_374,arguments[2]);
-case 4:
-return _376(_373,_374,arguments[2],arguments[3]);
-}
-return _376.apply(_373,arguments);
-};
-objj_msgSendSuper=function(_377,_378){
-var _379=_377.super_class;
-arguments[0]=_377.receiver;
-if(!((((_379.info&(_322)))?_379:_379.isa).info&(_323))){
-_351(_379);
-}
-var _37a=_379.method_dtable[_378];
-if(!_37a){
-_37a=_353;
-}
-var _37b=_37a.method_imp;
-return _37b.apply(_377.receiver,arguments);
-};
-method_getName=function(_37c){
-return _37c.name;
-};
-method_getImplementation=function(_37d){
-return _37d.method_imp;
-};
-method_setImplementation=function(_37e,_37f){
-var _380=_37e.method_imp;
-_37e.method_imp=_37f;
-return _380;
-};
-method_exchangeImplementations=function(lhs,rhs){
-var _381=method_getImplementation(lhs),_382=method_getImplementation(rhs);
-method_setImplementation(lhs,_382);
-method_setImplementation(rhs,_381);
-};
-sel_getName=function(_383){
-return _383?_383:"<null selector>";
-};
-sel_getUid=function(_384){
-return _384;
-};
-sel_isEqual=function(lhs,rhs){
-return lhs===rhs;
-};
-sel_registerName=function(_385){
-return _385;
-};
-objj_eval=function(_386){
-var url=_2.pageURL;
-var _387=_2.asyncLoader;
-_2.asyncLoader=NO;
-var _388=_2.preprocess(_386,url,0);
-if(!_388.hasLoadedFileDependencies()){
-_388.loadFileDependencies();
-}
-_1._objj_eval_scope={};
-_1._objj_eval_scope.objj_executeFile=_283.fileExecuterForURL(url);
-_1._objj_eval_scope.objj_importFile=_283.fileImporterForURL(url);
-var code="with(_objj_eval_scope){"+_388._code+"\n//*/\n}";
-var _389;
-_389=eval(code);
-_2.asyncLoader=_387;
-return _389;
-};
-_2.objj_eval=objj_eval;
-_145();
-var _38a=new CFURL(window.location.href),_38b=document.getElementsByTagName("base"),_38c=_38b.length;
-if(_38c>0){
-var _38d=_38b[_38c-1],_38e=_38d&&_38d.getAttribute("href");
-if(_38e){
-_38a=new CFURL(_38e,_38a);
-}
-}
-var _38f=new CFURL(window.OBJJ_MAIN_FILE||"main.j"),_1ab=new CFURL(".",new CFURL(_38f,_38a)).absoluteURL(),_390=new CFURL("..",_1ab).absoluteURL();
-if(_1ab===_390){
-_390=new CFURL(_390.schemeAndAuthority());
-}
-_192.resourceAtURL(_390,YES);
-_2.pageURL=_38a;
-_2.bootstrap=function(){
-_391();
-};
-function _391(){
-_192.resolveResourceAtURL(_1ab,YES,function(_392){
-var _393=_192.includeURLs(),_8c=0,_394=_393.length;
-for(;_8c<_394;++_8c){
-_392.resourceAtURL(_393[_8c],YES);
-}
-_283.fileImporterForURL(_1ab)(_38f.lastPathComponent(),YES,function(){
-_146();
-_39a(function(){
-var _395=window.location.hash.substring(1),args=[];
-if(_395.length){
-args=_395.split("/");
-for(var i=0,_394=args.length;i<_394;i++){
-args[i]=decodeURIComponent(args[i]);
-}
-}
-var _396=window.location.search.substring(1).split("&"),_397=new CFMutableDictionary();
-for(var i=0,_394=_396.length;i<_394;i++){
-var _398=_396[i].split("=");
-if(!_398[0]){
-continue;
-}
-if(_398[1]==null){
-_398[1]=true;
-}
-_397.setValueForKey(decodeURIComponent(_398[0]),decodeURIComponent(_398[1]));
-}
-main(args,_397);
-});
-});
-});
-};
-var _399=NO;
-function _39a(_39b){
-if(_399){
-return _39b();
-}
-if(window.addEventListener){
-window.addEventListener("load",_39b,NO);
-}else{
-if(window.attachEvent){
-window.attachEvent("onload",_39b);
-}
-}
-};
-_39a(function(){
-_399=YES;
-});
-if(typeof OBJJ_AUTO_BOOTSTRAP==="undefined"||OBJJ_AUTO_BOOTSTRAP){
-_2.bootstrap();
-}
-function _1a5(aURL){
-if(aURL instanceof CFURL&&aURL.scheme()){
-return aURL;
-}
-return new CFURL(aURL,_1ab);
-};
-objj_importFile=_283.fileImporterForURL(_1ab);
-objj_executeFile=_283.fileExecuterForURL(_1ab);
-objj_import=function(){
-CPLog.warn("objj_import is deprecated, use objj_importFile instead");
-objj_importFile.apply(this,arguments);
-};
-})(window,ObjectiveJ);
+if (typeof OBJJ_AUTO_BOOTSTRAP === "undefined" || OBJJ_AUTO_BOOTSTRAP)
+    exports.bootstrap();
+function makeAbsoluteURL( aURL)
+{
+    if (aURL instanceof CFURL && aURL.scheme())
+        return aURL;
+    return new CFURL(aURL, mainBundleURL);
+}
+objj_importFile = Executable.fileImporterForURL(mainBundleURL);
+objj_executeFile = Executable.fileExecuterForURL(mainBundleURL);
+objj_import = function()
+{
+    CPLog.warn("objj_import is deprecated, use objj_importFile instead");
+    objj_importFile.apply(this, arguments);
+}
+})(window, ObjectiveJ);
