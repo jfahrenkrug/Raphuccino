@@ -52,6 +52,7 @@
     
     if (_delegate && [_delegate respondsToSelector:@selector(raphaelViewDidFinishLoading:)]) 
     {
+        [self _resizeWebFrame];
         [_delegate raphaelViewDidFinishLoading:self];
     }
 }
@@ -126,8 +127,8 @@
     
     if (_paper)
     {
-        //console.log('resize');
-        //_paper.setSize(width, height);
+        console.log('resize');
+        _paper.setSize(width - 5.0, height - 5.0);
     }
 
     [_frameView setFrameSize:CGSizeMake(width, height)];
