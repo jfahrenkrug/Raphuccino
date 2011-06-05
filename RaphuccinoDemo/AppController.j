@@ -97,7 +97,7 @@
     [circle setMouseMoveFunction:function(event) {
         if (dragging === YES)
         {
-            [circle setAttr:{cx: event.x, cy: event.y}];
+            [circle setAttr:{cx: event.clientX, cy: event.clientY}];
         }
     }];
 }
