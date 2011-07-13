@@ -135,13 +135,13 @@ RCAnimationLinear       = nil;
     _raphaelObject.mousedown(function (event) {
         if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementMouseDown:atPoint:)]) 
         {
-            [_delegate raphaelElementMouseDown:self atPoint:CPMakePoint(event.x, event.y)];
+            [_delegate raphaelElementMouseDown:self atPoint:CPMakePoint(event.clientX, event.clientY)];
         }
     });
     _raphaelObject.mousemove(function (event) {
         if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementMouseDidMove:toPoint:)]) 
         {
-            [_delegate raphaelElementMouseDidMove:self toPoint:CPMakePoint(event.x, event.y)];
+            [_delegate raphaelElementMouseDidMove:self toPoint:CPMakePoint(event.clientX, event.clientY)];
         }
     });
     _raphaelObject.mouseout(function (event) {
@@ -159,7 +159,7 @@ RCAnimationLinear       = nil;
     _raphaelObject.mouseup(function (event) {
         if (_delegate && [_delegate respondsToSelector:@selector(raphaelElementMouseUp:atPoint:)]) 
         {
-            [_delegate raphaelElementMouseUp:self atPoint:CPMakePoint(event.x, event.y)];
+            [_delegate raphaelElementMouseUp:self atPoint:CPMakePoint(event.clientX, event.clientY)];
         }
     });
     _raphaelObject.hover(function (event) {
